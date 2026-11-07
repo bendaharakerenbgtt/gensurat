@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenSurat - Arsip & Manajemen Surat Organisasi</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/></svg>">
+
+    <!-- Instant Theme Detection -->
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.add('light-mode');
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.remove('light-mode');
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
+    <!-- External Assets -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Local Master Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col">
+
+    <!-- TOP HEADER NAVBAR -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl bg-neutral-950/80 border-b border-neutral-900 px-4 sm:px-8 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white shadow-xs">
+                <i class="fa-solid fa-file-signature text-base"></i>
+            </div>
+            <div>
+                <h1 class="text-sm sm:text-base font-black tracking-tight text-white flex items-center gap-1.5">
+                    Gen<span class="text-neutral-400">Surat</span>
+                </h1>
+                <p class="text-[10px] text-neutral-500 font-mono">Universal Document Engine &middot; Arsip Dokumen Lokal</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="exportAllDocumentsJson()" class="px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-bold text-neutral-300 hover:text-white flex items-center gap-1.5 transition-colors" title="Cadangkan semua dokumen ke file JSON">
+                <i class="fa-solid fa-download text-neutral-400 text-xs"></i>
+                <span class="hidden sm:inline">Cadangan JSON</span>
+            </button>
+            <label class="px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-bold text-neutral-300 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer" title="Pulihkan dokumen dari file JSON cadangan">
+                <i class="fa-solid fa-upload text-neutral-400 text-xs"></i>
+                <span class="hidden sm:inline">Pulihkan</span>
+                <input type="file" accept=".json,application/json" onchange="handleImportJsonFile(event)" class="hidden">
+            </label>
+            <button type="button" onclick="openProfileModal()" class="px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-bold text-neutral-300 hover:text-white flex items-center gap-1.5 transition-colors" title="Pengaturan Profil Organisasi">
+                <i class="fa-solid fa-sliders text-neutral-400 text-xs"></i>
+                <span class="hidden sm:inline">Profil</span>
+            </button>
+            <button type="button" onclick="toggleTheme(event)" aria-label="Ubah Tema" class="w-8 h-8 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-300 hover:bg-neutral-800 transition-colors" title="Ubah Tema">
+                <i class="fa-solid fa-sun text-xs theme-toggle-icon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-7 space-y-6">
+
+        <!-- DASHBOARD HERO & ACTION BAR -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-neutral-900/90 border border-neutral-800 shadow-xl backdrop-blur-md">
+            <div class="space-y-1">
+                <h2 class="text-base sm:text-lg font-black text-white">Arsip Surat Organisasi</h2>
+                <p class="text-xs text-neutral-400">Seluruh dokumen disimpan secara aman di perangkat lokal Anda tanpa server pihak ketiga.</p>
+            </div>
+            <div class="flex items-center gap-2.5">
+                <button type="button" onclick="openCreateNewDocModal()" class="px-5 py-2.5 rounded-xl bg-white text-black font-black text-xs hover:bg-neutral-200 shadow-md flex items-center gap-2 transition-all active:scale-95">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span>Buat Surat Baru</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SEARCH & FILTER TOOLBAR -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-1.5 bg-neutral-900 p-1 rounded-xl border border-neutral-800 w-full sm:w-auto">
+                <button type="button" onclick="filterDocsByType('ALL')" class="doc-filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-white/10 transition-all" data-filter="ALL">Semua</button>
+                <button type="button" onclick="filterDocsByType('SPZ')" class="doc-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold text-neutral-400 hover:text-white transition-all" data-filter="SPZ">Perizinan (SPZ)</button>
+                <button type="button" onclick="filterDocsByType('SBA')" class="doc-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold text-neutral-400 hover:text-white transition-all" data-filter="SBA">Berita Acara (SBA)</button>
+            </div>
+
+            <div class="relative w-full sm:w-72">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-xs"></i>
+                <input type="text" id="doc_search_input" oninput="handleSearchInput(this.value)" placeholder="Cari judul, nomor surat, perihal..." class="w-full pl-9 pr-3 py-2 bg-neutral-900 border border-neutral-800 rounded-xl text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white transition-colors">
+            </div>
+        </div>
+
+        <!-- DOCUMENTS GRID -->
+        <div id="documents_cards_grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Injected dynamically via JS -->
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div id="documents_empty_state" class="hidden p-12 text-center rounded-2xl bg-neutral-900/50 border border-dashed border-neutral-800 space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-neutral-800 flex items-center justify-center text-neutral-500 mx-auto text-xl">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-sm font-bold text-white">Belum Ada Dokumen Surat</h3>
+                <p class="text-xs text-neutral-500 max-w-sm mx-auto">Mulai buat surat perizinan kampus (SPZ) atau berita acara kegiatan (SBA) pertama Anda.</p>
+            </div>
+            <button type="button" onclick="openCreateNewDocModal()" class="px-4 py-2 rounded-xl bg-white text-black font-black text-xs hover:bg-neutral-200 transition-all">
+                + Buat Surat Baru
+            </button>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-neutral-900 py-4 px-6 text-center text-xs text-neutral-500 font-mono">
+        GenSurat &middot; Universal Open Document Engine &middot; Penyimpanan Lokal 100%
+    </footer>
+
+    <!-- MODAL: BUAT DOKUMEN BARU -->
+    <div id="modal_create_new_doc" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-file-circle-plus"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-white">Buat Dokumen Baru</h3>
+                        <p class="text-[11px] text-neutral-400">Pilih jenis format surat resmi</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeCreateNewDocModal()" class="w-8 h-8 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleCreateNewDocSubmit(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="text-xs font-bold text-neutral-300 block mb-2">1. Jenis Format Surat</label>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <label class="relative flex flex-col p-3 rounded-xl border border-neutral-700 bg-neutral-950 cursor-pointer hover:border-white transition-all">
+                            <input type="radio" name="new_doc_type" value="SPZ" class="sr-only" checked>
+                            <span class="text-xs font-black text-white">SPZ</span>
+                            <span class="text-[11px] text-neutral-300 font-semibold mt-0.5">Surat Perizinan</span>
+                            <span class="text-[9.5px] text-neutral-500 mt-1">Peminjaman fasilitas, barang, & kepanitiaan</span>
+                        </label>
+                        <label class="relative flex flex-col p-3 rounded-xl border border-neutral-800 bg-neutral-950 cursor-pointer hover:border-white transition-all">
+                            <input type="radio" name="new_doc_type" value="SBA" class="sr-only">
+                            <span class="text-xs font-black text-white">SBA</span>
+                            <span class="text-[11px] text-neutral-300 font-semibold mt-0.5">Surat Berita Acara</span>
+                            <span class="text-[9.5px] text-neutral-500 mt-1">Laporan kegiatan, keuangan, & nota</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-neutral-300 block mb-1">2. Judul / Nama Dokumen</label>
+                    <input type="text" id="new_doc_title_input" required placeholder="cth: SPZ Pelatihan Desain 2026" class="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-white text-xs">
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-800">
+                    <button type="button" onclick="closeCreateNewDocModal()" class="px-4 py-2 rounded-xl text-neutral-400 hover:text-white bg-neutral-800">Batal</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-white text-black font-black hover:bg-neutral-200 shadow-md">Buat & Buka Editor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: PROFIL ORGANISASI -->
+    <div id="modal_profil_organisasi" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 max-h-[92vh] overflow-y-auto shadow-2xl relative space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-sliders text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-white">Pengaturan Profil & Kop Surat</h3>
+                        <p class="text-[11px] text-neutral-400">Sesuaikan logo, teks kop surat, dan penanda tangan default</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeProfileModal()" class="w-8 h-8 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleSaveProfileSubmit(event)" class="space-y-4 text-xs">
+                <!-- 1. KAMPUS -->
+                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
+                    <span class="text-xs font-bold text-white block">1. Identitas Kampus</span>
+                    <div>
+                        <label class="text-[11px] text-neutral-400 block mb-1">Nama Kampus</label>
+                        <input type="text" id="prof_kampus_nama" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-neutral-400 block mb-1">Alamat Kampus</label>
+                        <input type="text" id="prof_kampus_alamat" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <div class="flex items-center gap-3">
+                            <img id="prev_kampus_logo" src="assets/logo_polimedia.png" alt="Logo Kampus" class="h-10 w-auto object-contain">
+                            <label class="px-2.5 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] font-bold text-neutral-300 cursor-pointer">
+                                Ganti Logo Kampus
+                                <input type="file" accept="image/*" onchange="handleProfileImageUpload(event, 'kampus_logo')" class="hidden">
+                            </label>
+                            <button type="button" onclick="removeProfileImage('kampus_logo')" class="text-neutral-500 hover:text-white text-[11px]">Reset</button>
+                        </div>
+                        <label class="flex items-center gap-1.5 text-neutral-400 cursor-pointer">
+                            <input type="checkbox" id="prof_kampus_logo_active" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                            <span>Tampilkan di Kop</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 2. ORGANISASI -->
+                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
+                    <span class="text-xs font-bold text-white block">2. Identitas Organisasi</span>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Wadah / Jenis</label>
+                            <input type="text" id="prof_org_wadah" placeholder="UNIT KEGIATAN MAHASISWA" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Nama Organisasi</label>
+                            <input type="text" id="prof_org_nama" placeholder="NAMA ORGANISASI" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2.5">
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Singkatan</label>
+                            <input type="text" id="prof_org_singkatan" placeholder="XXX" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Kode Nomor Surat</label>
+                            <input type="text" id="prof_org_kode_surat" placeholder="XXX/XXX" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none font-mono">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Email Resmi</label>
+                            <input type="text" id="prof_org_email" placeholder="email@xxx.com" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <div class="flex items-center gap-3">
+                            <img id="prev_org_logo" src="" alt="Logo Org" class="h-10 w-auto object-contain">
+                            <label class="px-2.5 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] font-bold text-neutral-300 cursor-pointer">
+                                Unggah Logo Organisasi
+                                <input type="file" accept="image/*" onchange="handleProfileImageUpload(event, 'org_logo')" class="hidden">
+                            </label>
+                            <button type="button" onclick="removeProfileImage('org_logo')" class="text-neutral-500 hover:text-white text-[11px]">Hapus</button>
+                        </div>
+                        <label class="flex items-center gap-1.5 text-neutral-400 cursor-pointer">
+                            <input type="checkbox" id="prof_org_logo_active" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                            <span>Tampilkan di Kop</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 3. KABINET & WATERMARK -->
+                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
+                    <span class="text-xs font-bold text-white block">3. Logo Kabinet & Watermark</span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img id="prev_kabinet_logo" src="" alt="Logo Kabinet" class="h-10 w-auto object-contain">
+                            <label class="px-2.5 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] font-bold text-neutral-300 cursor-pointer">
+                                Unggah Logo Kabinet
+                                <input type="file" accept="image/*" onchange="handleProfileImageUpload(event, 'kabinet_logo')" class="hidden">
+                            </label>
+                            <button type="button" onclick="removeProfileImage('kabinet_logo')" class="text-neutral-500 hover:text-white text-[11px]">Hapus</button>
+                        </div>
+                        <label class="flex items-center gap-1.5 text-neutral-400 cursor-pointer">
+                            <input type="checkbox" id="prof_kabinet_logo_active" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                            <span>Tampilkan di Kop</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-neutral-800">
+                        <div class="flex items-center gap-3">
+                            <img id="prev_watermark_logo" src="" alt="Watermark" class="h-10 w-auto object-contain">
+                            <label class="px-2.5 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] font-bold text-neutral-300 cursor-pointer">
+                                Unggah Watermark PNG
+                                <input type="file" accept="image/*" onchange="handleProfileImageUpload(event, 'watermark_image')" class="hidden">
+                            </label>
+                            <button type="button" onclick="removeProfileImage('watermark_image')" class="text-neutral-500 hover:text-white text-[11px]">Hapus</button>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span id="prof_watermark_opacity_label" class="text-[11px] text-neutral-400 font-mono">12%</span>
+                            <input type="range" id="prof_watermark_opacity" min="5" max="40" value="12" oninput="document.getElementById('prof_watermark_opacity_label').innerText = this.value + '%'" class="w-20 cursor-pointer">
+                            <label class="flex items-center gap-1 text-neutral-400 cursor-pointer">
+                                <input type="checkbox" id="prof_watermark_active" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                <span>Aktif</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-800">
+                    <button type="button" onclick="closeProfileModal()" class="px-4 py-2 rounded-xl text-neutral-400 hover:text-white bg-neutral-800">Batal</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-white text-black font-black hover:bg-neutral-200 shadow-md">Simpan Pengaturan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Storage and Dashboard Logic Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/profil.js"></script>
+    <script>
+        let currentFilter = 'ALL';
+        let searchQuery = '';
+
+        function renderDocuments() {
+            const grid = document.getElementById('documents_cards_grid');
+            const emptyState = document.getElementById('documents_empty_state');
+            if (!grid) return;
+
+            let docs = getSavedDocuments();
+
+            // Filter by type
+            if (currentFilter !== 'ALL') {
+                docs = docs.filter(d => d.type === currentFilter);
+            }
+
+            // Filter by search query
+            if (searchQuery.trim()) {
+                const q = searchQuery.toLowerCase();
+                docs = docs.filter(d => {
+                    const title = (d.title || '').toLowerCase();
+                    const no = (d.formData && d.formData.field_nomor_surat ? d.formData.field_nomor_surat : '').toLowerCase();
+                    const perihal = (d.formData && d.formData.field_perihal ? d.formData.field_perihal : '').toLowerCase();
+                    return title.includes(q) || no.includes(q) || perihal.includes(q);
+                });
+            }
+
+            if (docs.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            let html = '';
+
+            docs.forEach(doc => {
+                const isSpz = doc.type === 'SPZ';
+                const noSurat = (doc.formData && doc.formData.field_nomor_surat) ? doc.formData.field_nomor_surat : 'Nomor Belum Ditentukan';
+                const tgl = (doc.formData && doc.formData.field_tanggal_surat) ? doc.formData.field_tanggal_surat : formatRelativeTime(doc.lastModified);
+                const perihal = (doc.formData && (doc.formData.spz_input_fasilitas || doc.formData.field_perihal)) ? (doc.formData.spz_input_fasilitas || doc.formData.field_perihal) : (isSpz ? 'Peminjaman Fasilitas' : 'Laporan Kegiatan');
+
+                html += `
+                    <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-all flex flex-col justify-between space-y-4 group">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-black font-mono uppercase ${isSpz ? 'bg-white/10 text-white' : 'bg-white/10 text-white'} border border-neutral-700">
+                                    ${doc.type}
+                                </span>
+                                <span class="text-[10px] text-neutral-500 font-mono">
+                                    ${formatRelativeTime(doc.lastModified)}
+                                </span>
+                            </div>
+                            <h3 class="text-sm font-bold text-white group-hover:text-neutral-200 transition-colors line-clamp-1">
+                                <a href="buat-surat.html?id=${doc.id}">${escapeHtml(doc.title || 'Surat Tanpa Judul')}</a>
+                            </h3>
+                            <div class="text-[11px] text-neutral-400 space-y-0.5 font-mono">
+                                <p class="truncate"><i class="fa-solid fa-hashtag text-[9px] mr-1 text-neutral-600"></i> ${escapeHtml(noSurat)}</p>
+                                <p class="truncate"><i class="fa-regular fa-calendar text-[9px] mr-1 text-neutral-600"></i> ${escapeHtml(tgl)}</p>
+                                <p class="truncate"><i class="fa-solid fa-file-lines text-[9px] mr-1 text-neutral-600"></i> ${escapeHtml(perihal)}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-3 border-t border-neutral-800/80">
+                            <a href="buat-surat.html?id=${doc.id}" class="px-3.5 py-1.5 rounded-xl bg-white text-black font-bold text-xs hover:bg-neutral-200 transition-colors flex items-center gap-1.5">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i> Buka Editor
+                            </a>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="handleDuplicateDoc('${doc.id}')" class="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors" title="Duplikat Surat">
+                                    <i class="fa-solid fa-copy text-xs"></i>
+                                </button>
+                                <button type="button" onclick="handleRenameDoc('${doc.id}', '${escapeHtml(doc.title)}')" class="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors" title="Ganti Nama">
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
+                                <button type="button" onclick="handleDeleteDoc('${doc.id}')" class="p-1.5 rounded-lg text-neutral-400 hover:text-red-400 hover:bg-neutral-800 transition-colors" title="Hapus Dokumen">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        function filterDocsByType(type) {
+            currentFilter = type;
+            document.querySelectorAll('.doc-filter-btn').forEach(btn => {
+                if (btn.getAttribute('data-filter') === type) {
+                    btn.className = 'doc-filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-white/10 transition-all';
+                } else {
+                    btn.className = 'doc-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold text-neutral-400 hover:text-white transition-all';
+                }
+            });
+            renderDocuments();
+        }
+
+        function handleSearchInput(val) {
+            searchQuery = val;
+            renderDocuments();
+        }
+
+        function handleDuplicateDoc(id) {
+            const copy = duplicateDocument(id);
+            if (copy) {
+                renderDocuments();
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Dokumen berhasil disalin.',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        }
+
+        function handleRenameDoc(id, currentTitle) {
+            Swal.fire({
+                title: 'Ganti Nama Dokumen',
+                input: 'text',
+                inputValue: currentTitle,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#27272a'
+            }).then(res => {
+                if (res.isConfirmed && res.value.trim()) {
+                    const docs = getSavedDocuments();
+                    const doc = docs.find(d => d.id === id);
+                    if (doc) {
+                        doc.title = res.value.trim();
+                        doc.lastModified = new Date().toISOString();
+                        saveDocumentsList(docs);
+                        renderDocuments();
+                    }
+                }
+            });
+        }
+
+        function handleDeleteDoc(id) {
+            Swal.fire({
+                title: 'Hapus Dokumen?',
+                text: 'Dokumen yang dihapus tidak dapat dipulihkan kembali.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#ef4444'
+            }).then(res => {
+                if (res.isConfirmed) {
+                    deleteDocument(id);
+                    renderDocuments();
+                }
+            });
+        }
+
+        function handleImportJsonFile(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const res = importDocumentsJson(e.target.result);
+                if (res.success) {
+                    renderDocuments();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Impor Berhasil',
+                        text: `Sebanyak ${res.count} dokumen berhasil ditambahkan ke arsip lokal.`
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Mengimpor',
+                        text: res.error || 'Format file cadangan tidak valid.'
+                    });
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function openCreateNewDocModal() {
+            const modal = document.getElementById('modal_create_new_doc');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeCreateNewDocModal() {
+            const modal = document.getElementById('modal_create_new_doc');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function handleCreateNewDocSubmit(event) {
+            if (event) event.preventDefault();
+            const typeRadio = document.querySelector('input[name="new_doc_type"]:checked');
+            const type = typeRadio ? typeRadio.value : 'SPZ';
+            const title = (document.getElementById('new_doc_title_input')?.value || '').trim();
+
+            const newDoc = createNewDocument(type, title);
+            window.location.href = `buat-surat.html?id=${newDoc.id}`;
+        }
+
+        function toggleTheme(event) {
+            const isDark = !document.documentElement.classList.contains('light-mode');
+            if (isDark) {
+                document.documentElement.classList.add('light-mode');
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem(THEME_STORAGE_KEY, 'light');
+            } else {
+                document.documentElement.classList.remove('light-mode');
+                document.documentElement.classList.add('dark');
+                localStorage.setItem(THEME_STORAGE_KEY, 'dark');
+            }
+            syncThemeIcons();
+        }
+
+        function syncThemeIcons() {
+            const isLight = document.documentElement.classList.contains('light-mode');
+            document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
+                if (isLight) {
+                    icon.className = 'fa-solid fa-moon theme-toggle-icon text-neutral-600';
+                } else {
+                    icon.className = 'fa-solid fa-sun theme-toggle-icon text-neutral-300';
+                }
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-mode');
+                document.documentElement.classList.remove('dark');
+            }
+            syncThemeIcons();
+
+            // Seed initial document if empty
+            const docs = getSavedDocuments();
+            if (docs.length === 0) {
+                createNewDocument('SPZ', 'Contoh Surat Perizinan Kampus');
+            }
+
+            renderDocuments();
+        });
+    </script>
+</body>
+</html>

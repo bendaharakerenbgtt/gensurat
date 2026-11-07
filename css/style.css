@@ -1,0 +1,381 @@
+/* ==========================================================================
+   GenSurat - Universal Surat Generator
+   Clean, Elegant Monochrome Theme & A4 Document Engine
+   ========================================================================== */
+
+:root {
+    /* DARK THEME (Default) - Sophisticated Zinc / Slate Palette */
+    --bg-main: #09090b;
+    --bg-surface: #121215;
+    --bg-card: rgba(24, 24, 27, 0.92);
+    --border-card: rgba(255, 255, 255, 0.08);
+    --border-muted: rgba(255, 255, 255, 0.05);
+    
+    --text-primary: #fafafa;
+    --text-sec-100: #f4f4f5;
+    --text-sec-200: #e4e4e7;
+    --text-sec-300: #d4d4d8;
+    --text-sec-400: #a1a1aa;
+    --text-sec-500: #71717a;
+    
+    --accent-neutral: #e4e4e7;
+    --accent-bg: rgba(255, 255, 255, 0.08);
+    --accent-border: rgba(255, 255, 255, 0.2);
+    --focus-ring: rgba(255, 255, 255, 0.25);
+    
+    --preview-desk-bg: #18181b;
+}
+
+html.light-mode {
+    /* LIGHT THEME - Crisp Architectural White & Neutral Slate */
+    --bg-main: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-card: #ffffff;
+    --border-card: #e2e8f0;
+    --border-muted: #cbd5e1;
+    
+    --text-primary: #09090b;
+    --text-sec-100: #18181b;
+    --text-sec-200: #27272a;
+    --text-sec-300: #3f3f46;
+    --text-sec-400: #71717a;
+    --text-sec-500: #a1a1aa;
+    
+    --accent-neutral: #18181b;
+    --accent-bg: rgba(0, 0, 0, 0.05);
+    --accent-border: #d4d4d8;
+    --focus-ring: rgba(0, 0, 0, 0.15);
+    
+    --preview-desk-bg: #e2e8f0;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    transition: background-color 0.25s ease, color 0.25s ease;
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+}
+
+/* -------------------------------------------------------------
+   LIGHT MODE OVERRIDES
+   ------------------------------------------------------------- */
+html.light-mode header {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-bottom-color: #e2e8f0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light-mode header h1,
+html.light-mode header h1 span {
+    color: #09090b !important;
+}
+
+html.light-mode header p {
+    color: #71717a !important;
+}
+
+html.light-mode .glass-card {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light-mode .form-input,
+html.light-mode input[type="text"],
+html.light-mode input[type="number"],
+html.light-mode input[type="tel"],
+html.light-mode input[type="date"],
+html.light-mode select,
+html.light-mode textarea {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #09090b !important;
+}
+
+html.light-mode .form-input:focus,
+html.light-mode input:focus,
+html.light-mode select:focus,
+html.light-mode textarea:focus {
+    background-color: #ffffff !important;
+    border-color: #09090b !important;
+    box-shadow: 0 0 0 2px rgba(9, 9, 11, 0.12) !important;
+}
+
+html.light-mode #preview_sheet_outer_box {
+    background-color: #e4e4e7 !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* -------------------------------------------------------------
+   AUTHENTIC A4 MULTI-PAGE SYSTEM (794px x 1123px, 12pt Times New Roman)
+   ------------------------------------------------------------- */
+.spz-page-sheet {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    font-family: 'Times New Roman', Times, serif;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 2px;
+    width: 794px;
+    min-width: 794px;
+    max-width: 794px;
+    min-height: 1123px;
+    padding: 0.5cm 1.5cm 1.5cm 1.6cm;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    line-height: 1.5;
+    font-size: 12pt;
+    margin: 0 auto 32px auto;
+}
+
+/* Watermark Layer */
+.spz-watermark-layer {
+    position: absolute;
+    top: 145mm;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 345px;
+    height: 345px;
+    pointer-events: none;
+    z-index: 1;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spz-watermark-layer img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+}
+
+/* Page Badge */
+.spz-sheet-badge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 794px;
+    margin: 0 auto 8px auto;
+    padding: 0 4px;
+}
+
+/* Table Borders & Official Typography */
+table.spz-border-table {
+    border-collapse: collapse !important;
+    border: 1px solid #000000 !important;
+    width: 100% !important;
+    font-family: 'Times New Roman', Times, serif !important;
+    font-size: 12pt !important;
+    background-color: transparent !important;
+}
+
+table.spz-border-table thead,
+table.spz-border-table tbody,
+table.spz-border-table tr,
+table.spz-border-table th, 
+table.spz-border-table td {
+    background-color: transparent !important;
+    border: 1px solid #000000 !important;
+    padding: 3.5pt 5pt !important;
+    color: #000000 !important;
+    font-family: 'Times New Roman', Times, serif !important;
+    font-size: 12pt !important;
+    line-height: 1.35 !important;
+}
+
+/* Kop Separator Line */
+.kop-separator {
+    border-top: 2.5px solid #000000;
+    border-bottom: 0.8px solid #000000;
+    height: 3px;
+    margin: 8pt 0 14pt 0;
+}
+
+/* -------------------------------------------------------------
+   INTERACTIVE CLICK-TO-EDIT ON PREVIEW
+   ------------------------------------------------------------- */
+.preview-editable {
+    position: relative;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.15s ease, outline 0.15s ease;
+}
+
+.preview-editable:hover {
+    outline: 1.5px dashed #52525b !important;
+    outline-offset: 2px;
+    background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+.preview-editable.active-editing {
+    outline: 2px solid #18181b !important;
+    outline-offset: 2px;
+    background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light-mode .preview-editable.active-editing {
+    outline: 2px solid #09090b !important;
+}
+
+/* Placeholder hint in preview (Section 8a) */
+.preview-placeholder-hint {
+    color: #a1a1aa !important;
+    border-bottom: 1px dashed #cbd5e1;
+    font-style: italic;
+}
+
+/* Quick Edit Popover */
+#preview_quick_edit_popover {
+    position: fixed;
+    z-index: 1000;
+    width: 360px;
+    max-width: 95vw;
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    color: #f4f4f5;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+html.light-mode #preview_quick_edit_popover {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+    color: #09090b;
+}
+
+/* Stepper Tabs Scroll */
+#page_stepper_tabs::-webkit-scrollbar {
+    height: 4px;
+}
+#page_stepper_tabs::-webkit-scrollbar-track {
+    background: transparent;
+}
+#page_stepper_tabs::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+}
+html.light-mode #page_stepper_tabs::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Step visibility */
+.hidden-by-step {
+    display: none !important;
+}
+
+/* -------------------------------------------------------------
+   PRINT MEDIA QUERY (Clean A4 Paper Export)
+   ------------------------------------------------------------- */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0 !important;
+    }
+    body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    header, aside, nav, footer, #mobile_bottom_nav, .print\:hidden, [class*="print:hidden"], 
+    .spz-sheet-badge, .mb-6, .lg\:col-span-5, #workspace_form_section, #page_stepper_tabs, 
+    .workspace-toolbar, #form_step_banner, #page_stepper_card, #preview_toolbar_top, 
+    #view_folder_dokumen, #editor_top_doc_bar, #modal_create_new_doc, #nav_btn_folder, 
+    #nav_btn_editor, #preview_quick_edit_popover, #modal_preflight_warning, #modal_profil_organisasi {
+        display: none !important;
+    }
+    .preview-editable {
+        outline: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        cursor: default !important;
+    }
+    .preview-placeholder-hint {
+        color: #000000 !important;
+        border-bottom: none !important;
+        font-style: normal !important;
+    }
+    #view_editor_dokumen {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    #preview_sheet_outer_box {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+    }
+    .spz-page-sheet.hidden-by-step {
+        display: block !important;
+    }
+    main, #main_workspace_container, #workspace_preview_section, .grid, .lg\:col-span-7, .overflow-x-auto, #rendered_surat_paper {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+    }
+    .spz-page-sheet {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12pt !important;
+        box-shadow: none !important;
+        border: none !important;
+        transform: none !important;
+        margin: 0 !important;
+        padding: 5mm 15mm 15mm 16mm !important;
+        width: 210mm !important;
+        min-width: 210mm !important;
+        max-width: 210mm !important;
+        height: 297mm !important;
+        max-height: 297mm !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        position: relative !important;
+    }
+    .spz-page-sheet:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+    }
+    .spz-watermark-layer {
+        position: absolute !important;
+        left: 105mm !important;
+        top: 148.5mm !important;
+        transform: translate(-50%, -50%) !important;
+        width: 345px !important;
+        height: 345px !important;
+        max-width: 345px !important;
+        max-height: 345px !important;
+        pointer-events: none !important;
+        z-index: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    .spz-watermark-layer img {
+        width: 345px !important;
+        height: 345px !important;
+        max-width: 345px !important;
+        max-height: 345px !important;
+        object-fit: contain !important;
+        display: block !important;
+    }
+}

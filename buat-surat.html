@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenSurat - Editor Surat Resmi & Berita Acara</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/></svg>">
+    
+    <!-- Instant Theme Detection -->
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.add('light-mode');
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.remove('light-mode');
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
+    <!-- External Assets: Tailwind, Font Awesome, Google Fonts, SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Local Master Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col">
+
+    <!-- TOP HEADER NAVBAR -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl bg-neutral-950/80 border-b border-neutral-900 px-4 sm:px-8 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <a href="index.html" id="header_back_btn" class="w-8 h-8 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:border-neutral-700 transition-colors" title="Kembali ke Beranda Dokumen">
+                <i class="fa-solid fa-arrow-left text-xs"></i>
+            </a>
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-white shadow-xs">
+                    <i class="fa-solid fa-file-signature text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="text-xs sm:text-sm font-black tracking-tight text-white flex items-center gap-1.5">
+                        Gen<span class="text-neutral-400">Surat</span>
+                    </h1>
+                    <p class="text-[9px] text-neutral-500 font-mono">Universal Generator Surat</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="openProfileModal()" class="px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-bold text-neutral-300 hover:text-white flex items-center gap-1.5 transition-colors" title="Pengaturan Profil Organisasi & Kop">
+                <i class="fa-solid fa-sliders text-neutral-400"></i>
+                <span class="hidden sm:inline">Profil Organisasi</span>
+            </button>
+            <button type="button" onclick="toggleTheme(event)" aria-label="Ubah Tema" class="w-8 h-8 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-300 hover:bg-neutral-800 transition-colors" title="Ubah Tema">
+                <i class="fa-solid fa-sun text-xs theme-toggle-icon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 space-y-5">
+        
+        <!-- TOP DOCUMENT BAR -->
+        <div id="editor_top_doc_bar" class="p-3 sm:p-4 rounded-2xl bg-neutral-900/90 border border-neutral-800 backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-lg">
+            <!-- Left: Document Title Editable -->
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                        <a href="index.html" class="px-2 py-1 rounded-lg text-xs font-bold text-neutral-400 hover:text-white hover:bg-neutral-800 transition-all flex items-center gap-1.5 shrink-0" title="Buka Daftar Surat">
+                            <i class="fa-solid fa-folder-open text-xs text-neutral-400"></i>
+                            <span class="hidden sm:inline">Folder</span>
+                        </a>
+                        <span class="text-neutral-700 font-mono text-xs shrink-0">/</span>
+                        <input type="text" id="active_doc_title" oninput="handleActiveDocTitleChange(this.value)" class="bg-neutral-950/60 hover:bg-neutral-950 focus:bg-neutral-950 border border-transparent hover:border-neutral-700 focus:border-white rounded-lg px-2.5 py-1 text-sm sm:text-base font-black text-white focus:outline-none transition-all truncate w-full max-w-md" value="Surat Tanpa Judul" title="Ubah nama dokumen">
+                        <span id="active_doc_badge" class="px-2 py-0.5 rounded text-[10px] font-black font-mono uppercase bg-white/10 text-white border border-white/20 shrink-0">SPZ</span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-0.5 px-2.5">
+                        <span id="doc_auto_save_status" class="text-[10px] text-neutral-400 font-mono flex items-center gap-1">
+                            <i class="fa-solid fa-check text-[10px]"></i> <span id="doc_last_modified_text">Tersimpan lokal</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Action Buttons -->
+            <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                <!-- Layout Mode -->
+                <div class="hidden sm:flex items-center bg-neutral-950 p-1 rounded-xl border border-neutral-800 text-xs">
+                    <button type="button" onclick="setLayoutMode('side')" class="px-2.5 py-1 rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-800 font-bold" title="Berdampingan (Form + Preview)">
+                        <i class="fa-solid fa-table-columns mr-1"></i> Dual
+                    </button>
+                    <button type="button" onclick="setLayoutMode('form')" class="px-2.5 py-1 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 font-bold" title="Hanya Form">
+                        <i class="fa-solid fa-pen-to-square mr-1"></i> Form
+                    </button>
+                    <button type="button" onclick="setLayoutMode('preview')" class="px-2.5 py-1 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 font-bold" title="Hanya Preview">
+                        <i class="fa-solid fa-file mr-1"></i> Preview
+                    </button>
+                </div>
+
+                <button type="button" onclick="openCreateNewDocModal()" class="px-3 py-2 rounded-xl text-xs font-bold bg-neutral-800 hover:bg-neutral-700 text-neutral-200 transition-colors flex items-center gap-1.5" title="Buat Dokumen Surat Baru">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span>Baru</span>
+                </button>
+                <button type="button" onclick="exportSuratWord()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-neutral-800 hover:bg-neutral-700 text-neutral-200 transition-colors flex items-center gap-1.5" title="Ekspor ke Microsoft Word (.doc)">
+                    <i class="fa-solid fa-file-word text-blue-400 text-xs"></i>
+                    <span>Word</span>
+                </button>
+                <button type="button" onclick="quickPrintSurat()" class="px-4 py-2 rounded-xl text-xs font-black text-black bg-white hover:bg-neutral-200 shadow-md flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer" title="Cetak / Simpan ke PDF">
+                    <i class="fa-solid fa-print text-xs"></i>
+                    <span>Cetak PDF</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- WORKSPACE TOOLBAR & PAGE STEPPER -->
+        <div id="page_stepper_card" class="glass-card p-3 sm:p-4 rounded-2xl bg-neutral-900 border border-neutral-800 shadow-md">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div class="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none flex-1" id="page_stepper_tabs">
+                    <!-- Injected dynamically via main.js -->
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0 self-end md:self-auto">
+                    <button type="button" onclick="scrollPageTabs('left')" class="w-7 h-7 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button type="button" onclick="scrollPageTabs('right')" class="w-7 h-7 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button type="button" onclick="goToPrevPage()" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white text-xs font-bold">
+                        Prev
+                    </button>
+                    <button type="button" onclick="goToNextPage()" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white text-xs font-bold">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- WORKSPACE DUAL COLUMN CONTAINER -->
+        <div id="main_workspace_container" class="flex flex-col lg:flex-row gap-6 items-start">
+            
+            <!-- LEFT COLUMN: FORM EDITOR SECTION -->
+            <div id="workspace_form_section" class="w-full lg:w-5/12 space-y-4">
+
+                <!-- CARD 1: KOP & PENOMORAN -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3.5" id="card_kop_nomor">
+                    <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
+                        <span class="text-xs font-black tracking-wider uppercase text-neutral-200 flex items-center gap-2">
+                            <i class="fa-solid fa-heading text-neutral-400"></i> Kop & Nomor Surat
+                        </span>
+                        <label class="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer">
+                            <input type="checkbox" id="field_use_kop" checked onchange="updatePreview()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                            <span>Gunakan Kop Resmi</span>
+                        </label>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-xs font-bold text-neutral-300">Nomor Surat</label>
+                                <button type="button" onclick="autoGenerateNoSurat()" class="text-[11px] text-neutral-400 hover:text-white font-mono flex items-center gap-1">
+                                    <i class="fa-solid fa-rotate"></i> Nomor Otomatis
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-1.5 w-full">
+                                <input type="text" id="field_nomor_urut" oninput="composeNomorSurat()" class="text-xs font-mono font-bold text-center py-2 px-2 bg-neutral-950 border border-neutral-800 text-white rounded-lg focus:outline-none focus:border-white w-20" placeholder="001" value="001" maxlength="6">
+                                <div id="nomor_surat_preview_pill" class="text-xs font-mono text-neutral-300 bg-neutral-950 px-3 py-2 rounded-lg border border-neutral-800 select-none flex-1 truncate">
+                                    001/SPZ/XXX/XXX/XI/2026
+                                </div>
+                            </div>
+                            <input type="hidden" id="field_nomor_surat" value="">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="text-xs font-bold text-neutral-300 block mb-1">Lampiran</label>
+                                <input type="text" id="field_lampiran" oninput="updatePreview()" class="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white" placeholder="cth: 1 Lembar / Terlampir">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-neutral-300 block mb-1">Tanggal Surat</label>
+                                <input type="text" id="field_tanggal_surat" oninput="updatePreview()" class="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white" placeholder="Jakarta, 8 November 2026">
+                            </div>
+                        </div>
+
+                        <!-- KHUSUS SPZ: PERIHAL DENGAN FORMAT FASILITAS -->
+                        <div id="spz_perihal_helper" class="space-y-1.5">
+                            <label class="text-xs font-bold text-neutral-300 block">Fasilitas / Sarana Yang Dipinjam (SPZ)</label>
+                            <input type="text" id="spz_input_fasilitas" oninput="handleSpzFasilitasChange(this.value)" placeholder="cth: Aula Lt. 3 / Sound System / Kelas 201" class="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white">
+                        </div>
+
+                        <!-- DEFAULT PERIHAL (Untuk Selain SPZ) -->
+                        <div id="default_perihal_helper" class="hidden space-y-1.5">
+                            <label class="text-xs font-bold text-neutral-300 block">Perihal Surat</label>
+                            <input type="text" id="field_perihal" oninput="updatePreview()" placeholder="cth: Surat Berita Acara Kegiatan..." class="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white">
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-neutral-300 block mb-1">Tujuan Surat</label>
+                            <textarea id="field_tujuan" oninput="updatePreview()" rows="3" class="w-full p-2.5 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 leading-relaxed focus:outline-none focus:border-white" placeholder="Yth. Kepala Subbagian Umum&#10;Politeknik Negeri Media Kreatif&#10;Di Tempat"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 2: DETAIL KEGIATAN & WAKTU -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3.5" id="card_detail_kegiatan">
+                    <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
+                        <span class="text-xs font-black tracking-wider uppercase text-neutral-200 flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-days text-neutral-400"></i> Detail Acara & Waktu
+                        </span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs font-bold text-neutral-300 block mb-1">Nama Acara / Kegiatan</label>
+                            <input type="text" id="field_nama_acara" oninput="updatePreview(); updateSpzAutoPembuka();" class="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white" placeholder="cth: Pelatihan Desain Grafis 2026">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="text-xs font-bold text-neutral-300 block mb-1">Hari & Tanggal</label>
+                                <input type="text" id="field_hari_tanggal" oninput="updatePreview()" class="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white" placeholder="cth: Sabtu, 14 November 2026">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-neutral-300 block mb-1">Pilih dari Kalender</label>
+                                <input type="date" id="field_tanggal_picker" onchange="syncEventDateFromPickers()" class="w-full px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white cursor-pointer focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-xs font-bold text-neutral-300">Waktu Pelaksanaan</label>
+                                <label class="flex items-center gap-1.5 text-[11px] text-neutral-400 cursor-pointer">
+                                    <input type="checkbox" id="time_until_finish" onchange="syncTimeFromPickers()" class="rounded border-neutral-700 text-white w-3.5 h-3.5">
+                                    <span>s.d. Selesai</span>
+                                </label>
+                            </div>
+                            <div class="flex items-center gap-1.5 mb-1.5">
+                                <select id="time_start_h" onchange="syncTimeFromPickers()" class="bg-neutral-950 border border-neutral-800 rounded px-2 py-1 text-xs text-white"></select>
+                                <span class="text-xs text-neutral-500">:</span>
+                                <select id="time_start_m" onchange="syncTimeFromPickers()" class="bg-neutral-950 border border-neutral-800 rounded px-2 py-1 text-xs text-white"></select>
+                                <span class="text-xs text-neutral-500 mx-1">s/d</span>
+                                <div id="time_end_wrapper" class="flex items-center gap-1.5">
+                                    <select id="time_end_h" onchange="syncTimeFromPickers()" class="bg-neutral-950 border border-neutral-800 rounded px-2 py-1 text-xs text-white"></select>
+                                    <span class="text-xs text-neutral-500">:</span>
+                                    <select id="time_end_m" onchange="syncTimeFromPickers()" class="bg-neutral-950 border border-neutral-800 rounded px-2 py-1 text-xs text-white"></select>
+                                </div>
+                            </div>
+                            <input type="text" id="field_waktu" oninput="updatePreview()" class="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white font-mono" placeholder="cth: 08.00 – 16.00 WIB">
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-neutral-300 block mb-1">Tempat / Ruangan Pelaksanaan</label>
+                            <input type="text" id="field_tempat" oninput="updatePreview()" class="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white" placeholder="cth: Aula Lt. 3 Gd. Utama">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 3: PARAGRAF SURAT -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3.5" id="card_isi_surat">
+                    <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
+                        <span class="text-xs font-black tracking-wider uppercase text-neutral-200 flex items-center gap-2">
+                            <i class="fa-solid fa-align-left text-neutral-400"></i> Paragraf Isi Surat
+                        </span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-xs font-bold text-neutral-300">Paragraf Pembuka</label>
+                                <button type="button" onclick="toggleSpzPembukaManual()" class="text-[11px] text-neutral-400 hover:text-white font-mono">
+                                    <i class="fa-solid fa-pen-to-square"></i> Edit Manual
+                                </button>
+                            </div>
+                            <div id="spz_pembuka_auto_container" class="p-2.5 rounded-lg bg-neutral-950 border border-neutral-800 text-xs text-neutral-300 leading-relaxed">
+                                <span class="text-[10px] font-mono text-neutral-500 block mb-1">Tampilan Otomatis SPZ:</span>
+                                <div id="spz_pembuka_display_box"></div>
+                            </div>
+                            <div id="spz_pembuka_manual_container" class="hidden">
+                                <textarea id="field_pembuka" oninput="updatePreview()" rows="3" class="w-full p-2.5 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 leading-relaxed focus:outline-none focus:border-white"></textarea>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-neutral-300 block mb-1">Paragraf Isi Inti</label>
+                            <textarea id="field_isi_inti" oninput="updatePreview()" rows="3" class="w-full p-2.5 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 leading-relaxed focus:outline-none focus:border-white" placeholder="Uraikan detail dan tujuan penting acara di sini..."></textarea>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-neutral-300 block mb-1">Paragraf Penutup</label>
+                            <textarea id="field_penutup" oninput="updatePreview()" rows="2" class="w-full p-2.5 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 leading-relaxed focus:outline-none focus:border-white" placeholder="Demikian surat ini kami sampaikan. Atas perhatian dan kerja sama Bapak/Ibu..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 4: PENANDATANGAN (TTD 6 PIHAK) -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3.5" id="card_penandatangan">
+                    <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
+                        <span class="text-xs font-black tracking-wider uppercase text-neutral-200 flex items-center gap-2">
+                            <i class="fa-solid fa-signature text-neutral-400"></i> Pengesahan & Tanda Tangan
+                        </span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <!-- TINGKAT 1: PENANGGUNG JAWAB -->
+                        <div class="p-3 rounded-xl bg-neutral-950 border border-neutral-800/80 space-y-2.5">
+                            <span class="text-xs font-bold text-neutral-300 block">Tingkat 1: Penanggung Jawab Kegiatan</span>
+                            
+                            <!-- KETUA PELAKSANA -->
+                            <div class="p-2.5 rounded-lg bg-neutral-900 border border-neutral-800 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-white">1. Ketua Pelaksana</span>
+                                    <label class="flex items-center gap-1.5 text-xs text-neutral-400 cursor-pointer">
+                                        <input type="checkbox" id="field_ttd1_active" checked onchange="updatePreview()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                        <span>Aktif</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="field_ttd1_nama" oninput="updatePreview()" placeholder="Nama Lengkap" class="px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded text-xs text-white focus:outline-none">
+                                    <input type="text" id="field_ttd1_nim" oninput="updatePreview()" placeholder="NIM" class="px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded text-xs text-white font-mono focus:outline-none">
+                                </div>
+                                <input type="text" id="field_ttd1_jabatan" oninput="updatePreview()" placeholder="Jabatan (cth: Ketua Pelaksana)" class="w-full px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded text-xs text-neutral-400 focus:outline-none">
+                            </div>
+
+                            <!-- KETUA ORGANISASI -->
+                            <div class="p-2.5 rounded-lg bg-neutral-900 border border-neutral-800 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-white">2. Ketua Organisasi</span>
+                                    <label class="flex items-center gap-1.5 text-xs text-neutral-400 cursor-pointer">
+                                        <input type="checkbox" id="field_ttd2_active" checked onchange="updatePreview()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                        <span>Aktif</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="field_ttd2_nama" oninput="updatePreview()" placeholder="Nama Lengkap" class="px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded text-xs text-white focus:outline-none">
+                                    <input type="text" id="field_ttd2_nim" oninput="updatePreview()" placeholder="NIM" class="px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded text-xs text-white font-mono focus:outline-none">
+                                </div>
+                                <input type="text" id="field_ttd2_jabatan" oninput="updatePreview()" placeholder="Jabatan (cth: Ketua UKM XXX)" class="w-full px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded text-xs text-neutral-400 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <!-- TINGKAT 2: MENGETAHUI -->
+                        <div class="p-3 rounded-xl bg-neutral-950 border border-neutral-800/80 space-y-2.5">
+                            <span class="text-xs font-bold text-neutral-300 block">Tingkat 2: Pihak Mengetahui</span>
+                            
+                            <!-- DOSEN PEMBINA -->
+                            <div class="p-2 rounded-lg bg-neutral-900 border border-neutral-800 space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <input type="text" id="field_ttd3_jabatan" oninput="updatePreview()" value="Dosen Pembina" class="text-xs font-bold text-white bg-transparent border-none p-0 focus:outline-none w-48">
+                                    <label class="flex items-center gap-1 text-xs text-neutral-400 cursor-pointer">
+                                        <input type="checkbox" id="field_ttd3_active" checked onchange="updatePreview()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                        <span>Aktif</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="field_ttd3_nama" oninput="updatePreview()" placeholder="Nama Dosen Pembina" class="px-2.5 py-1 bg-neutral-950 border border-neutral-800 rounded text-xs text-white focus:outline-none">
+                                    <input type="text" id="field_ttd3_nim" oninput="updatePreview()" placeholder="NIP. XXXXXXXXXXXXX" class="px-2.5 py-1 bg-neutral-950 border border-neutral-800 rounded text-xs text-white font-mono focus:outline-none">
+                                </div>
+                            </div>
+
+                            <!-- KETUA MPM -->
+                            <div class="p-2 rounded-lg bg-neutral-900 border border-neutral-800 space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <input type="text" id="field_ttd_mpm_jabatan" oninput="updatePreview()" value="Ketua MPM PoliMedia" class="text-xs font-bold text-white bg-transparent border-none p-0 focus:outline-none w-48">
+                                    <label class="flex items-center gap-1 text-xs text-neutral-400 cursor-pointer">
+                                        <input type="checkbox" id="field_ttd_mpm_active" checked onchange="updatePreview()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                        <span>Aktif</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="field_ttd_mpm_nama" oninput="updatePreview()" placeholder="Nama Ketua MPM" class="px-2.5 py-1 bg-neutral-950 border border-neutral-800 rounded text-xs text-white focus:outline-none">
+                                    <input type="text" id="field_ttd_mpm_nim" oninput="updatePreview()" placeholder="NIM" class="px-2.5 py-1 bg-neutral-950 border border-neutral-800 rounded text-xs text-white font-mono focus:outline-none">
+                                </div>
+                            </div>
+
+                            <!-- KETUA BEM -->
+                            <div class="p-2 rounded-lg bg-neutral-900 border border-neutral-800 space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <input type="text" id="field_ttd_bem_jabatan" oninput="updatePreview()" value="Ketua BEM PoliMedia" class="text-xs font-bold text-white bg-transparent border-none p-0 focus:outline-none w-48">
+                                    <label class="flex items-center gap-1 text-xs text-neutral-400 cursor-pointer">
+                                        <input type="checkbox" id="field_ttd_bem_active" checked onchange="updatePreview()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                        <span>Aktif</span>
+                                    </label>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="field_ttd_bem_nama" oninput="updatePreview()" placeholder="Nama Ketua BEM" class="px-2.5 py-1 bg-neutral-950 border border-neutral-800 rounded text-xs text-white focus:outline-none">
+                                    <input type="text" id="field_ttd_bem_nim" oninput="updatePreview()" placeholder="NIM" class="px-2.5 py-1 bg-neutral-950 border border-neutral-800 rounded text-xs text-white font-mono focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TINGKAT 3: MENYETUJUI WADIR -->
+                        <div class="p-3 rounded-xl bg-neutral-950 border border-neutral-800/80 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-neutral-300">Tingkat 3: Menyetujui (Wakil Direktur)</span>
+                                <label class="flex items-center gap-1.5 text-xs text-neutral-400 cursor-pointer">
+                                    <input type="checkbox" id="field_ttd_wadir_active" checked onchange="updatePreview()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                    <span>Aktif</span>
+                                </label>
+                            </div>
+                            <input type="text" id="field_ttd_wadir_jabatan" oninput="updatePreview()" placeholder="Jabatan Wadir" class="w-full px-2.5 py-1.5 bg-neutral-900 border border-neutral-800 rounded text-xs text-white focus:outline-none">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="field_ttd_wadir_nama" oninput="updatePreview()" placeholder="Nama Pejabat Wadir" class="px-2.5 py-1.5 bg-neutral-900 border border-neutral-800 rounded text-xs text-white focus:outline-none">
+                                <input type="text" id="field_ttd_wadir_nip" oninput="updatePreview()" placeholder="NIP" class="px-2.5 py-1.5 bg-neutral-900 border border-neutral-800 rounded text-xs text-white font-mono focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SPZ ONLY CARDS -->
+                <div class="spz-only-card space-y-4">
+                    <!-- BARANG PINJAMAN -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
+                            <span class="text-xs font-black uppercase text-neutral-200">Lampiran 1: Barang Pinjaman</span>
+                            <button type="button" onclick="addSpzBarangRow()" class="text-xs text-neutral-300 hover:text-white px-2 py-1 rounded bg-neutral-800 hover:bg-neutral-700 font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-plus text-[10px]"></i> Tambah
+                            </button>
+                        </div>
+                        <div id="spz_barang_editor_rows" class="space-y-2"></div>
+                    </div>
+
+                    <!-- KEPANITIAAN -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
+                            <span class="text-xs font-black uppercase text-neutral-200">Lampiran 2: Susunan Panitia</span>
+                            <div class="flex items-center gap-2">
+                                <label class="flex items-center gap-1 text-xs text-neutral-400 cursor-pointer">
+                                    <input type="checkbox" id="spz_inc_lampiran_panitia" checked onchange="toggleSpzAttachmentSections()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                    <span>Aktif</span>
+                                </label>
+                                <button type="button" onclick="addSpzPanitiaRow()" class="text-xs text-neutral-300 hover:text-white px-2 py-1 rounded bg-neutral-800 hover:bg-neutral-700 font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-plus text-[10px]"></i> Tambah
+                                </button>
+                            </div>
+                        </div>
+                        <div id="spz_panitia_editor_rows" class="space-y-2"></div>
+                    </div>
+
+                    <!-- RUNDOWN SPZ -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
+                            <span class="text-xs font-black uppercase text-neutral-200">Lampiran 3: Susunan Acara (Rundown)</span>
+                            <button type="button" onclick="addSpzRundownRow()" class="text-xs text-neutral-300 hover:text-white px-2 py-1 rounded bg-neutral-800 hover:bg-neutral-700 font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-plus text-[10px]"></i> Tambah
+                            </button>
+                        </div>
+                        <div id="spz_rundown_editor_rows" class="space-y-2"></div>
+                    </div>
+
+                    <!-- LEMBAR PERSETUJUAN SUBBAG -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
+                            <span class="text-xs font-black uppercase text-neutral-200">Lembar Persetujuan Subbag</span>
+                            <label class="flex items-center gap-1.5 text-xs text-neutral-400 cursor-pointer">
+                                <input type="checkbox" id="spz_inc_subbag_umum" checked onchange="toggleSpzSubbagSections()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                <span>Sertakan Lembar Subbag</span>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="text-[11px] text-neutral-400 block mb-1">No. WhatsApp / HP PJ</label>
+                                <input type="text" id="spz_no_hp" oninput="updatePreview()" placeholder="08XXXXXXXXXX" class="w-full px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded text-xs text-white focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-neutral-400 block mb-1">Batas Waktu Pelaksanaan</label>
+                                <input type="text" id="spz_batas_waktu" oninput="updatePreview()" placeholder="21.00 WIB" class="w-full px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded text-xs text-white focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SBA ONLY CARDS -->
+                <div class="sba-only-card hidden space-y-4">
+                    <!-- RUNDOWN SBA -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
+                            <span class="text-xs font-black uppercase text-neutral-200">Realisasi Rundown Kegiatan</span>
+                            <button type="button" onclick="addSbaRundownRow()" class="text-xs text-neutral-300 hover:text-white px-2 py-1 rounded bg-neutral-800 hover:bg-neutral-700 font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-plus text-[10px]"></i> Tambah
+                            </button>
+                        </div>
+                        <div id="sba_rundown_editor_rows" class="space-y-2"></div>
+                    </div>
+
+                    <!-- OUTPUT & PRESTASI -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
+                            <span class="text-xs font-black uppercase text-neutral-200">Output & Prestasi Peserta</span>
+                            <label class="flex items-center gap-1.5 text-xs text-neutral-400 cursor-pointer">
+                                <input type="checkbox" id="sba_inc_prestasi" checked onchange="updatePreview()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                <span>Aktif</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Deskripsi Output</label>
+                            <textarea id="sba_output_kegiatan" oninput="updatePreview()" rows="3" class="w-full p-2.5 bg-neutral-950 border border-neutral-800 rounded text-xs text-white focus:outline-none" placeholder="Uraikan hasil dan output nyata kegiatan..."></textarea>
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-neutral-800">
+                            <span class="text-xs font-bold text-neutral-300">Daftar Capaian Peserta</span>
+                            <button type="button" onclick="addSbaPrestasiRow()" class="text-[10px] text-neutral-300 hover:text-white px-2 py-0.5 rounded bg-neutral-800 font-bold">
+                                + Tambah Peserta
+                            </button>
+                        </div>
+                        <div id="sba_prestasi_editor_rows" class="space-y-1.5"></div>
+                    </div>
+
+                    <!-- HAMBATAN & EVALUASI -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
+                        <span class="text-xs font-black uppercase text-neutral-200 block border-b border-neutral-800 pb-2">Hambatan & Evaluasi</span>
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Hambatan Selama Kegiatan</label>
+                            <textarea id="sba_hambatan_kegiatan" oninput="updatePreview()" rows="2" class="w-full p-2.5 bg-neutral-950 border border-neutral-800 rounded text-xs text-white focus:outline-none" placeholder="Kendala teknis atau operasional..."></textarea>
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Evaluasi & Solusi</label>
+                            <textarea id="sba_evaluasi_kegiatan" oninput="updatePreview()" rows="2" class="w-full p-2.5 bg-neutral-950 border border-neutral-800 rounded text-xs text-white focus:outline-none" placeholder="Solusi dan rekomendasi untuk kegiatan mendatang..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- KEUANGAN & REKAPITULASI -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
+                            <span class="text-xs font-black uppercase text-neutral-200">Laporan Keuangan & Rekap</span>
+                            <label class="flex items-center gap-1.5 text-xs text-neutral-400 cursor-pointer">
+                                <input type="checkbox" id="sba_inc_keuangan" checked onchange="updatePreview()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                <span>Aktif</span>
+                            </label>
+                        </div>
+
+                        <!-- Pemasukan -->
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-neutral-300">Pemasukan Dana</span>
+                                <button type="button" onclick="addSbaPemasukanRow()" class="text-[10px] text-neutral-300 hover:text-white px-2 py-0.5 rounded bg-neutral-800 font-bold">+ Pemasukan</button>
+                            </div>
+                            <div id="sba_pemasukan_editor_rows" class="space-y-1.5"></div>
+                        </div>
+
+                        <!-- Pengeluaran -->
+                        <div class="space-y-2 pt-3 border-t border-neutral-800">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-neutral-300">Pengeluaran Dana</span>
+                                <button type="button" onclick="addSbaCategory()" class="text-[10px] text-neutral-300 hover:text-white px-2.5 py-1 rounded-lg bg-neutral-800 font-bold">+ Tambah Kategori Belanja</button>
+                            </div>
+                            <div id="sba_pengeluaran_categories_container" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- NOTA -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
+                            <span class="text-xs font-black uppercase text-neutral-200">Lampiran Nota Keuangan</span>
+                            <div class="flex items-center gap-2">
+                                <label class="flex items-center gap-1.5 text-xs text-neutral-400 cursor-pointer">
+                                    <input type="checkbox" id="sba_inc_nota" checked onchange="updatePreview()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                    <span>Aktif</span>
+                                </label>
+                                <label class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-bold text-neutral-200 cursor-pointer flex items-center gap-1">
+                                    <i class="fa-solid fa-upload text-[10px]"></i> Unggah
+                                    <input type="file" multiple accept="image/*" onchange="handleSbaNotaUpload(event)" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+                        <div id="sba_nota_gallery_grid" class="grid grid-cols-2 gap-2"></div>
+                    </div>
+
+                    <!-- DOKUMENTASI -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
+                        <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
+                            <span class="text-xs font-black uppercase text-neutral-200">Lampiran Foto Dokumentasi</span>
+                            <div class="flex items-center gap-2">
+                                <label class="flex items-center gap-1.5 text-xs text-neutral-400 cursor-pointer">
+                                    <input type="checkbox" id="sba_inc_dok" checked onchange="updatePreview()" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                    <span>Aktif</span>
+                                </label>
+                                <label class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-bold text-neutral-200 cursor-pointer flex items-center gap-1">
+                                    <i class="fa-solid fa-upload text-[10px]"></i> Unggah
+                                    <input type="file" multiple accept="image/*" onchange="handleSbaDokumentasiUpload(event)" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+                        <div id="sba_dok_gallery_grid" class="grid grid-cols-2 gap-2"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: A4 PREVIEW SECTION -->
+            <div id="workspace_preview_section" class="w-full lg:w-7/12 sticky top-20">
+                <div class="p-3 sm:p-4 rounded-2xl bg-neutral-900 border border-neutral-800 shadow-xl space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-neutral-800">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span class="text-xs font-bold text-neutral-200">Pratinjau Lembar A4 (Live Preview)</span>
+                        </div>
+                        <span class="text-[10px] font-mono text-neutral-400">Klik bagian mana saja pada surat untuk mengedit langsung</span>
+                    </div>
+
+                    <!-- Outer Desk for Paper -->
+                    <div id="preview_sheet_outer_box" class="p-4 sm:p-8 rounded-xl bg-neutral-950 border border-neutral-800 overflow-y-auto max-h-[calc(100vh-140px)] flex justify-center">
+                        <div id="paper_scale_wrapper" class="transition-transform duration-150">
+                            <div id="rendered_surat_paper">
+                                <!-- Injected dynamically by renderSuratFullHtml() -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- MODAL: PROFIL ORGANISASI & KOP BUILDER     -->
+    <!-- ========================================== -->
+    <div id="modal_profil_organisasi" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 max-h-[92vh] overflow-y-auto shadow-2xl relative space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-sliders text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-white">Pengaturan Profil & Kop Surat</h3>
+                        <p class="text-[11px] text-neutral-400">Sesuaikan logo, teks kop surat, dan penanda tangan default</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeProfileModal()" class="w-8 h-8 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleSaveProfileSubmit(event)" class="space-y-4 text-xs">
+                <!-- 1. KAMPUS -->
+                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
+                    <span class="text-xs font-bold text-white block">1. Identitas Kampus</span>
+                    <div>
+                        <label class="text-[11px] text-neutral-400 block mb-1">Nama Kampus</label>
+                        <input type="text" id="prof_kampus_nama" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-neutral-400 block mb-1">Alamat Kampus</label>
+                        <input type="text" id="prof_kampus_alamat" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <div class="flex items-center gap-3">
+                            <img id="prev_kampus_logo" src="assets/logo_polimedia.png" alt="Logo Kampus" class="h-10 w-auto object-contain">
+                            <label class="px-2.5 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] font-bold text-neutral-300 cursor-pointer">
+                                Ganti Logo Kampus
+                                <input type="file" accept="image/*" onchange="handleProfileImageUpload(event, 'kampus_logo')" class="hidden">
+                            </label>
+                            <button type="button" onclick="removeProfileImage('kampus_logo')" class="text-neutral-500 hover:text-white text-[11px]">Reset</button>
+                        </div>
+                        <label class="flex items-center gap-1.5 text-neutral-400 cursor-pointer">
+                            <input type="checkbox" id="prof_kampus_logo_active" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                            <span>Tampilkan di Kop</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 2. ORGANISASI -->
+                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
+                    <span class="text-xs font-bold text-white block">2. Identitas Organisasi</span>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Wadah / Jenis</label>
+                            <input type="text" id="prof_org_wadah" placeholder="UNIT KEGIATAN MAHASISWA" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Nama Organisasi</label>
+                            <input type="text" id="prof_org_nama" placeholder="NAMA ORGANISASI" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2.5">
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Singkatan</label>
+                            <input type="text" id="prof_org_singkatan" placeholder="XXX" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Kode Nomor Surat</label>
+                            <input type="text" id="prof_org_kode_surat" placeholder="XXX/XXX" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none font-mono">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Email Resmi</label>
+                            <input type="text" id="prof_org_email" placeholder="email@xxx.com" class="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <div class="flex items-center gap-3">
+                            <img id="prev_org_logo" src="" alt="Logo Org" class="h-10 w-auto object-contain">
+                            <label class="px-2.5 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] font-bold text-neutral-300 cursor-pointer">
+                                Unggah Logo Organisasi
+                                <input type="file" accept="image/*" onchange="handleProfileImageUpload(event, 'org_logo')" class="hidden">
+                            </label>
+                            <button type="button" onclick="removeProfileImage('org_logo')" class="text-neutral-500 hover:text-white text-[11px]">Hapus</button>
+                        </div>
+                        <label class="flex items-center gap-1.5 text-neutral-400 cursor-pointer">
+                            <input type="checkbox" id="prof_org_logo_active" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                            <span>Tampilkan di Kop</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 3. KABINET & WATERMARK -->
+                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
+                    <span class="text-xs font-bold text-white block">3. Logo Kabinet & Watermark</span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img id="prev_kabinet_logo" src="" alt="Logo Kabinet" class="h-10 w-auto object-contain">
+                            <label class="px-2.5 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] font-bold text-neutral-300 cursor-pointer">
+                                Unggah Logo Kabinet
+                                <input type="file" accept="image/*" onchange="handleProfileImageUpload(event, 'kabinet_logo')" class="hidden">
+                            </label>
+                            <button type="button" onclick="removeProfileImage('kabinet_logo')" class="text-neutral-500 hover:text-white text-[11px]">Hapus</button>
+                        </div>
+                        <label class="flex items-center gap-1.5 text-neutral-400 cursor-pointer">
+                            <input type="checkbox" id="prof_kabinet_logo_active" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                            <span>Tampilkan di Kop</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-neutral-800">
+                        <div class="flex items-center gap-3">
+                            <img id="prev_watermark_logo" src="" alt="Watermark" class="h-10 w-auto object-contain">
+                            <label class="px-2.5 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] font-bold text-neutral-300 cursor-pointer">
+                                Unggah Watermark PNG
+                                <input type="file" accept="image/*" onchange="handleProfileImageUpload(event, 'watermark_image')" class="hidden">
+                            </label>
+                            <button type="button" onclick="removeProfileImage('watermark_image')" class="text-neutral-500 hover:text-white text-[11px]">Hapus</button>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span id="prof_watermark_opacity_label" class="text-[11px] text-neutral-400 font-mono">12%</span>
+                            <input type="range" id="prof_watermark_opacity" min="5" max="40" value="12" oninput="document.getElementById('prof_watermark_opacity_label').innerText = this.value + '%'" class="w-20 cursor-pointer">
+                            <label class="flex items-center gap-1 text-neutral-400 cursor-pointer">
+                                <input type="checkbox" id="prof_watermark_active" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
+                                <span>Aktif</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. PEJABAT DEFAULT -->
+                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
+                    <span class="text-xs font-bold text-white block">4. Default Pejabat (Dapat Disesuaikan)</span>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">Nama Wadir III</label>
+                            <input type="text" id="prof_wadir_nama" class="w-full px-2.5 py-1 bg-neutral-900 border border-neutral-800 rounded text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-neutral-400 block mb-1">NIP Wadir III</label>
+                            <input type="text" id="prof_wadir_nip" class="w-full px-2.5 py-1 bg-neutral-900 border border-neutral-800 rounded text-white font-mono focus:outline-none">
+                        </div>
+                    </div>
+                    <input type="hidden" id="prof_wadir_jabatan" value="Wakil Direktur Bidang Kemahasiswaan dan Alumni">
+                    <input type="hidden" id="prof_subbag_nama" value="Runny Wachyuni, S.Pd., M.M.">
+                    <input type="hidden" id="prof_subbag_nip" value="198106172005012004">
+                    <input type="hidden" id="prof_dosen_nama" value="Nama Dosen Pembina">
+                    <input type="hidden" id="prof_dosen_nip" value="NIP. XXXXXXXXXXXXXXXXXX">
+                    <input type="hidden" id="prof_dosen_jabatan" value="Dosen Pembina">
+                    <input type="hidden" id="prof_ketua_org_nama" value="Nama Ketua Organisasi">
+                    <input type="hidden" id="prof_ketua_org_nim" value="NIM. XXXXXXXXX">
+                    <input type="hidden" id="prof_ketua_org_jabatan" value="Ketua Organisasi">
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-800">
+                    <button type="button" onclick="closeProfileModal()" class="px-4 py-2 rounded-xl text-neutral-400 hover:text-white bg-neutral-800">Batal</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-white text-black font-black hover:bg-neutral-200 shadow-md">Simpan Pengaturan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: PREFLIGHT EMPTY FIELDS WARNING      -->
+    <!-- ========================================== -->
+    <div id="modal_preflight_warning" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-lg w-full p-5 sm:p-6 max-h-[90vh] overflow-y-auto shadow-2xl relative space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-white">Bagian Dokumen Belum Diisi</h3>
+                        <p class="text-[11px] text-neutral-400">Ditemukan <span id="preflight_missing_count" class="font-bold text-amber-400">0 Bagian</span> yang masih kosong</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closePrintPreflightModal()" class="w-8 h-8 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-neutral-300 leading-relaxed">
+                Bagian yang belum diisi akan dicetak menggunakan placeholder standar (<code class="bg-neutral-800 px-1.5 py-0.5 rounded text-amber-300">XXX</code>). Apakah Anda ingin melengkapi data terlebih dahulu atau tetap melanjutkan?
+            </p>
+
+            <div id="preflight_missing_list" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                <!-- Injected dynamically -->
+            </div>
+
+            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-neutral-800">
+                <button type="button" onclick="proceedWithExportAnyway()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-neutral-400 hover:text-white bg-neutral-800 hover:bg-neutral-700">
+                    Tetap Cetak / Unduh
+                </button>
+                <button type="button" onclick="closePrintPreflightModal()" class="px-5 py-2 rounded-xl text-xs font-black text-black bg-white hover:bg-neutral-200 shadow-md">
+                    Isi Dulu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: BUAT SURAT BARU                     -->
+    <!-- ========================================== -->
+    <div id="modal_create_new_doc" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-file-circle-plus"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-white">Buat Dokumen Baru</h3>
+                        <p class="text-[11px] text-neutral-400">Pilih jenis format surat resmi</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeCreateNewDocModal()" class="w-8 h-8 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleCreateNewDocSubmit(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="text-xs font-bold text-neutral-300 block mb-2">1. Jenis Format Surat</label>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <label class="relative flex flex-col p-3 rounded-xl border border-neutral-700 bg-neutral-950 cursor-pointer hover:border-white transition-all">
+                            <input type="radio" name="new_doc_type" value="SPZ" class="sr-only" checked>
+                            <span class="text-xs font-black text-white">SPZ</span>
+                            <span class="text-[11px] text-neutral-300 font-semibold mt-0.5">Surat Perizinan</span>
+                            <span class="text-[9.5px] text-neutral-500 mt-1">Peminjaman fasilitas, barang, & kepanitiaan</span>
+                        </label>
+                        <label class="relative flex flex-col p-3 rounded-xl border border-neutral-800 bg-neutral-950 cursor-pointer hover:border-white transition-all">
+                            <input type="radio" name="new_doc_type" value="SBA" class="sr-only">
+                            <span class="text-xs font-black text-white">SBA</span>
+                            <span class="text-[11px] text-neutral-300 font-semibold mt-0.5">Surat Berita Acara</span>
+                            <span class="text-[9.5px] text-neutral-500 mt-1">Laporan kegiatan, keuangan, & nota</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-neutral-300 block mb-1">2. Judul / Nama Dokumen</label>
+                    <input type="text" id="new_doc_title_input" required placeholder="cth: SPZ Pelatihan Desain 2026" class="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-white text-xs">
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-800">
+                    <button type="button" onclick="closeCreateNewDocModal()" class="px-4 py-2 rounded-xl text-neutral-400 hover:text-white bg-neutral-800">Batal</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-white text-black font-black hover:bg-neutral-200 shadow-md">Buat & Buka Editor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FLOATING QUICK EDIT POPOVER                -->
+    <!-- ========================================== -->
+    <div id="preview_quick_edit_popover" class="hidden shadow-2xl p-3.5">
+        <div id="popover_drag_handle" class="flex items-center justify-between pb-2 mb-2.5 border-b border-neutral-800 cursor-move">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-grip-vertical text-neutral-500 text-xs"></i>
+                <span id="popover_target_title" class="text-xs font-bold text-white truncate">Edit Cepat</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <button type="button" onclick="dockPopoverToSide()" class="p-1 text-neutral-400 hover:text-white text-xs" title="Geser ke samping">
+                    <i class="fa-solid fa-arrows-left-right-to-line"></i>
+                </button>
+                <button type="button" onclick="closePreviewQuickEdit()" class="p-1 text-neutral-400 hover:text-white text-xs" title="Tutup">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div id="popover_input_container" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+        <div class="flex items-center justify-end pt-2 mt-2 border-t border-neutral-800">
+            <button type="button" onclick="closePreviewQuickEdit()" class="px-3.5 py-1.5 rounded-lg bg-white text-black font-bold text-xs hover:bg-neutral-200">
+                Selesai
+            </button>
+        </div>
+    </div>
+
+    <!-- Master Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/profil.js"></script>
+    <script src="js/spz.js"></script>
+    <script src="js/sba.js"></script>
+    <script src="js/quickedit.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

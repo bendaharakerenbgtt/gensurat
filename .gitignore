@@ -1,0 +1,8 @@
+node_modules/
+*.log
+test_screenshot_*.png
+test_suite.mjs
+package.json
+package-lock.json
+.DS_Store
+Thumbs.db
