@@ -4,10 +4,11 @@
  */
 
 export class CanvasRenderer {
-    constructor(containerEl, onElementSelected, onElementEdit) {
+    constructor(containerEl, onElementSelected, onElementEdit, onDeleteImage) {
         this.container = containerEl;
         this.onElementSelected = onElementSelected;
         this.onElementEdit = onElementEdit;
+        this.onDeleteImage = onDeleteImage;
         this.scale = 1.0;
         this.selectedElementId = null;
         this.docModel = null;
@@ -130,6 +131,9 @@ export class CanvasRenderer {
                 overlay.appendChild(target);
             });
 
+            // 3. Render Added Signatures / Stamps / Images
+            this.renderAddedImages(pageWrapper, pageData, pIdx);
+
             pageWrapper.appendChild(overlay);
             this.container.appendChild(pageWrapper);
         }
@@ -186,14 +190,14 @@ export class CanvasRenderer {
                 } else if (el.type === 'table') {
                     const tblWrapper = document.createElement('div');
                     tblWrapper.id = 'target_' + el.id;
-                    tblWrapper.className = 'docx-interactive-table cursor-pointer my-3 p-1 rounded hover:bg-blue-50/70 border border-neutral-300';
+                    tblWrapper.className = 'docx-interactive-table my-3 p-1 rounded border border-neutral-300';
                     
                     const rows = el.extra?.rows || [];
                     let tableHtml = `<table style="width: 100%; border-collapse: collapse; font-size: ${10 * this.scale}pt; font-family: 'Times New Roman';">`;
-                    rows.forEach(r => {
+                    rows.forEach((r, rIdx) => {
                         tableHtml += '<tr>';
-                        r.forEach(c => {
-                            tableHtml += `<td style="border: 1px solid #71717a; padding: ${3 * this.scale}px ${6 * this.scale}px; vertical-align: top;">${escapeHtml(c.text)}</td>`;
+                        r.forEach((c, cIdx) => {
+                            tableHtml += `<td class="docx-interactive-cell cursor-pointer hover:bg-blue-100/70 transition-colors p-1" data-row="${rIdx}" data-col="${cIdx}" style="border: 1px solid #71717a; padding: ${3 * this.scale}px ${6 * this.scale}px; vertical-align: top;">${escapeHtml(c.text)}</td>`;
                         });
                         tableHtml += '</tr>';
                     });
@@ -207,11 +211,101 @@ export class CanvasRenderer {
                         this.selectElement(el.id, pageWrapper);
                     });
 
+                    // Cell click listener
+                    tblWrapper.querySelectorAll('.docx-interactive-cell').forEach(cellEl => {
+                        cellEl.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.selectElement(el.id, pageWrapper);
+                            const rIdx = parseInt(cellEl.dataset.row, 10);
+                            const cIdx = parseInt(cellEl.dataset.col, 10);
+                            const cellData = rows[rIdx]?.[cIdx];
+                            if (cellData && this.onElementEdit) {
+                                this.onElementEdit({
+                                    id: el.id,
+                                    text: cellData.text,
+                                    isTableCell: true,
+                                    rowIndex: rIdx,
+                                    colIndex: cIdx
+                                }, cellEl);
+                            }
+                        });
+                    });
+
                     pageWrapper.appendChild(tblWrapper);
                 }
             });
 
+            // Render Added Signatures / Stamps / Images for DOCX
+            this.renderAddedImages(pageWrapper, pageData, pIdx);
+
             this.container.appendChild(pageWrapper);
+        });
+    }
+
+    renderAddedImages(pageWrapper, pageData, pIdx) {
+        if (!pageData.addedImages || pageData.addedImages.length === 0) return;
+
+        pageData.addedImages.forEach(img => {
+            const box = document.createElement('div');
+            box.className = 'canvas-added-image-box absolute border-2 border-dashed border-blue-400 bg-blue-500/10 cursor-move z-30 group rounded select-none shadow-lg';
+            box.style.left = (img.x * this.scale) + 'px';
+            box.style.top = (img.y * this.scale) + 'px';
+            box.style.width = (img.width * this.scale) + 'px';
+            box.style.height = (img.height * this.scale) + 'px';
+
+            box.innerHTML = `
+                <img src="${img.dataUrl}" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;">
+                <button type="button" class="btn-del-img absolute -top-2.5 -right-2.5 w-5 h-5 bg-red-600 hover:bg-red-500 text-white rounded-full text-[10px] items-center justify-center hidden group-hover:flex shadow z-40 transition-transform active:scale-90" title="Hapus Gambar / TTD">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+
+            // Delete button
+            const delBtn = box.querySelector('.btn-del-img');
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.onDeleteImage) {
+                    this.onDeleteImage(img.id);
+                }
+            });
+
+            // Drag to position
+            let isDragging = false;
+            let startX = 0, startY = 0, origLeft = 0, origTop = 0;
+
+            box.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.btn-del-img')) return;
+                e.preventDefault();
+                e.stopPropagation();
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                origLeft = parseFloat(box.style.left) || 0;
+                origTop = parseFloat(box.style.top) || 0;
+
+                const onMouseMove = (moveEv) => {
+                    if (!isDragging) return;
+                    const dx = moveEv.clientX - startX;
+                    const dy = moveEv.clientY - startY;
+                    const newLeft = Math.max(0, origLeft + dx);
+                    const newTop = Math.max(0, origTop + dy);
+                    box.style.left = newLeft + 'px';
+                    box.style.top = newTop + 'px';
+                    img.x = newLeft / this.scale;
+                    img.y = newTop / this.scale;
+                };
+
+                const onMouseUp = () => {
+                    isDragging = false;
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+                };
+
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+            });
+
+            pageWrapper.appendChild(box);
         });
     }
 

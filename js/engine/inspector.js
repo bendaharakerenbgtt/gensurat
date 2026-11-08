@@ -3,10 +3,11 @@
  */
 
 export class InspectorPanel {
-    constructor(inspectorEl, hierarchyEl, onTextUpdated) {
+    constructor(inspectorEl, hierarchyEl, onTextUpdated, onAddTableRow) {
         this.inspectorEl = inspectorEl;
         this.hierarchyEl = hierarchyEl;
         this.onTextUpdated = onTextUpdated;
+        this.onAddTableRow = onAddTableRow;
         this.currentElement = null;
     }
 
@@ -27,14 +28,33 @@ export class InspectorPanel {
         const isModified = element.isModified;
         const typeLabel = element.type === 'paragraph' ? 'Paragraf Word' : (element.type === 'table' ? 'Tabel' : 'Teks PDF');
 
+        // Detect if text corresponds to a signature block or official title
+        const isTtdArea = /(ketua|direktur|wadir|sekretaris|bendahara|pembina|mengetahui|menyetujui|nip\.|nim\.|penanggung jawab|yth\.)/i.test(element.text || '');
+
+        let tableControlsHtml = '';
+        if (element.type === 'table') {
+            tableControlsHtml = `
+                <div class="pt-2">
+                    <button type="button" id="btn_add_table_row" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow">
+                        <i class="fa-solid fa-plus"></i> Tambah Baris Baru pada Tabel
+                    </button>
+                </div>
+            `;
+        }
+
         this.inspectorEl.innerHTML = `
             <div class="space-y-4">
                 <!-- Header Info -->
                 <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
-                    <div>
+                    <div class="flex items-center gap-1.5 flex-wrap">
                         <span class="text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded ${isModified ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-neutral-800 text-neutral-400'} font-semibold">
                             ${typeLabel} ${isModified ? '&bull; Diedit' : ''}
                         </span>
+                        ${isTtdArea ? `
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800 font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-signature text-purple-400"></i> Area TTD / Pejabat
+                            </span>
+                        ` : ''}
                     </div>
                     <span class="text-[10px] font-mono text-neutral-500">Hal. ${(page?.pageIndex || 0) + 1}</span>
                 </div>
@@ -58,6 +78,8 @@ export class InspectorPanel {
                         <span class="truncate block text-neutral-200 font-semibold" title="${element.fontFamily}">${element.fontFamily || 'Times New Roman'}</span>
                     </div>
                 </div>
+
+                ${tableControlsHtml}
 
                 <!-- Actions -->
                 <div class="pt-2 flex flex-col gap-2">
@@ -97,6 +119,15 @@ export class InspectorPanel {
             resetBtn.addEventListener('click', () => {
                 if (this.onTextUpdated) {
                     this.onTextUpdated(element.id, element.originalText);
+                }
+            });
+        }
+
+        const addRowBtn = document.getElementById('btn_add_table_row');
+        if (addRowBtn) {
+            addRowBtn.addEventListener('click', () => {
+                if (this.onAddTableRow) {
+                    this.onAddTableRow(element.id);
                 }
             });
         }

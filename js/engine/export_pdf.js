@@ -66,6 +66,29 @@ export async function exportToPdf(docModel, customFilename) {
                     color: rgb(0.05, 0.05, 0.05)
                 });
             }
+
+            // 4. Draw Added Signatures / Stamps / Images
+            if (pageModel.addedImages && pageModel.addedImages.length > 0) {
+                for (const imgItem of pageModel.addedImages) {
+                    try {
+                        let embeddedImg = null;
+                        if (imgItem.mimeType && imgItem.mimeType.includes('png')) {
+                            embeddedImg = await pdfDoc.embedPng(imgItem.bytes);
+                        } else {
+                            embeddedImg = await pdfDoc.embedJpg(imgItem.bytes);
+                        }
+                        const pdfY = (pageModel.height || 841.89) - imgItem.y - imgItem.height;
+                        targetPdfPage.drawImage(embeddedImg, {
+                            x: Math.max(0, imgItem.x),
+                            y: Math.max(0, pdfY),
+                            width: imgItem.width,
+                            height: imgItem.height
+                        });
+                    } catch (imgErr) {
+                        console.warn('Failed to embed signature/image:', imgErr);
+                    }
+                }
+            }
         }
 
         const pdfBytes = await pdfDoc.save();
@@ -146,6 +169,29 @@ export async function exportToPdf(docModel, customFilename) {
                             color: rgb(0.3, 0.3, 0.3)
                         });
                         currentY -= 36;
+                    }
+                }
+            }
+
+            // Draw Added Signatures / Stamps
+            if (pageModel.addedImages && pageModel.addedImages.length > 0) {
+                for (const imgItem of pageModel.addedImages) {
+                    try {
+                        let embeddedImg = null;
+                        if (imgItem.mimeType && imgItem.mimeType.includes('png')) {
+                            embeddedImg = await pdfDoc.embedPng(imgItem.bytes);
+                        } else {
+                            embeddedImg = await pdfDoc.embedJpg(imgItem.bytes);
+                        }
+                        const pdfY = (pageModel.height || 841.89) - imgItem.y - imgItem.height;
+                        pdfPage.drawImage(embeddedImg, {
+                            x: Math.max(0, imgItem.x),
+                            y: Math.max(0, pdfY),
+                            width: imgItem.width,
+                            height: imgItem.height
+                        });
+                    } catch (imgErr) {
+                        console.warn('Failed to embed signature image in docx->pdf:', imgErr);
                     }
                 }
             }

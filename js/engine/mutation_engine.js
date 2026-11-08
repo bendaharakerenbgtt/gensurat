@@ -151,4 +151,151 @@ export class MutationEngine {
     canRedo() {
         return this.docModel && this.docModel.redoStack && this.docModel.redoStack.length > 0;
     }
+
+    /**
+     * Add a new row to an existing table
+     */
+    addTableRow(tableElementId) {
+        if (!this.docModel) return;
+
+        let tableEl = null;
+        for (const page of this.docModel.pages) {
+            for (const el of page.elements) {
+                if (el.id === tableElementId && el.type === 'table') {
+                    tableEl = el;
+                    break;
+                }
+            }
+            if (tableEl) break;
+        }
+
+        if (!tableEl || !tableEl.extra || !tableEl.extra.rows) return;
+
+        const rows = tableEl.extra.rows;
+        const colCount = tableEl.extra.colCount || (rows[0] ? rows[0].length : 1);
+        const newRowIndex = rows.length;
+        const newRow = [];
+
+        // Clone XML row if in DOCX mode
+        let clonedTr = null;
+        if (this.docModel.source.format === 'docx' && tableEl.sourceRef?.xmlNode) {
+            const trList = tableEl.sourceRef.xmlNode.getElementsByTagNameNS('*', 'tr');
+            if (trList.length > 0) {
+                clonedTr = trList[trList.length - 1].cloneNode(true);
+                // Clear text in all <w:t> nodes of the cloned row
+                const tNodes = clonedTr.getElementsByTagNameNS('*', 't');
+                for (let i = 0; i < tNodes.length; i++) {
+                    tNodes[i].textContent = '';
+                }
+                tableEl.sourceRef.xmlNode.appendChild(clonedTr);
+            }
+        }
+
+        const tcList = clonedTr ? clonedTr.getElementsByTagNameNS('*', 'tc') : [];
+
+        for (let c = 0; c < colCount; c++) {
+            newRow.push({
+                rowIndex: newRowIndex,
+                colIndex: c,
+                text: '',
+                xmlNode: tcList[c] || null
+            });
+        }
+
+        rows.push(newRow);
+        tableEl.extra.rowCount = rows.length;
+        tableEl.text = `[Tabel: ${rows.length} Baris x ${colCount} Kolom]`;
+        tableEl.isModified = true;
+
+        if (this.onStateChanged) {
+            this.onStateChanged(this.docModel, { type: 'ADD_TABLE_ROW', tableId: tableElementId });
+        }
+    }
+
+    /**
+     * Update individual table cell text
+     */
+    updateTableCellText(tableElementId, rowIndex, colIndex, newText) {
+        if (!this.docModel) return;
+
+        let tableEl = null;
+        for (const page of this.docModel.pages) {
+            for (const el of page.elements) {
+                if (el.id === tableElementId && el.type === 'table') {
+                    tableEl = el;
+                    break;
+                }
+            }
+            if (tableEl) break;
+        }
+
+        if (!tableEl || !tableEl.extra || !tableEl.extra.rows) return;
+        const cell = tableEl.extra.rows[rowIndex]?.[colIndex];
+        if (!cell) return;
+
+        cell.text = newText;
+        tableEl.isModified = true;
+
+        if (this.docModel.source.format === 'docx' && cell.xmlNode) {
+            this.syncDocxXmlNode(cell.xmlNode, newText);
+        }
+
+        if (this.onStateChanged) {
+            this.onStateChanged(this.docModel, { type: 'UPDATE_TABLE_CELL', tableId: tableElementId, rowIndex, colIndex });
+        }
+    }
+
+    /**
+     * Add a signature / stamp image onto a page
+     */
+    addSignatureImage(pageIndex, imageObj) {
+        if (!this.docModel) return;
+        const page = this.docModel.pages[pageIndex] || this.docModel.pages[0];
+        if (!page) return;
+
+        page.addedImages = page.addedImages || [];
+        page.addedImages.push(imageObj);
+
+        if (this.onStateChanged) {
+            this.onStateChanged(this.docModel, { type: 'ADD_IMAGE', imageId: imageObj.id });
+        }
+    }
+
+    /**
+     * Delete an added signature / stamp image
+     */
+    deleteSignatureImage(imageId) {
+        if (!this.docModel) return;
+        for (const page of this.docModel.pages) {
+            if (page.addedImages) {
+                const idx = page.addedImages.findIndex(img => img.id === imageId);
+                if (idx !== -1) {
+                    page.addedImages.splice(idx, 1);
+                    if (this.onStateChanged) {
+                        this.onStateChanged(this.docModel, { type: 'DELETE_IMAGE', imageId });
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * Update position/size of signature image
+     */
+    updateSignaturePosition(imageId, x, y, width, height) {
+        if (!this.docModel) return;
+        for (const page of this.docModel.pages) {
+            if (page.addedImages) {
+                const img = page.addedImages.find(i => i.id === imageId);
+                if (img) {
+                    img.x = Math.max(0, x);
+                    img.y = Math.max(0, y);
+                    if (width) img.width = width;
+                    if (height) img.height = height;
+                    return;
+                }
+            }
+        }
+    }
 }

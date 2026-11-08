@@ -99,6 +99,12 @@
                 <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline">Upload Dokumen</span>
             </button>
             
+            <!-- Insert Signature / Image -->
+            <input type="file" id="signature_file_input" accept="image/png,image/jpeg,image/webp" class="hidden">
+            <button type="button" id="btn_insert_signature" class="px-2.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-amber-300 hover:text-amber-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors" title="Sisipkan Tanda Tangan Digital atau Gambar Stempel">
+                <i class="fa-solid fa-signature"></i> <span class="hidden lg:inline">Sisipkan TTD / Gambar</span>
+            </button>
+
             <div class="h-4 w-[1px] bg-neutral-800 mx-0.5"></div>
 
             <button type="button" id="btn_export_pdf" class="px-3 py-1.5 bg-red-600/90 hover:bg-red-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm" title="Ekspor ke format PDF">

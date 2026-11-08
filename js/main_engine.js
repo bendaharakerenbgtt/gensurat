@@ -27,11 +27,21 @@ function initEngine() {
     const hierarchyEl = document.getElementById('hierarchy_panel_content');
 
     // 1. Initialize Inspector
-    inspectorPanel = new InspectorPanel(inspectorEl, hierarchyEl, (elementId, newText) => {
-        if (mutationEngine) {
-            mutationEngine.updateElementText(elementId, newText);
+    inspectorPanel = new InspectorPanel(
+        inspectorEl,
+        hierarchyEl,
+        (elementId, newText) => {
+            if (mutationEngine) {
+                mutationEngine.updateElementText(elementId, newText);
+            }
+        },
+        (tableId) => {
+            if (mutationEngine) {
+                mutationEngine.addTableRow(tableId);
+                showStatusBadge('Baris baru berhasil ditambahkan ke tabel!');
+            }
         }
-    });
+    );
 
     // 2. Initialize Canvas Renderer
     canvasRenderer = new CanvasRenderer(
@@ -44,6 +54,12 @@ function initEngine() {
         (elementToEdit, targetDomEl) => {
             // Double click -> Quick in-place popover
             openQuickPopoverEdit(elementToEdit, targetDomEl);
+        },
+        (deletedImageId) => {
+            if (mutationEngine) {
+                mutationEngine.deleteSignatureImage(deletedImageId);
+                showStatusBadge('Gambar / Tanda Tangan dihapus');
+            }
         }
     );
 
@@ -211,6 +227,45 @@ function setupToolbar() {
             alert('Gagal ekspor DOCX: ' + err.message);
         }
     });
+
+    // Signature & Image insertion
+    const sigInput = document.getElementById('signature_file_input');
+    const sigBtn = document.getElementById('btn_insert_signature');
+    if (sigBtn && sigInput) {
+        sigBtn.addEventListener('click', () => {
+            if (!currentDocModel) {
+                alert('Harap buka atau upload dokumen terlebih dahulu sebelum menyisipkan tanda tangan.');
+                return;
+            }
+            sigInput.click();
+        });
+
+        sigInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentDocModel) return;
+
+            const arrayBuffer = await file.arrayBuffer();
+            const reader = new FileReader();
+            reader.onload = (loadEv) => {
+                const dataUrl = loadEv.target.result;
+                const newImageObj = {
+                    id: 'sig_' + Date.now(),
+                    type: 'signature',
+                    x: 80,
+                    y: 350,
+                    width: 140,
+                    height: 70,
+                    dataUrl: dataUrl,
+                    bytes: new Uint8Array(arrayBuffer),
+                    mimeType: file.type || 'image/png'
+                };
+                mutationEngine.addSignatureImage(0, newImageObj);
+                showStatusBadge('Tanda tangan berhasil disisipkan. Anda dapat menggeser posisinya di atas kertas!');
+            };
+            reader.readAsDataURL(file);
+            sigInput.value = '';
+        });
+    }
 }
 
 function applyZoom() {
@@ -253,7 +308,11 @@ function openQuickPopoverEdit(element, targetDomEl) {
 
     const applyChange = () => {
         if (input.value !== element.text) {
-            mutationEngine.updateElementText(element.id, input.value);
+            if (element.isTableCell) {
+                mutationEngine.updateTableCellText(element.id, element.rowIndex, element.colIndex, input.value);
+            } else {
+                mutationEngine.updateElementText(element.id, input.value);
+            }
         }
         popover.classList.add('hidden');
     };
