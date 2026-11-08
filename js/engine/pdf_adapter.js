@@ -41,27 +41,31 @@ export async function parsePdfDocument(arrayBuffer, filename) {
             disableCombineTextItems: false
         });
 
-        // Group into lines or keep individual semantic text runs
+        // Group into lines then group adjacent lines into semantic paragraphs
         const rawItems = textContent.items || [];
         const lines = groupTextItemsIntoLines(rawItems, viewport.height);
+        const elements = groupLinesIntoParagraphs(lines, viewport.height);
 
-        lines.forEach((line, idx) => {
-            const el = createElementModel('text', {
-                text: line.text,
-                x: line.x,
-                y: line.y,
-                width: line.width,
-                height: line.height,
-                fontSize: line.fontSize,
-                fontFamily: mapPdfFontFamily(line.fontName),
+        elements.forEach((elData, idx) => {
+            const el = createElementModel(elData.isParagraph ? 'paragraph' : 'text', {
+                text: elData.text,
+                x: elData.x,
+                y: elData.y,
+                width: elData.width,
+                height: elData.height,
+                fontSize: elData.fontSize,
+                fontFamily: mapPdfFontFamily(elData.fontName),
                 sourceRef: {
                     pageIndex: pageNum - 1,
-                    lineIndex: idx,
-                    rawItems: line.rawItems,
-                    pdfX: line.pdfX,
-                    pdfY: line.pdfY,
-                    pdfWidth: line.width,
-                    pdfHeight: line.height
+                    elementIndex: idx,
+                    rawItems: elData.rawItems,
+                    pdfX: elData.pdfX,
+                    pdfY: elData.pdfY,
+                    pdfWidth: elData.width,
+                    pdfHeight: elData.height,
+                    lineHeight: elData.lineHeight || (elData.fontSize * 1.45),
+                    isParagraph: elData.isParagraph,
+                    linesCount: elData.lines?.length || 1
                 }
             });
             pageModel.elements.push(el);
@@ -132,6 +136,70 @@ function groupTextItemsIntoLines(items, pageHeight) {
     }
 
     return lines;
+}
+
+/**
+ * Intelligent Layout-Aware Paragraph Grouping:
+ * Merges consecutive lines that belong to the same body paragraph
+ * so that users can edit entire paragraphs with natural text reflow like in Word.
+ */
+function groupLinesIntoParagraphs(lines, pageHeight) {
+    if (!lines || lines.length === 0) return [];
+
+    // Sort lines by vertical position (y) ascending
+    const sortedLines = [...lines].sort((a, b) => {
+        if (Math.abs(a.y - b.y) <= 3) return a.x - b.x;
+        return a.y - b.y;
+    });
+
+    const paragraphs = [];
+    let current = null;
+
+    const isLabelOrMetadata = (str) => {
+        const trimmed = (str || '').trim();
+        return /^(nomor|hal|lampiran|perihal|tembusan|yth|di tempat|kepada)\b/i.test(trimmed) ||
+               /^(nomor|hal|lampiran|perihal)\s*:/i.test(trimmed) ||
+               /^(\d+\.|\([a-z0-9]+\))\s+/i.test(trimmed);
+    };
+
+    for (const line of sortedLines) {
+        if (!current) {
+            current = { ...line, lines: [line], isParagraph: false };
+            continue;
+        }
+
+        const prev = current.lines[current.lines.length - 1];
+        const baselineDiff = Math.abs(prev.pdfY - line.pdfY);
+        const isVerticallyAdjacent = (line.y > prev.y) && (baselineDiff > 5) && (baselineDiff <= prev.fontSize * 2.2);
+        const sameLeftMargin = Math.abs(line.x - prev.x) <= 35;
+        const bothAreWide = (line.width > 220 || prev.width > 220);
+        const sameFontSize = Math.abs(line.fontSize - prev.fontSize) <= 1.5;
+
+        // Never merge labels, letterheads, or metadata lines
+        const hasLabel = isLabelOrMetadata(line.text) || isLabelOrMetadata(prev.text);
+
+        if (isVerticallyAdjacent && sameFontSize && !hasLabel && (bothAreWide || (sameLeftMargin && line.text.length > 30))) {
+            // Merge into current paragraph
+            current.lines.push(line);
+            current.text += ' ' + line.text;
+            current.rawItems.push(...line.rawItems);
+            current.x = Math.min(current.x, line.x);
+            current.width = Math.max(current.width, (line.x + line.width) - current.x);
+            current.height = (line.y + line.height) - current.y;
+            current.pdfY = Math.min(current.pdfY, line.pdfY); // Lowest pdfY baseline
+            current.lineHeight = baselineDiff;
+            current.isParagraph = true;
+        } else {
+            paragraphs.push(current);
+            current = { ...line, lines: [line], isParagraph: false };
+        }
+    }
+
+    if (current) {
+        paragraphs.push(current);
+    }
+
+    return paragraphs;
 }
 
 function mapPdfFontFamily(pdfFontName) {

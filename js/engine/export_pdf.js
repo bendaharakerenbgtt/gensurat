@@ -57,14 +57,52 @@ export async function exportToPdf(docModel, customFilename) {
                     selectedFont = (el.fontWeight === 'bold') ? fontTimesBold : fontTimes;
                 }
 
-                // 3. Draw New Text
-                targetPdfPage.drawText(el.text, {
-                    x: pdfX,
-                    y: pdfY,
-                    size: Math.max(7, el.fontSize),
-                    font: selectedFont,
-                    color: rgb(0.05, 0.05, 0.05)
-                });
+                // 3. Draw New Text (with intelligent word-wrapping for multi-line paragraphs)
+                const isParagraph = el.type === 'paragraph' || el.sourceRef?.isParagraph;
+
+                if (isParagraph) {
+                    const maxWidth = width - 4;
+                    const words = el.text.split(/\s+/);
+                    let currentLine = '';
+                    let currentLineY = (pageModel.height || 841.89) - el.rect.y - (el.fontSize * 0.95);
+                    const lineHeight = el.sourceRef?.lineHeight || (el.fontSize * 1.45);
+
+                    for (const word of words) {
+                        const testLine = currentLine ? (currentLine + ' ' + word) : word;
+                        const testWidth = selectedFont.widthOfTextAtSize(testLine, Math.max(7, el.fontSize));
+                        if (testWidth > maxWidth && currentLine) {
+                            targetPdfPage.drawText(currentLine, {
+                                x: pdfX,
+                                y: currentLineY,
+                                size: Math.max(7, el.fontSize),
+                                font: selectedFont,
+                                color: rgb(0.05, 0.05, 0.05)
+                            });
+                            currentLineY -= lineHeight;
+                            currentLine = word;
+                        } else {
+                            currentLine = testLine;
+                        }
+                    }
+
+                    if (currentLine) {
+                        targetPdfPage.drawText(currentLine, {
+                            x: pdfX,
+                            y: currentLineY,
+                            size: Math.max(7, el.fontSize),
+                            font: selectedFont,
+                            color: rgb(0.05, 0.05, 0.05)
+                        });
+                    }
+                } else {
+                    targetPdfPage.drawText(el.text, {
+                        x: pdfX,
+                        y: pdfY,
+                        size: Math.max(7, el.fontSize),
+                        font: selectedFont,
+                        color: rgb(0.05, 0.05, 0.05)
+                    });
+                }
             }
 
             // 4. Draw Added Signatures / Stamps / Images

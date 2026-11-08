@@ -105,14 +105,16 @@ export class CanvasRenderer {
                     target.classList.add('active-selected');
                 }
 
-                // If element has been modified, render whiteout mask + updated text!
+                // If element has been modified, render whiteout mask + updated text with natural reflow!
                 if (el.isModified) {
                     target.classList.add('is-modified');
+                    const isParagraph = el.type === 'paragraph' || el.sourceRef?.isParagraph;
+                    const fontFam = el.fontFamily || 'Times New Roman';
                     target.innerHTML = `
                         <div class="modified-whiteout-patch absolute inset-0 bg-white" style="z-index: 1;"></div>
-                        <span class="relative z-10 text-neutral-900 truncate block font-sans" style="font-size: ${Math.max(9, el.fontSize * this.scale)}px; line-height: 1.1;">
+                        <div class="relative z-10 text-neutral-900" style="font-size: ${Math.max(8, el.fontSize * this.scale)}pt; font-family: '${fontFam}', serif; line-height: 1.45; text-align: ${isParagraph ? 'justify' : 'left'}; word-break: break-word; white-space: ${isParagraph ? 'normal' : 'nowrap'}; padding: 0 1px;">
                             ${escapeHtml(el.text)}
-                        </span>
+                        </div>
                     `;
                 }
 
