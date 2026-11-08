@@ -22,8 +22,13 @@ export async function exportToPdf(docModel, customFilename) {
         // Embed standard fonts for replacement
         const fontTimes = await pdfDoc.embedFont(StandardFonts.TimesRoman);
         const fontTimesBold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+        const fontTimesItalic = await pdfDoc.embedFont(StandardFonts.TimesRomanItalic);
+        const fontTimesBoldItalic = await pdfDoc.embedFont(StandardFonts.TimesRomanBoldItalic);
+
         const fontHelvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
         const fontHelveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const fontHelveticaItalic = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+        const fontHelveticaBoldItalic = await pdfDoc.embedFont(StandardFonts.HelveticaBoldOblique);
 
         for (const pageModel of docModel.pages) {
             let targetPdfPage = pages[pageModel.pageIndex];
@@ -35,10 +40,20 @@ export async function exportToPdf(docModel, customFilename) {
             const shiftedElements = pageModel.elements.filter(el => (el.cumulativeShift || 0) > 0 && !el.isModified);
 
             const getFont = (el) => {
-                if (el.fontFamily.toLowerCase().includes('arial') || el.fontFamily.toLowerCase().includes('sans')) {
-                    return (el.fontWeight === 'bold') ? fontHelveticaBold : fontHelvetica;
+                const isBold = el.isBold || el.fontWeight === 'bold';
+                const isItalic = el.isItalic || el.fontStyle === 'italic';
+                const isSans = (el.fontFamily || '').toLowerCase().includes('arial') || (el.fontFamily || '').toLowerCase().includes('sans');
+
+                if (isSans) {
+                    if (isBold && isItalic) return fontHelveticaBoldItalic;
+                    if (isBold) return fontHelveticaBold;
+                    if (isItalic) return fontHelveticaItalic;
+                    return fontHelvetica;
                 }
-                return (el.fontWeight === 'bold') ? fontTimesBold : fontTimes;
+                if (isBold && isItalic) return fontTimesBoldItalic;
+                if (isBold) return fontTimesBold;
+                if (isItalic) return fontTimesItalic;
+                return fontTimes;
             };
 
             // =========================================================================
@@ -86,18 +101,32 @@ export async function exportToPdf(docModel, customFilename) {
                     }
                 } else {
                     const measuredTextWidth = selectedFont.widthOfTextAtSize(el.text, Math.max(7, el.fontSize));
-                    let whiteoutX = el.rect.x - 4;
-                    if (isKopText) {
-                        const pageWidth = pageModel.width || 595.28;
-                        const centeredX = (pageWidth - measuredTextWidth) / 2;
-                        whiteoutX = Math.min(centeredX, el.rect.x) - 6;
+                    const isKopText = (el.rect.y < 125);
+                    const alignment = el.alignment || (isKopText ? 'center' : 'left');
+
+                    let drawX = el.rect.x + (el.offsetX || 0);
+                    if (alignment === 'center') {
+                        if (isKopText) {
+                            const pageWidth = pageModel.width || 595.28;
+                            drawX = (pageWidth - measuredTextWidth) / 2 + (el.offsetX || 0);
+                        } else {
+                            const colCenterX = el.rect.x + (el.rect.width / 2);
+                            drawX = colCenterX - (measuredTextWidth / 2) + (el.offsetX || 0);
+                        }
+                    } else if (alignment === 'right') {
+                        drawX = el.rect.x + el.rect.width - measuredTextWidth + (el.offsetX || 0);
                     }
-                    const whiteoutWidth = Math.max(el.rect.width, measuredTextWidth) + 14;
+
+                    const minX = Math.min(drawX, el.rect.x) - 4;
+                    const maxX = Math.max(drawX + measuredTextWidth, el.rect.x + el.rect.width) + 4;
+                    const whiteoutX = Math.max(0, minX);
+                    const whiteoutWidth = maxX - minX;
+
                     const lineHeight = el.sourceRef?.lineHeight || (el.fontSize * 1.15);
                     const whiteoutHeight = Math.min(el.rect.height + 2, lineHeight);
                     const whiteoutY = (pageModel.height || 841.89) - el.rect.y - whiteoutHeight + 1;
                     targetPdfPage.drawRectangle({
-                        x: Math.max(0, whiteoutX),
+                        x: whiteoutX,
                         y: Math.max(0, whiteoutY),
                         width: whiteoutWidth,
                         height: whiteoutHeight,
@@ -215,11 +244,22 @@ export async function exportToPdf(docModel, customFilename) {
                     }
                 } else {
                     const measuredTextWidth = selectedFont.widthOfTextAtSize(el.text, Math.max(7, el.fontSize));
-                    let drawX = el.rect.x;
-                    if (isKopText) {
-                        const pageWidth = pageModel.width || 595.28;
-                        drawX = (pageWidth - measuredTextWidth) / 2;
+                    const isKopText = (el.rect.y < 125);
+                    const alignment = el.alignment || (isKopText ? 'center' : 'left');
+
+                    let drawX = el.rect.x + (el.offsetX || 0);
+                    if (alignment === 'center') {
+                        if (isKopText) {
+                            const pageWidth = pageModel.width || 595.28;
+                            drawX = (pageWidth - measuredTextWidth) / 2 + (el.offsetX || 0);
+                        } else {
+                            const colCenterX = el.rect.x + (el.rect.width / 2);
+                            drawX = colCenterX - (measuredTextWidth / 2) + (el.offsetX || 0);
+                        }
+                    } else if (alignment === 'right') {
+                        drawX = el.rect.x + el.rect.width - measuredTextWidth + (el.offsetX || 0);
                     }
+
                     const pdfY = (pageModel.height || 841.89) - el.rect.y - (el.fontSize * 0.85);
                     targetPdfPage.drawText(el.text, {
                         x: drawX,

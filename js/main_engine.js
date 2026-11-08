@@ -3,13 +3,13 @@
  * Coordinates file imports, visual canvas, mutations, inspector, and dual exports.
  */
 
-import { parsePdfDocument } from './engine/pdf_adapter.js?v=2.2.0';
-import { parseDocxDocument } from './engine/docx_adapter.js?v=2.2.0';
-import { CanvasRenderer } from './engine/canvas_renderer.js?v=2.2.0';
-import { MutationEngine } from './engine/mutation_engine.js?v=2.2.0';
-import { InspectorPanel } from './engine/inspector.js?v=2.2.0';
-import { exportToPdf } from './engine/export_pdf.js?v=2.2.0';
-import { exportToDocx } from './engine/export_docx.js?v=2.2.0';
+import { parsePdfDocument } from './engine/pdf_adapter.js?v=2.2.1';
+import { parseDocxDocument } from './engine/docx_adapter.js?v=2.2.1';
+import { CanvasRenderer } from './engine/canvas_renderer.js?v=2.2.1';
+import { MutationEngine } from './engine/mutation_engine.js?v=2.2.1';
+import { InspectorPanel } from './engine/inspector.js?v=2.2.1';
+import { exportToPdf } from './engine/export_pdf.js?v=2.2.1';
+import { exportToDocx } from './engine/export_docx.js?v=2.2.1';
 
 let currentDocModel = null;
 let canvasRenderer = null;
@@ -58,6 +58,19 @@ function initEngine() {
                 mutationEngine.resetKopLogo(elementId);
                 showStatusBadge('Logo Kop dikembalikan ke asli.');
             }
+        },
+        (elementId, formatData) => {
+            if (canvasRenderer) {
+                canvasRenderer.updateElementFormat(elementId, formatData);
+            }
+            if (mutationEngine) {
+                mutationEngine.updateElementFormat(elementId, formatData);
+            }
+        },
+        (elementId, newText) => {
+            if (canvasRenderer) {
+                canvasRenderer.updateLiveElement(elementId, newText);
+            }
         }
     );
 
@@ -84,6 +97,10 @@ function initEngine() {
     // 3. Initialize Mutation Engine
     mutationEngine = new MutationEngine(null, (docModel, mutationRecord) => {
         updateUndoRedoButtons();
+        if (mutationRecord?.type === 'UPDATE_FORMAT') {
+            // In-place real-time DOM update already performed by canvasRenderer.updateElementFormat
+            return;
+        }
         // Re-render canvas preserving scroll and selection
         canvasRenderer.render(docModel);
         inspectorPanel.renderHierarchy(docModel, (elId) => {

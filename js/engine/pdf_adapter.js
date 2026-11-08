@@ -93,6 +93,11 @@ export async function parsePdfDocument(arrayBuffer, filename) {
         const elements = groupLinesIntoParagraphs(linesToGroup, viewport.height);
 
         elements.forEach((elData, idx) => {
+            const isKop = (elData.y < 125);
+            const isSigZone = structure.signatureZone?.elements?.some(s => Math.abs(s.y - elData.y) <= 8) ||
+                              /(ketua|direktur|wadir|sekretaris|bendahara|pembina|mengetahui|menyetujui|nip\.|nim\.)/i.test(elData.text);
+            const detectedAlignment = isKop ? 'center' : (isSigZone ? 'center' : (elData.isParagraph ? 'justify' : 'left'));
+
             const el = createElementModel(elData.isParagraph ? 'paragraph' : 'text', {
                 text: elData.text,
                 x: elData.x,
@@ -101,6 +106,11 @@ export async function parsePdfDocument(arrayBuffer, filename) {
                 height: elData.height,
                 fontSize: elData.fontSize,
                 fontFamily: mapPdfFontFamily(elData.fontName),
+                alignment: detectedAlignment,
+                _initialAlignment: detectedAlignment,
+                offsetX: 0,
+                isBold: false,
+                isItalic: false,
                 sourceRef: {
                     pageIndex: pageNum - 1,
                     elementIndex: idx,

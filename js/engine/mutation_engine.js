@@ -69,6 +69,51 @@ export class MutationEngine {
         }
     }
 
+    updateElementFormat(elementId, formatData) {
+        if (!this.docModel) return;
+
+        let targetEl = null;
+        for (const page of this.docModel.pages) {
+            for (const el of page.elements) {
+                if (el.id === elementId) {
+                    targetEl = el;
+                    break;
+                }
+            }
+            if (targetEl) break;
+        }
+
+        if (!targetEl) return;
+
+        const oldFormat = {
+            isBold: targetEl.isBold,
+            isItalic: targetEl.isItalic,
+            alignment: targetEl.alignment,
+            offsetX: targetEl.offsetX
+        };
+
+        const mutationRecord = {
+            elementId: elementId,
+            type: 'UPDATE_FORMAT',
+            oldFormat: oldFormat,
+            newFormat: { ...formatData },
+            timestamp: Date.now()
+        };
+        this.docModel.undoStack.push(mutationRecord);
+        this.docModel.redoStack = [];
+
+        Object.assign(targetEl, formatData);
+        targetEl.isModified = true;
+
+        if (!this.docModel.modifications.includes(elementId)) {
+            this.docModel.modifications.push(elementId);
+        }
+
+        if (this.onStateChanged) {
+            this.onStateChanged(this.docModel, mutationRecord);
+        }
+    }
+
     /**
      * Recalculates vertical flow and spills overflowing elements onto Page 2 if needed (non-destructively)
      */
@@ -174,6 +219,8 @@ export class MutationEngine {
                 targetEl.extra.mimeType = lastAction.oldMime;
                 targetEl.extra.isRemoved = lastAction.oldRemoved;
                 targetEl.isModified = !!(lastAction.oldSrc || lastAction.oldRemoved);
+            } else if (lastAction.type === 'UPDATE_FORMAT') {
+                Object.assign(targetEl, lastAction.oldFormat);
             } else {
                 targetEl.text = lastAction.oldText;
                 targetEl.isModified = (targetEl.text !== targetEl.originalText);
@@ -218,6 +265,9 @@ export class MutationEngine {
             } else if (action.type === 'REMOVE_KOP_LOGO') {
                 targetEl.extra = targetEl.extra || {};
                 targetEl.extra.isRemoved = true;
+                targetEl.isModified = true;
+            } else if (action.type === 'UPDATE_FORMAT') {
+                Object.assign(targetEl, action.newFormat);
                 targetEl.isModified = true;
             } else {
                 targetEl.text = action.newText;

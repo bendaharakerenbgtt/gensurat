@@ -3,7 +3,7 @@
  */
 
 export class InspectorPanel {
-    constructor(inspectorEl, hierarchyEl, onTextUpdated, onAddTableRow, onLogoUpdated, onLogoRemoved, onLogoReset) {
+    constructor(inspectorEl, hierarchyEl, onTextUpdated, onAddTableRow, onLogoUpdated, onLogoRemoved, onLogoReset, onFormatChanged, onTextLive) {
         this.inspectorEl = inspectorEl;
         this.hierarchyEl = hierarchyEl;
         this.onTextUpdated = onTextUpdated;
@@ -11,6 +11,8 @@ export class InspectorPanel {
         this.onLogoUpdated = onLogoUpdated;
         this.onLogoRemoved = onLogoRemoved;
         this.onLogoReset = onLogoReset;
+        this.onFormatChanged = onFormatChanged;
+        this.onTextLive = onTextLive;
         this.currentElement = null;
     }
 
@@ -76,6 +78,56 @@ export class InspectorPanel {
                     <textarea id="inspector_text_input" rows="5" class="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white leading-relaxed focus:outline-none focus:border-blue-500 font-sans resize-y">${escapeHtml(element.text)}</textarea>
                 </div>
 
+                <!-- Word-Like Formatting Toolbar -->
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-1.5 flex flex-wrap items-center gap-1">
+                    <!-- Bold / Italic -->
+                    <div class="flex items-center bg-neutral-950 rounded p-0.5 border border-neutral-800/60">
+                        <button type="button" id="btn_format_bold" class="w-7 h-7 flex items-center justify-center rounded text-xs transition-colors ${element.isBold ? 'bg-blue-600 text-white font-bold' : 'text-neutral-400 hover:text-white hover:bg-neutral-800'}" title="Tebal (Bold)">
+                            <i class="fa-solid fa-bold"></i>
+                        </button>
+                        <button type="button" id="btn_format_italic" class="w-7 h-7 flex items-center justify-center rounded text-xs transition-colors ${element.isItalic ? 'bg-blue-600 text-white italic' : 'text-neutral-400 hover:text-white hover:bg-neutral-800'}" title="Miring (Italic)">
+                            <i class="fa-solid fa-italic"></i>
+                        </button>
+                    </div>
+
+                    <div class="h-5 w-px bg-neutral-800"></div>
+
+                    <!-- Alignment -->
+                    <div class="flex items-center bg-neutral-950 rounded p-0.5 border border-neutral-800/60">
+                        <button type="button" id="btn_align_left" class="w-7 h-7 flex items-center justify-center rounded text-xs transition-colors ${(element.alignment === 'left' || !element.alignment) ? 'bg-blue-600 text-white' : 'text-neutral-400 hover:text-white hover:bg-neutral-800'}" title="Rata Kiri">
+                            <i class="fa-solid fa-align-left"></i>
+                        </button>
+                        <button type="button" id="btn_align_center" class="w-7 h-7 flex items-center justify-center rounded text-xs transition-colors ${element.alignment === 'center' ? 'bg-blue-600 text-white' : 'text-neutral-400 hover:text-white hover:bg-neutral-800'}" title="Rata Tengah">
+                            <i class="fa-solid fa-align-center"></i>
+                        </button>
+                        <button type="button" id="btn_align_right" class="w-7 h-7 flex items-center justify-center rounded text-xs transition-colors ${element.alignment === 'right' ? 'bg-blue-600 text-white' : 'text-neutral-400 hover:text-white hover:bg-neutral-800'}" title="Rata Kanan">
+                            <i class="fa-solid fa-align-right"></i>
+                        </button>
+                        <button type="button" id="btn_align_justify" class="w-7 h-7 flex items-center justify-center rounded text-xs transition-colors ${element.alignment === 'justify' ? 'bg-blue-600 text-white' : 'text-neutral-400 hover:text-white hover:bg-neutral-800'}" title="Rata Kanan Kiri">
+                            <i class="fa-solid fa-align-justify"></i>
+                        </button>
+                    </div>
+
+                    <div class="h-5 w-px bg-neutral-800"></div>
+
+                    <!-- Horizontal Nudge / Geser / Tab -->
+                    <div class="flex items-center bg-neutral-950 rounded p-0.5 border border-neutral-800/60 gap-1 px-1">
+                        <span class="text-[9px] uppercase font-mono text-neutral-500 font-bold">Geser</span>
+                        <button type="button" id="btn_nudge_left" class="w-6 h-6 flex items-center justify-center rounded text-xs text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors" title="Geser ke Kiri (5pt)">
+                            <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                        </button>
+                        <span id="label_nudge_offset" class="text-[10px] font-mono text-blue-400 min-w-8 text-center">${element.offsetX || 0}pt</span>
+                        <button type="button" id="btn_nudge_right" class="w-6 h-6 flex items-center justify-center rounded text-xs text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors" title="Geser ke Kanan / Tab (5pt)">
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </button>
+                        ${element.offsetX ? `
+                            <button type="button" id="btn_nudge_reset" class="text-[10px] text-neutral-500 hover:text-red-400 px-1" title="Reset Posisi Geser">
+                                <i class="fa-solid fa-rotate-left text-[9px]"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+
                 <!-- Formatting Info -->
                 <div class="grid grid-cols-2 gap-2 text-[11px]">
                     <div class="p-2 bg-neutral-950 border border-neutral-800/80 rounded">
@@ -109,16 +161,113 @@ export class InspectorPanel {
         const applyBtn = document.getElementById('btn_apply_inspector');
         const resetBtn = document.getElementById('btn_reset_inspector');
 
-        if (textarea && applyBtn) {
-            applyBtn.addEventListener('click', () => {
-                if (this.onTextUpdated) {
-                    this.onTextUpdated(element.id, textarea.value);
+        // Word Toolbar Listeners
+        const boldBtn = document.getElementById('btn_format_bold');
+        const italicBtn = document.getElementById('btn_format_italic');
+        const alignLeftBtn = document.getElementById('btn_align_left');
+        const alignCenterBtn = document.getElementById('btn_align_center');
+        const alignRightBtn = document.getElementById('btn_align_right');
+        const alignJustifyBtn = document.getElementById('btn_align_justify');
+        const nudgeLeftBtn = document.getElementById('btn_nudge_left');
+        const nudgeRightBtn = document.getElementById('btn_nudge_right');
+        const nudgeResetBtn = document.getElementById('btn_nudge_reset');
+
+        const triggerFormatUpdate = () => {
+            if (this.onFormatChanged) {
+                this.onFormatChanged(element.id, {
+                    isBold: !!element.isBold,
+                    isItalic: !!element.isItalic,
+                    alignment: element.alignment || 'left',
+                    offsetX: element.offsetX || 0
+                });
+            }
+            this.renderElement(element, page);
+        };
+
+        if (boldBtn) {
+            boldBtn.addEventListener('click', () => {
+                element.isBold = !element.isBold;
+                element.isModified = true;
+                triggerFormatUpdate();
+            });
+        }
+        if (italicBtn) {
+            italicBtn.addEventListener('click', () => {
+                element.isItalic = !element.isItalic;
+                element.isModified = true;
+                triggerFormatUpdate();
+            });
+        }
+        if (alignLeftBtn) {
+            alignLeftBtn.addEventListener('click', () => {
+                element.alignment = 'left';
+                element.isModified = true;
+                triggerFormatUpdate();
+            });
+        }
+        if (alignCenterBtn) {
+            alignCenterBtn.addEventListener('click', () => {
+                element.alignment = 'center';
+                element.isModified = true;
+                triggerFormatUpdate();
+            });
+        }
+        if (alignRightBtn) {
+            alignRightBtn.addEventListener('click', () => {
+                element.alignment = 'right';
+                element.isModified = true;
+                triggerFormatUpdate();
+            });
+        }
+        if (alignJustifyBtn) {
+            alignJustifyBtn.addEventListener('click', () => {
+                element.alignment = 'justify';
+                element.isModified = true;
+                triggerFormatUpdate();
+            });
+        }
+        if (nudgeLeftBtn) {
+            nudgeLeftBtn.addEventListener('click', () => {
+                element.offsetX = (element.offsetX || 0) - 5;
+                element.isModified = true;
+                triggerFormatUpdate();
+            });
+        }
+        if (nudgeRightBtn) {
+            nudgeRightBtn.addEventListener('click', () => {
+                element.offsetX = (element.offsetX || 0) + 5;
+                element.isModified = true;
+                triggerFormatUpdate();
+            });
+        }
+        if (nudgeResetBtn) {
+            nudgeResetBtn.addEventListener('click', () => {
+                element.offsetX = 0;
+                element.isModified = true;
+                triggerFormatUpdate();
+            });
+        }
+
+        if (textarea) {
+            // Live instant DOM update without full canvas re-render (Zero Flickering)
+            textarea.addEventListener('input', () => {
+                element.text = textarea.value;
+                if (this.onTextLive) {
+                    this.onTextLive(element.id, textarea.value);
                 }
             });
 
-            // Live sync on Enter or input debounce
-            textarea.addEventListener('input', () => {
-                if (this.onTextUpdated) {
+            // Commit state to mutation engine on apply button or blur
+            if (applyBtn) {
+                applyBtn.addEventListener('click', () => {
+                    if (this.onTextUpdated) {
+                        this.onTextUpdated(element.id, textarea.value);
+                    }
+                });
+            }
+
+            textarea.addEventListener('blur', () => {
+                if (this.onTextUpdated && textarea.value !== element.originalText) {
                     this.onTextUpdated(element.id, textarea.value);
                 }
             });
@@ -126,6 +275,11 @@ export class InspectorPanel {
 
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
+                element.text = element.originalText;
+                element.isBold = false;
+                element.isItalic = false;
+                element.alignment = element._initialAlignment || 'left';
+                element.offsetX = 0;
                 if (this.onTextUpdated) {
                     this.onTextUpdated(element.id, element.originalText);
                 }
@@ -313,11 +467,21 @@ export class InspectorPanel {
             `;
 
             page.elements.forEach(el => {
-                const previewText = el.text ? el.text.substring(0, 32) + (el.text.length > 32 ? '...' : '') : '[Kosong]';
+                let icon = 'fa-font text-neutral-500';
+                if (el.type === 'kop_logo') icon = 'fa-image text-blue-400';
+                else if (/@/.test(el.text || '')) icon = 'fa-envelope text-emerald-400';
+                else if (/^(https?:\/\/|www\.)/i.test(el.text || '')) icon = 'fa-globe text-cyan-400';
+                else if (/^(telp|wa|fax|phone)/i.test(el.text || '')) icon = 'fa-phone text-amber-400';
+                else if (/(ketua|direktur|wadir|sekretaris|bendahara|pembina|mengetahui|menyetujui|nip\.|nim\.)/i.test(el.text || '')) icon = 'fa-signature text-purple-400';
+
+                const previewText = el.text ? el.text.substring(0, 30) + (el.text.length > 30 ? '...' : '') : '[Kosong]';
                 const isMod = el.isModified;
                 html += `
                     <div data-element-id="${el.id}" class="hierarchy-tree-node px-2.5 py-1.5 rounded text-xs text-neutral-400 hover:text-white hover:bg-neutral-800/60 cursor-pointer flex items-center justify-between transition-colors ${this.currentElement?.id === el.id ? 'bg-blue-950/60 text-blue-300 font-medium' : ''}">
-                        <span class="truncate pr-2">${escapeHtml(previewText)}</span>
+                        <span class="truncate pr-2 flex items-center gap-1.5">
+                            <i class="fa-solid ${icon} text-[10px] shrink-0"></i>
+                            <span class="truncate">${escapeHtml(previewText)}</span>
+                        </span>
                         ${isMod ? '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" title="Diedit"></span>' : ''}
                     </div>
                 `;

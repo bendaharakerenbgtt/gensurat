@@ -23,6 +23,7 @@ export class CanvasRenderer {
 
     async render(docModel) {
         this.docModel = docModel;
+        window._renderCount = (window._renderCount || 0) + 1;
         this.container.innerHTML = '';
 
         if (!docModel || !docModel.pages || docModel.pages.length === 0) {
@@ -43,56 +44,180 @@ export class CanvasRenderer {
     }
 
     /**
+     * Update an element's text live in the DOM without full canvas re-render (Zero Flickering)
+     */
+    updateLiveElement(elementId, newText) {
+        if (!this.docModel) return;
+        let targetEl = null;
+        for (const page of this.docModel.pages) {
+            for (const el of page.elements) {
+                if (el.id === elementId) {
+                    targetEl = el;
+                    break;
+                }
+            }
+            if (targetEl) break;
+        }
+        if (!targetEl) return;
+        targetEl.text = newText;
+        targetEl.isModified = true;
+
+        const targetDom = document.getElementById('target_' + elementId);
+        if (!targetDom) return;
+        targetDom.title = newText;
+
+        const isParagraph = targetEl.type === 'paragraph' || targetEl.sourceRef?.isParagraph;
+        const fontFam = targetEl.fontFamily || 'Times New Roman';
+        const alignment = targetEl.alignment || ((targetEl.rect.y < 125) ? 'center' : (isParagraph ? 'justify' : 'left'));
+
+        let contentEl = targetDom.querySelector('.modified-text-content');
+        if (!contentEl) {
+            targetDom.classList.add('is-modified');
+            targetDom.innerHTML = `
+                <div class="modified-whiteout-patch absolute inset-0 bg-white" style="z-index: 1;"></div>
+                <div class="modified-text-content relative z-10 text-neutral-900" style="
+                    font-size: ${Math.max(8, targetEl.fontSize * this.scale)}px;
+                    font-family: '${fontFam}', serif;
+                    font-weight: ${targetEl.isBold ? 'bold' : 'normal'};
+                    font-style: ${targetEl.isItalic ? 'italic' : 'normal'};
+                    line-height: ${isParagraph ? '1.45' : '1.1'};
+                    text-align: ${alignment};
+                    word-break: break-word;
+                    white-space: ${isParagraph ? 'normal' : 'nowrap'};
+                    padding: 0 4px;
+                ">
+                    ${formatRichHtml(newText)}
+                </div>
+            `;
+        } else {
+            contentEl.innerHTML = formatRichHtml(newText);
+        }
+    }
+
+    /**
+     * Update formatting (bold, italic, alignment, horizontal offset) in real-time
+     */
+    updateElementFormat(elementId, formatData) {
+        if (!this.docModel) return;
+        let targetEl = null;
+        let targetPage = null;
+        for (const page of this.docModel.pages) {
+            for (const el of page.elements) {
+                if (el.id === elementId) {
+                    targetEl = el;
+                    targetPage = page;
+                    break;
+                }
+            }
+            if (targetEl) break;
+        }
+        if (!targetEl) return;
+
+        Object.assign(targetEl, formatData);
+        targetEl.isModified = true;
+
+        const targetDom = document.getElementById('target_' + elementId);
+        if (!targetDom) return;
+
+        const isParagraph = targetEl.type === 'paragraph' || targetEl.sourceRef?.isParagraph;
+        const isKopText = (targetEl.rect.y < 125);
+        const alignment = targetEl.alignment || (isKopText ? 'center' : (isParagraph ? 'justify' : 'left'));
+
+        if (alignment === 'center') {
+            if (isKopText && targetPage) {
+                targetDom.style.left = ((targetPage.width * this.scale) / 2 + (targetEl.offsetX || 0) * this.scale) + 'px';
+            } else {
+                const colCenterX = targetEl.rect.x + (targetEl.rect.width / 2);
+                targetDom.style.left = (colCenterX * this.scale + (targetEl.offsetX || 0) * this.scale) + 'px';
+            }
+            targetDom.style.transform = 'translateX(-50%)';
+            targetDom.style.textAlign = 'center';
+            targetDom.style.width = 'auto';
+            targetDom.style.minWidth = (targetEl.rect.width * this.scale + 10) + 'px';
+        } else if (alignment === 'right') {
+            targetDom.style.left = ((targetEl.rect.x + targetEl.rect.width) * this.scale + (targetEl.offsetX || 0) * this.scale) + 'px';
+            targetDom.style.transform = 'translateX(-100%)';
+            targetDom.style.textAlign = 'right';
+        } else {
+            targetDom.style.left = (targetEl.rect.x * this.scale + (targetEl.offsetX || 0) * this.scale) + 'px';
+            targetDom.style.transform = 'none';
+            targetDom.style.textAlign = alignment;
+        }
+
+        const contentEl = targetDom.querySelector('.modified-text-content');
+        if (contentEl) {
+            contentEl.style.fontWeight = targetEl.isBold ? 'bold' : 'normal';
+            contentEl.style.fontStyle = targetEl.isItalic ? 'italic' : 'normal';
+            contentEl.style.textAlign = alignment;
+        }
+    }
+
+    /**
      * Render PDF Mode: Background Canvas + Text Overlay Targets
      */
     async renderPdfPages(docModel) {
-        // Load PDF Document instance from rawBytes
-        const loadingTask = window.pdfjsLib.getDocument({
-            data: new Uint8Array(docModel.source.rawBytes.slice(0))
-        });
-        const pdfDoc = await loadingTask.promise;
+        if (this._isRendering) {
+            this._pendingRenderDoc = docModel;
+            return;
+        }
+        this._isRendering = true;
 
-        for (let pIdx = 0; pIdx < docModel.pages.length; pIdx++) {
-            const pageData = docModel.pages[pIdx];
-            let pdfPage = null;
-            if (pIdx + 1 <= pdfDoc.numPages) {
-                pdfPage = await pdfDoc.getPage(pIdx + 1);
+        try {
+            // Pre-mount all page wrappers synchronously upfront to guarantee strict monotonic order [0, 1, ...]
+            this.container.innerHTML = '';
+            const wrappers = [];
+            for (let pIdx = 0; pIdx < docModel.pages.length; pIdx++) {
+                const pageData = docModel.pages[pIdx];
+                const pageWrapper = document.createElement('div');
+                pageWrapper.className = 'canvas-page-wrapper pdf-mode relative shadow-2xl bg-white mb-8 mx-auto shrink-0';
+                pageWrapper.style.width = (pageData.width * this.scale) + 'px';
+                pageWrapper.style.height = (pageData.height * this.scale) + 'px';
+                pageWrapper.style.minWidth = (pageData.width * this.scale) + 'px';
+                pageWrapper.style.minHeight = (pageData.height * this.scale) + 'px';
+                pageWrapper.dataset.pageIndex = pIdx;
+
+                const pageBadge = document.createElement('div');
+                pageBadge.className = 'absolute -top-6 left-0 text-[11px] font-mono text-neutral-400 font-bold';
+                pageBadge.innerText = `Halaman ${pIdx + 1} / ${docModel.pages.length}`;
+                pageWrapper.appendChild(pageBadge);
+
+                this.container.appendChild(pageWrapper);
+                wrappers.push(pageWrapper);
             }
 
-            // Create Page Sheet Wrapper
-            const pageWrapper = document.createElement('div');
-            pageWrapper.className = 'canvas-page-wrapper pdf-mode relative shadow-2xl bg-white mb-8 mx-auto shrink-0';
-            pageWrapper.style.width = (pageData.width * this.scale) + 'px';
-            pageWrapper.style.height = (pageData.height * this.scale) + 'px';
-            pageWrapper.style.minWidth = (pageData.width * this.scale) + 'px';
-            pageWrapper.style.minHeight = (pageData.height * this.scale) + 'px';
-            pageWrapper.dataset.pageIndex = pIdx;
+            // Load PDF Document instance from rawBytes
+            const loadingTask = window.pdfjsLib.getDocument({
+                data: new Uint8Array(docModel.source.rawBytes.slice(0))
+            });
+            const pdfDoc = await loadingTask.promise;
 
-            // Page Number Badge
-            const pageBadge = document.createElement('div');
-            pageBadge.className = 'absolute -top-6 left-0 text-[11px] font-mono text-neutral-400 font-bold';
-            pageBadge.innerText = `Halaman ${pIdx + 1} / ${docModel.pages.length}`;
-            pageWrapper.appendChild(pageBadge);
+            for (let pIdx = 0; pIdx < docModel.pages.length; pIdx++) {
+                const pageData = docModel.pages[pIdx];
+                const pageWrapper = wrappers[pIdx];
+                let pdfPage = null;
+                if (pIdx + 1 <= pdfDoc.numPages) {
+                    pdfPage = await pdfDoc.getPage(pIdx + 1);
+                }
 
-            // 1. Background Canvas
-            const canvas = document.createElement('canvas');
-            canvas.className = 'absolute inset-0 w-full h-full pointer-events-none';
-            if (pdfPage) {
-                const pixelRatio = window.devicePixelRatio || 1.5;
-                const viewport = pdfPage.getViewport({ scale: this.scale * pixelRatio });
-                canvas.width = viewport.width;
-                canvas.height = viewport.height;
-                const ctx = canvas.getContext('2d');
+                // 1. Background Canvas
+                const canvas = document.createElement('canvas');
+                canvas.className = 'absolute inset-0 w-full h-full pointer-events-none';
+                if (pdfPage) {
+                    const pixelRatio = window.devicePixelRatio || 1.5;
+                    const viewport = pdfPage.getViewport({ scale: this.scale * pixelRatio });
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const ctx = canvas.getContext('2d');
 
-                const renderContext = {
-                    canvasContext: ctx,
-                    viewport: viewport
-                };
-                await pdfPage.render(renderContext).promise;
-            } else {
-                canvas.style.backgroundColor = '#ffffff';
-            }
-            pageWrapper.appendChild(canvas);
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    await pdfPage.render(renderContext).promise;
+                } else {
+                    canvas.style.backgroundColor = '#ffffff';
+                }
+                pageWrapper.appendChild(canvas);
 
             // 2. Interactive Text Overlay & Flowable Layout
             const overlay = document.createElement('div');
@@ -191,14 +316,14 @@ export class CanvasRenderer {
 
                 const effectiveY = el.rect.y + cumulativeShift;
                 const isParagraph = el.type === 'paragraph' || el.sourceRef?.isParagraph;
-                const isKopText = (el.rect.y < 95);
+                const isKopText = (el.rect.y < 125);
                 const fontFam = el.fontFamily || 'Times New Roman';
-                const alignment = isKopText ? 'center' : (isParagraph ? 'justify' : 'left');
+                const alignment = el.alignment || (isKopText ? 'center' : (isParagraph ? 'justify' : 'left'));
 
-                let targetWidth = Math.max(20, el.rect.width * this.scale) + 'px';
+                let targetWidth = Math.max(24, el.rect.width * this.scale) + 'px';
                 let targetLeft = (el.rect.x * this.scale) + 'px';
                 let targetTop = (effectiveY * this.scale) + 'px';
-                let targetHeight = (currentHeight * this.scale) + 'px';
+                let targetHeight = Math.max(18, currentHeight * this.scale) + 'px';
 
                 const target = document.createElement('div');
                 target.id = 'target_' + el.id;
@@ -210,18 +335,36 @@ export class CanvasRenderer {
                 target.style.zIndex = '10';
                 target.title = el.text;
 
-                if (el.isModified && isKopText) {
-                    target.style.left = ((pageData.width * this.scale) / 2) + 'px';
-                    target.style.transform = 'translateX(-50%)';
-                    target.style.width = 'auto';
-                    target.style.minWidth = (el.rect.width * this.scale + 16) + 'px';
-                    target.style.height = (el.rect.height * this.scale) + 'px';
-                    target.style.top = (effectiveY * this.scale) + 'px';
-                } else if (el.isModified && !isParagraph) {
-                    target.style.width = 'auto';
-                    target.style.minWidth = (el.rect.width * this.scale + 10) + 'px';
-                    target.style.height = (el.rect.height * this.scale) + 'px';
-                    target.style.top = (effectiveY * this.scale) + 'px';
+                if (el.isModified) {
+                    if (alignment === 'center') {
+                        if (isKopText) {
+                            target.style.left = ((pageData.width * this.scale) / 2 + (el.offsetX || 0) * this.scale) + 'px';
+                        } else {
+                            const colCenterX = el.rect.x + (el.rect.width / 2);
+                            target.style.left = (colCenterX * this.scale + (el.offsetX || 0) * this.scale) + 'px';
+                        }
+                        target.style.transform = 'translateX(-50%)';
+                        target.style.width = 'auto';
+                        target.style.minWidth = (el.rect.width * this.scale + 16) + 'px';
+                        target.style.height = targetHeight;
+                        target.style.top = (effectiveY * this.scale) + 'px';
+                    } else if (alignment === 'right') {
+                        target.style.left = ((el.rect.x + el.rect.width) * this.scale + (el.offsetX || 0) * this.scale) + 'px';
+                        target.style.transform = 'translateX(-100%)';
+                        target.style.width = 'auto';
+                        target.style.minWidth = (el.rect.width * this.scale + 10) + 'px';
+                        target.style.height = targetHeight;
+                        target.style.top = (effectiveY * this.scale) + 'px';
+                    } else {
+                        target.style.left = (el.rect.x * this.scale + (el.offsetX || 0) * this.scale) + 'px';
+                        target.style.transform = 'none';
+                        if (!isParagraph) {
+                            target.style.width = 'auto';
+                            target.style.minWidth = (el.rect.width * this.scale + 10) + 'px';
+                        }
+                        target.style.height = targetHeight;
+                        target.style.top = (effectiveY * this.scale) + 'px';
+                    }
                 }
 
                 if (this.selectedElementId === el.id) {
@@ -248,7 +391,17 @@ export class CanvasRenderer {
 
                     target.innerHTML = `
                         <div class="modified-whiteout-patch absolute inset-0 bg-white" style="z-index: 1;"></div>
-                        <div class="relative z-10 text-neutral-900" style="font-size: ${Math.max(8, el.fontSize * this.scale)}px; font-family: '${fontFam}', serif; line-height: ${isParagraph ? '1.45' : '1.1'}; text-align: ${alignment}; word-break: break-word; white-space: ${isParagraph ? 'normal' : 'nowrap'}; padding: 0;">
+                        <div class="modified-text-content relative z-10 text-neutral-900" style="
+                            font-size: ${Math.max(8, el.fontSize * this.scale)}px;
+                            font-family: '${fontFam}', serif;
+                            font-weight: ${el.isBold ? 'bold' : 'normal'};
+                            font-style: ${el.isItalic ? 'italic' : 'normal'};
+                            line-height: ${isParagraph ? '1.45' : '1.1'};
+                            text-align: ${alignment};
+                            word-break: break-word;
+                            white-space: ${isParagraph ? 'normal' : 'nowrap'};
+                            padding: 0 4px;
+                        ">
                             ${formatRichHtml(el.text)}
                         </div>
                     `;
@@ -288,9 +441,16 @@ export class CanvasRenderer {
             this.renderAddedImages(pageWrapper, pageData, pIdx);
 
             pageWrapper.appendChild(overlay);
-            this.container.appendChild(pageWrapper);
+        }
+    } finally {
+        this._isRendering = false;
+        if (this._pendingRenderDoc) {
+            const nextDoc = this._pendingRenderDoc;
+            this._pendingRenderDoc = null;
+            this.render(nextDoc);
         }
     }
+}
 
     /**
      * Render DOCX Mode: Structured A4 Sheets with live DOM elements
