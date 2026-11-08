@@ -70,20 +70,47 @@ export class MutationEngine {
     }
 
     /**
-     * Recalculates vertical flow and spills overflowing elements onto Page 2 if needed
+     * Recalculates vertical flow and spills overflowing elements onto Page 2 if needed (non-destructively)
      */
     recalculatePagination() {
         if (!this.docModel || !this.docModel.pages || this.docModel.pages.length === 0) return;
         const p1 = this.docModel.pages[0];
+        if (!p1._canonicalElements) {
+            p1._canonicalElements = [...p1.elements];
+        }
+
+        // Merge latest text & isModified state from active pages into canonical pool
+        const modifiedMap = new Map();
+        for (const p of this.docModel.pages) {
+            for (const el of p.elements) {
+                if (el.isModified || el.text !== el.originalText) {
+                    modifiedMap.set(el.id, el);
+                }
+            }
+        }
+
+        const fullPool = p1._canonicalElements.map(el => {
+            const active = modifiedMap.get(el.id);
+            if (active) {
+                return {
+                    ...el,
+                    text: active.text,
+                    isModified: active.isModified,
+                    expandedHeight: active.expandedHeight || (active.isModified ? Math.max(el.height || 14, Math.ceil(active.text.length / 50) * 18) : el.height)
+                };
+            }
+            return { ...el, isModified: false, expandedHeight: undefined };
+        });
+
         const pageHeight = p1.height || 842;
-        const res = calculateReflowAndPagination(p1.elements, pageHeight, 50);
+        const res = calculateReflowAndPagination(fullPool, pageHeight, 50);
 
         if (res.pages.length > 1) {
             p1.elements = res.pages[0].elements;
             const page2Elements = res.pages[1].elements;
             if (this.docModel.pages.length > 1) {
                 const existingP2 = this.docModel.pages[1];
-                const keptP2Elements = existingP2.elements.filter(el => !el.originalPage);
+                const keptP2Elements = existingP2.elements.filter(el => el.originalPage === undefined);
                 existingP2.elements = [...page2Elements, ...keptP2Elements];
             } else {
                 this.docModel.pages.push({
@@ -93,6 +120,15 @@ export class MutationEngine {
                     elements: page2Elements,
                     addedImages: []
                 });
+            }
+        } else {
+            p1.elements = res.pages[0].elements;
+            if (this.docModel.pages.length > 1) {
+                const existingP2 = this.docModel.pages[1];
+                existingP2.elements = existingP2.elements.filter(el => el.originalPage === undefined);
+                if (existingP2.elements.length === 0 && (!existingP2.addedImages || existingP2.addedImages.length === 0)) {
+                    this.docModel.pages.splice(1, 1);
+                }
             }
         }
     }
@@ -148,6 +184,7 @@ export class MutationEngine {
             }
 
             this.docModel.redoStack.push(lastAction);
+            this.recalculatePagination();
 
             if (this.onStateChanged) {
                 this.onStateChanged(this.docModel, { type: 'UNDO', elementId: targetEl.id });
@@ -192,6 +229,7 @@ export class MutationEngine {
             }
 
             this.docModel.undoStack.push(action);
+            this.recalculatePagination();
 
             if (this.onStateChanged) {
                 this.onStateChanged(this.docModel, { type: 'REDO', elementId: targetEl.id });

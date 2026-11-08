@@ -208,5 +208,6 @@ export function detectDocumentStructure(lines = [], images = [], pageDimensions 
         structure.bodyParagraphs.elements.push(currentBodyParagraph);
     }
 
+    structure.unifiedLines = unifiedLines;
     return structure;
 }

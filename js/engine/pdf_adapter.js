@@ -88,8 +88,9 @@ export async function parsePdfDocument(arrayBuffer, filename) {
             }));
         }
 
-        // 5. Add Structured Lines and Flowable Paragraphs
-        const elements = groupLinesIntoParagraphs(lines, viewport.height);
+        // 5. Add Structured Lines and Flowable Paragraphs using Unified Semantic Lines
+        const linesToGroup = (structure && structure.unifiedLines && structure.unifiedLines.length > 0) ? structure.unifiedLines : lines;
+        const elements = groupLinesIntoParagraphs(linesToGroup, viewport.height);
 
         elements.forEach((elData, idx) => {
             const el = createElementModel(elData.isParagraph ? 'paragraph' : 'text', {

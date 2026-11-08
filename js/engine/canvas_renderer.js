@@ -230,24 +230,26 @@ export class CanvasRenderer {
 
                 const isPushedDown = cumulativeShift > 0 && !el.isModified;
 
-                // Render whiteout & text for modified or pushed down elements
-                if (el.isModified || isPushedDown) {
+                // Render whiteout & text for modified, pushed down, or spilled elements
+                if (el.isModified || isPushedDown || el.isSpilled) {
                     target.classList.add('is-modified');
 
-                    // Erase old position from canvas background if element was pushed down OR modified
-                    const oldPosWhiteout = document.createElement('div');
-                    oldPosWhiteout.className = 'absolute bg-white pointer-events-none';
-                    oldPosWhiteout.style.left = (el.rect.x * this.scale - 4) + 'px';
-                    oldPosWhiteout.style.top = (el.rect.y * this.scale - 1) + 'px';
-                    oldPosWhiteout.style.width = (el.rect.width * this.scale + 8) + 'px';
-                    oldPosWhiteout.style.height = (el.rect.height * this.scale + 2) + 'px';
-                    oldPosWhiteout.style.zIndex = '5';
-                    overlay.appendChild(oldPosWhiteout);
+                    // Erase old position from canvas background if element was pushed down OR modified (on original page)
+                    if (el.originalPage === undefined) {
+                        const oldPosWhiteout = document.createElement('div');
+                        oldPosWhiteout.className = 'absolute bg-white pointer-events-none';
+                        oldPosWhiteout.style.left = (el.rect.x * this.scale - 4) + 'px';
+                        oldPosWhiteout.style.top = (el.rect.y * this.scale - 1) + 'px';
+                        oldPosWhiteout.style.width = (el.rect.width * this.scale + 8) + 'px';
+                        oldPosWhiteout.style.height = (el.rect.height * this.scale + 2) + 'px';
+                        oldPosWhiteout.style.zIndex = '5';
+                        overlay.appendChild(oldPosWhiteout);
+                    }
 
                     target.innerHTML = `
                         <div class="modified-whiteout-patch absolute inset-0 bg-white" style="z-index: 1;"></div>
                         <div class="relative z-10 text-neutral-900" style="font-size: ${Math.max(8, el.fontSize * this.scale)}px; font-family: '${fontFam}', serif; line-height: ${isParagraph ? '1.45' : '1.1'}; text-align: ${alignment}; word-break: break-word; white-space: ${isParagraph ? 'normal' : 'nowrap'}; padding: 0;">
-                            ${escapeHtml(el.text)}
+                            ${formatRichHtml(el.text)}
                         </div>
                     `;
                 }
@@ -504,6 +506,13 @@ function escapeHtml(str) {
         .replace(/"/g, '&quot;');
 }
 
+function formatRichHtml(str) {
+    if (!str) return '';
+    return escapeHtml(str)
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+}
+
 function measureParagraphHeight(text, widthPt, fontSizePt, fontFamily = 'Times New Roman', lineHeightRatio = 1.45) {
     if (!text) return fontSizePt * lineHeightRatio;
     let measurer = document.getElementById('ude_text_measurer');
@@ -584,7 +593,9 @@ export function calculateReflowAndPagination(elements, pageHeight = 842, marginB
                 y: newY,
                 shiftedY: newY,
                 originalPage: 0,
-                pageIndex: 1
+                pageIndex: 1,
+                isSpilled: true,
+                isModified: true
             };
             if (spilledEl.rect) {
                 spilledEl.rect = { ...spilledEl.rect, y: newY };

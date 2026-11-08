@@ -69,17 +69,21 @@ export async function exportToPdf(docModel, customFilename) {
                 const selectedFont = getFont(el);
 
                 if (isParagraph) {
-                    const whiteoutX = Math.max(0, el.rect.x - 6);
+                    const whiteoutX = Math.max(0, el.rect.x - 4);
+                    const lineHeight = el.sourceRef?.lineHeight || (el.fontSize * 1.45);
                     const totalHeight = el.expandedHeight || el.rect.height;
-                    const whiteoutY = (pageModel.height || 841.89) - el.rect.y - totalHeight;
-                    targetPdfPage.drawRectangle({
-                        x: whiteoutX,
-                        y: Math.max(0, whiteoutY - 2),
-                        width: el.rect.width + 12,
-                        height: totalHeight + 6,
-                        color: rgb(1, 1, 1),
-                        borderWidth: 0
-                    });
+                    const lineCount = Math.max(1, Math.ceil(totalHeight / lineHeight));
+                    for (let l = 0; l < lineCount; l++) {
+                        const lineY = (pageModel.height || 841.89) - el.rect.y - (l * lineHeight) - (el.fontSize * 1.15);
+                        targetPdfPage.drawRectangle({
+                            x: whiteoutX,
+                            y: Math.max(0, lineY),
+                            width: el.rect.width + 8,
+                            height: el.fontSize * 1.25,
+                            color: rgb(1, 1, 1),
+                            borderWidth: 0
+                        });
+                    }
                 } else {
                     const measuredTextWidth = selectedFont.widthOfTextAtSize(el.text, Math.max(7, el.fontSize));
                     let whiteoutX = el.rect.x - 4;
@@ -115,6 +119,23 @@ export async function exportToPdf(docModel, customFilename) {
                     color: rgb(1, 1, 1),
                     borderWidth: 0
                 });
+            }
+
+            // 1D. Whiteout on Page 1 for Spilled Elements moved to Page 2
+            if (pageModel.pageIndex === 0) {
+                const spilledFromPage1 = (docModel.pages[1]?.elements || []).filter(el => el.originalPage === 0);
+                for (const el of spilledFromPage1) {
+                    const whiteoutX = Math.max(0, el.rect.x - 4);
+                    const oldPdfY = el.sourceRef?.pdfY !== undefined ? el.sourceRef.pdfY : (pageModel.height - el.rect.y - el.fontSize);
+                    targetPdfPage.drawRectangle({
+                        x: whiteoutX,
+                        y: Math.max(0, oldPdfY - 2),
+                        width: el.rect.width + 8,
+                        height: el.rect.height + 4,
+                        color: rgb(1, 1, 1),
+                        borderWidth: 0
+                    });
+                }
             }
 
             // =========================================================================
@@ -212,17 +233,51 @@ export async function exportToPdf(docModel, customFilename) {
 
             // 2C. Draw Shifted Elements at New Downward Positions
             for (const el of shiftedElements) {
+                const isParagraph = el.type === 'paragraph' || el.sourceRef?.isParagraph;
                 const oldPdfY = el.sourceRef?.pdfY !== undefined ? el.sourceRef.pdfY : (pageModel.height - el.rect.y - el.fontSize);
                 const newPdfY = oldPdfY - el.cumulativeShift;
                 const selectedFont = getFont(el);
 
-                targetPdfPage.drawText(el.text, {
-                    x: el.rect.x,
-                    y: newPdfY,
-                    size: Math.max(7, el.fontSize),
-                    font: selectedFont,
-                    color: rgb(0.05, 0.05, 0.05)
-                });
+                if (isParagraph) {
+                    const words = el.text.split(/\s+/).filter(Boolean);
+                    let currentLine = '';
+                    let currentLineY = newPdfY;
+                    const lineHeight = el.sourceRef?.lineHeight || (el.fontSize * 1.45);
+                    for (const word of words) {
+                        const testLine = currentLine ? (currentLine + ' ' + word) : word;
+                        const testWidth = selectedFont.widthOfTextAtSize(testLine, Math.max(7, el.fontSize));
+                        if (testWidth > el.rect.width && currentLine) {
+                            targetPdfPage.drawText(currentLine, {
+                                x: el.rect.x,
+                                y: currentLineY,
+                                size: Math.max(7, el.fontSize),
+                                font: selectedFont,
+                                color: rgb(0.05, 0.05, 0.05)
+                            });
+                            currentLineY -= lineHeight;
+                            currentLine = word;
+                        } else {
+                            currentLine = testLine;
+                        }
+                    }
+                    if (currentLine) {
+                        targetPdfPage.drawText(currentLine, {
+                            x: el.rect.x,
+                            y: currentLineY,
+                            size: Math.max(7, el.fontSize),
+                            font: selectedFont,
+                            color: rgb(0.05, 0.05, 0.05)
+                        });
+                    }
+                } else {
+                    targetPdfPage.drawText(el.text, {
+                        x: el.rect.x,
+                        y: newPdfY,
+                        size: Math.max(7, el.fontSize),
+                        font: selectedFont,
+                        color: rgb(0.05, 0.05, 0.05)
+                    });
+                }
             }
 
             // 4. Draw Added Signatures / Stamps / Images
