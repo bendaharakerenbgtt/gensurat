@@ -3,13 +3,13 @@
  * Coordinates file imports, visual canvas, mutations, inspector, and dual exports.
  */
 
-import { parsePdfDocument } from './engine/pdf_adapter.js?v=2.1.0';
-import { parseDocxDocument } from './engine/docx_adapter.js?v=2.1.0';
-import { CanvasRenderer } from './engine/canvas_renderer.js?v=2.1.0';
-import { MutationEngine } from './engine/mutation_engine.js?v=2.1.0';
-import { InspectorPanel } from './engine/inspector.js?v=2.1.0';
-import { exportToPdf } from './engine/export_pdf.js?v=2.1.0';
-import { exportToDocx } from './engine/export_docx.js?v=2.1.0';
+import { parsePdfDocument } from './engine/pdf_adapter.js?v=2.2.0';
+import { parseDocxDocument } from './engine/docx_adapter.js?v=2.2.0';
+import { CanvasRenderer } from './engine/canvas_renderer.js?v=2.2.0';
+import { MutationEngine } from './engine/mutation_engine.js?v=2.2.0';
+import { InspectorPanel } from './engine/inspector.js?v=2.2.0';
+import { exportToPdf } from './engine/export_pdf.js?v=2.2.0';
+import { exportToDocx } from './engine/export_docx.js?v=2.2.0';
 
 let currentDocModel = null;
 let canvasRenderer = null;
