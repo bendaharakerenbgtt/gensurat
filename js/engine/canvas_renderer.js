@@ -54,7 +54,10 @@ export class CanvasRenderer {
 
         for (let pIdx = 0; pIdx < docModel.pages.length; pIdx++) {
             const pageData = docModel.pages[pIdx];
-            const pdfPage = await pdfDoc.getPage(pIdx + 1);
+            let pdfPage = null;
+            if (pIdx + 1 <= pdfDoc.numPages) {
+                pdfPage = await pdfDoc.getPage(pIdx + 1);
+            }
 
             // Create Page Sheet Wrapper
             const pageWrapper = document.createElement('div');
@@ -74,17 +77,21 @@ export class CanvasRenderer {
             // 1. Background Canvas
             const canvas = document.createElement('canvas');
             canvas.className = 'absolute inset-0 w-full h-full pointer-events-none';
-            const pixelRatio = window.devicePixelRatio || 1.5;
-            const viewport = pdfPage.getViewport({ scale: this.scale * pixelRatio });
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            const ctx = canvas.getContext('2d');
+            if (pdfPage) {
+                const pixelRatio = window.devicePixelRatio || 1.5;
+                const viewport = pdfPage.getViewport({ scale: this.scale * pixelRatio });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
 
-            const renderContext = {
-                canvasContext: ctx,
-                viewport: viewport
-            };
-            await pdfPage.render(renderContext).promise;
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                await pdfPage.render(renderContext).promise;
+            } else {
+                canvas.style.backgroundColor = '#ffffff';
+            }
             pageWrapper.appendChild(canvas);
 
             // 2. Interactive Text Overlay & Flowable Layout
@@ -239,7 +246,7 @@ export class CanvasRenderer {
 
                     target.innerHTML = `
                         <div class="modified-whiteout-patch absolute inset-0 bg-white" style="z-index: 1;"></div>
-                        <div class="relative z-10 text-neutral-900" style="font-size: ${Math.max(8, el.fontSize * this.scale)}pt; font-family: '${fontFam}', serif; line-height: ${isParagraph ? '1.45' : '1.1'}; text-align: ${alignment}; word-break: break-word; white-space: ${isParagraph ? 'normal' : 'nowrap'}; padding: 0 4px;">
+                        <div class="relative z-10 text-neutral-900" style="font-size: ${Math.max(8, el.fontSize * this.scale)}px; font-family: '${fontFam}', serif; line-height: ${isParagraph ? '1.45' : '1.1'}; text-align: ${alignment}; word-break: break-word; white-space: ${isParagraph ? 'normal' : 'nowrap'}; padding: 0;">
                             ${escapeHtml(el.text)}
                         </div>
                     `;
@@ -310,7 +317,7 @@ export class CanvasRenderer {
                     const pEl = document.createElement('div');
                     pEl.id = 'target_' + el.id;
                     pEl.className = 'docx-interactive-paragraph cursor-pointer transition-all rounded px-1.5 py-0.5 hover:bg-blue-50/70';
-                    pEl.style.fontSize = (el.fontSize * this.scale) + 'pt';
+                    pEl.style.fontSize = (el.fontSize * this.scale) + 'px';
                     pEl.style.fontFamily = el.fontFamily || 'Times New Roman';
                     pEl.style.textAlign = el.alignment || 'left';
                     pEl.style.fontWeight = el.fontWeight || 'normal';
@@ -513,16 +520,90 @@ function measureParagraphHeight(text, widthPt, fontSizePt, fontFamily = 'Times N
             white-space: normal;
             text-align: justify;
             box-sizing: border-box;
-            padding: 0 1px;
+            padding: 0;
             margin: 0;
         `;
         document.body.appendChild(measurer);
     }
     measurer.style.width = widthPt + 'px';
-    measurer.style.fontSize = fontSizePt + 'pt';
+    measurer.style.fontSize = fontSizePt + 'px';
     measurer.style.fontFamily = `"${fontFamily}", serif`;
     measurer.style.lineHeight = String(lineHeightRatio);
     measurer.innerText = text;
     const measuredHeight = measurer.getBoundingClientRect().height;
     return Math.ceil(measuredHeight) + 8;
+}
+
+/**
+ * Universal Sub-Pixel Reflow & Multi-Page Pagination Calculator
+ * Reflows downstream elements when paragraphs expand, and spills overflowing
+ * elements onto Page 2 when y + height > pageHeight - marginBottom.
+ */
+export function calculateReflowAndPagination(elements, pageHeight = 842, marginBottom = 50) {
+    if (!elements || elements.length === 0) {
+        return { pages: [{ pageIndex: 0, elements: [] }] };
+    }
+
+    const getY = (el) => (el.rect ? el.rect.y : el.y) || 0;
+    const getHeight = (el) => (el.rect ? el.rect.height : el.height) || 0;
+
+    let cumulativeShift = 0;
+    const page1Elements = [];
+    const page2Elements = [];
+    let firstSpillY = null;
+    const page2MarginTop = 50;
+
+    for (const el of elements) {
+        const origY = getY(el);
+        const origH = getHeight(el);
+        const isModified = Boolean(el.isModified);
+        const expandedH = (isModified && el.expandedHeight) ? el.expandedHeight : origH;
+        const currentH = expandedH;
+
+        const effectiveY = origY + cumulativeShift;
+
+        // Check if this element triggers vertical shift downstream
+        if (isModified && el.expandedHeight && el.expandedHeight > origH) {
+            const deltaH = el.expandedHeight - origH;
+            cumulativeShift += deltaH;
+        }
+
+        // Determine if element overflows Page 1
+        // Element overflows if effectiveY > (pageHeight - marginBottom) OR bottom exceeds pageHeight
+        const isOverflow = (effectiveY > (pageHeight - marginBottom)) || ((effectiveY + currentH) > pageHeight);
+
+        if (isOverflow || page2Elements.length > 0) {
+            if (firstSpillY === null) {
+                firstSpillY = effectiveY;
+            }
+            const relativeOffset = effectiveY - firstSpillY;
+            const newY = page2MarginTop + relativeOffset;
+
+            const spilledEl = {
+                ...el,
+                y: newY,
+                shiftedY: newY,
+                originalPage: 0,
+                pageIndex: 1
+            };
+            if (spilledEl.rect) {
+                spilledEl.rect = { ...spilledEl.rect, y: newY };
+            }
+            page2Elements.push(spilledEl);
+        } else {
+            const page1El = {
+                ...el,
+                shiftedY: cumulativeShift > 0 && !isModified ? effectiveY : (isModified ? effectiveY : undefined),
+                cumulativeShift: cumulativeShift
+            };
+            page1Elements.push(page1El);
+        }
+    }
+
+    const pages = [{ pageIndex: 0, elements: page1Elements }];
+    if (page2Elements.length > 0) {
+        pages.push({ pageIndex: 1, elements: page2Elements });
+    }
+
+    return { pages };
 }

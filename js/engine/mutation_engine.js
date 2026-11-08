@@ -4,6 +4,8 @@
  * and maintains live sync with DOCX XML DOM nodes.
  */
 
+import { calculateReflowAndPagination } from './canvas_renderer.js';
+
 export class MutationEngine {
     constructor(docModel, onStateChanged) {
         this.docModel = docModel;
@@ -59,8 +61,39 @@ export class MutationEngine {
             this.syncDocxXmlNode(targetEl.sourceRef.xmlNode, newText);
         }
 
+        // Recalculate reflow and pagination if needed
+        this.recalculatePagination();
+
         if (this.onStateChanged) {
             this.onStateChanged(this.docModel, mutationRecord);
+        }
+    }
+
+    /**
+     * Recalculates vertical flow and spills overflowing elements onto Page 2 if needed
+     */
+    recalculatePagination() {
+        if (!this.docModel || !this.docModel.pages || this.docModel.pages.length === 0) return;
+        const p1 = this.docModel.pages[0];
+        const pageHeight = p1.height || 842;
+        const res = calculateReflowAndPagination(p1.elements, pageHeight, 50);
+
+        if (res.pages.length > 1) {
+            p1.elements = res.pages[0].elements;
+            const page2Elements = res.pages[1].elements;
+            if (this.docModel.pages.length > 1) {
+                const existingP2 = this.docModel.pages[1];
+                const keptP2Elements = existingP2.elements.filter(el => !el.originalPage);
+                existingP2.elements = [...page2Elements, ...keptP2Elements];
+            } else {
+                this.docModel.pages.push({
+                    pageIndex: 1,
+                    width: p1.width,
+                    height: p1.height,
+                    elements: page2Elements,
+                    addedImages: []
+                });
+            }
         }
     }
 
