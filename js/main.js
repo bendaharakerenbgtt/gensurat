@@ -471,6 +471,10 @@ function escapeHtml(str) {
 
 function formatInlineRichText(str) {
     if (!str) return '';
+    if (typeof str !== 'string') return String(str);
+    if (str.includes('preview-placeholder-hint')) {
+        return str;
+    }
     let out = escapeHtml(str);
     out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
