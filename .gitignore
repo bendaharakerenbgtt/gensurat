@@ -2,6 +2,8 @@ node_modules/
 *.log
 test_screenshot_*.png
 test_suite.mjs
+test_engine_samples.mjs
+contoh/
 package.json
 package-lock.json
 .DS_Store

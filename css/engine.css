@@ -1,0 +1,94 @@
+/* ==========================================================================
+   Universal Document Engine (UDE-001) - Engine Stylesheet
+   ========================================================================== */
+
+/* Canvas Viewport */
+#canvas_viewport {
+    background-color: #0c0d0e;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+    background-size: 24px 24px;
+}
+
+/* Page Sheet Wrapper */
+.canvas-page-wrapper {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    transition: transform 0.15s ease-out;
+}
+
+.canvas-page-wrapper.pdf-mode canvas {
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* PDF Interactive Text Target */
+.pdf-interactive-target {
+    border: 1px solid transparent;
+    border-radius: 2px;
+}
+
+.pdf-interactive-target:hover {
+    background-color: rgba(59, 130, 246, 0.18);
+    border: 1px dashed #60a5fa;
+}
+
+.pdf-interactive-target.active-selected {
+    background-color: rgba(59, 130, 246, 0.28);
+    border: 1.5px solid #3b82f6 !important;
+    z-index: 60;
+}
+
+.pdf-interactive-target.is-modified {
+    box-shadow: 0 0 0 1.5px #f59e0b;
+}
+
+.modified-whiteout-patch {
+    pointer-events: none;
+}
+
+/* DOCX Interactive Elements */
+.docx-interactive-paragraph {
+    border: 1px solid transparent;
+    word-break: break-word;
+}
+
+.docx-interactive-paragraph:hover {
+    background-color: rgba(59, 130, 246, 0.08);
+    border: 1px dashed #93c5fd;
+}
+
+.docx-interactive-paragraph.active-selected {
+    background-color: rgba(59, 130, 246, 0.16);
+    border: 1.5px solid #2563eb !important;
+}
+
+.docx-interactive-paragraph.is-modified {
+    background-color: rgba(245, 158, 11, 0.08);
+    border-left: 3px solid #f59e0b;
+}
+
+/* Popover Edit */
+#quick_edit_popover {
+    position: fixed;
+    z-index: 9999;
+    filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.6));
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #3f3f46;
+}
