@@ -3,6 +3,8 @@
  * Implements Round-Trip Preservation for DOCX and Synthetic OOXML Packaging for PDF.
  */
 
+import { parseRichTextRuns } from './export_pdf.js';
+
 export async function exportToDocx(docModel, customFilename) {
     if (typeof window.JSZip === 'undefined') {
         throw new Error('JSZip is not loaded. Please check CDN connection.');
@@ -76,24 +78,33 @@ export async function exportToDocx(docModel, customFilename) {
         docModel.pages.forEach((page, pIdx) => {
             page.elements.forEach(el => {
                 if (el.text && el.text.trim()) {
-                    const escaped = escapeXml(el.text);
+                    const runs = parseRichTextRuns(el.text);
+                    let runsXml = '';
                     const sz = Math.round((el.fontSize || 12) * 2);
-                    const isBold = el.fontWeight === 'bold';
                     const font = el.fontFamily || 'Times New Roman';
 
-                    paragraphsXml += `
-    <w:p>
-      <w:pPr>
-        <w:jc w:val="${el.alignment || 'left'}"/>
-      </w:pPr>
+                    for (const run of runs) {
+                        const escaped = escapeXml(run.text);
+                        const isBold = el.fontWeight === 'bold' || run.bold;
+                        const isItalic = el.fontStyle === 'italic' || run.italic;
+
+                        runsXml += `
       <w:r>
         <w:rPr>
           <w:rFonts w:ascii="${font}" w:hAnsi="${font}"/>
           <w:sz w:val="${sz}"/>
           ${isBold ? '<w:b/>' : ''}
+          ${isItalic ? '<w:i/>' : ''}
         </w:rPr>
         <w:t xml:space="preserve">${escaped}</w:t>
-      </w:r>
+      </w:r>`;
+                    }
+
+                    paragraphsXml += `
+    <w:p>
+      <w:pPr>
+        <w:jc w:val="${el.alignment || 'left'}"/>
+      </w:pPr>${runsXml}
     </w:p>`;
                 }
             });

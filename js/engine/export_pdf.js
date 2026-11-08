@@ -26,8 +26,10 @@ export async function exportToPdf(docModel, customFilename) {
         const fontHelveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
         for (const pageModel of docModel.pages) {
-            const targetPdfPage = pages[pageModel.pageIndex];
-            if (!targetPdfPage) continue;
+            let targetPdfPage = pages[pageModel.pageIndex];
+            if (!targetPdfPage) {
+                targetPdfPage = pdfDoc.addPage([pageModel.width || 595.28, pageModel.height || 841.89]);
+            }
 
             const modifiedElements = pageModel.elements.filter(el => el.isModified);
             const shiftedElements = pageModel.elements.filter(el => (el.cumulativeShift || 0) > 0 && !el.isModified);
@@ -368,4 +370,39 @@ function triggerDownload(blob, filename) {
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/**
+ * Universal Rich Text Run Parser
+ * Converts markdown-style **bold** and *italic* tokens into formatted runs
+ */
+export function parseRichTextRuns(text) {
+    if (!text) return [];
+    const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+    const parts = text.split(pattern);
+    const runs = [];
+
+    for (const part of parts) {
+        if (!part) continue;
+        if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
+            runs.push({
+                text: part.slice(2, -2),
+                bold: true,
+                italic: false
+            });
+        } else if (part.startsWith('*') && part.endsWith('*') && part.length >= 2) {
+            runs.push({
+                text: part.slice(1, -1),
+                bold: false,
+                italic: true
+            });
+        } else {
+            runs.push({
+                text: part,
+                bold: false,
+                italic: false
+            });
+        }
+    }
+    return runs;
 }
