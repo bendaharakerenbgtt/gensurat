@@ -1,8 +1,9 @@
 /**
  * PDF Import Adapter - UDE-001
- * Uses PDF.js to parse PDF pages, extract text coordinates, and render background canvas.
+ * Uses PDF.js to parse PDF pages, extract text coordinates, images, and render background canvas.
  */
 import { createDocumentModel, createPageModel, createElementModel } from './dim.js';
+import { detectDocumentStructure } from './semantic_detector.js';
 
 export async function parsePdfDocument(arrayBuffer, filename) {
     if (typeof window.pdfjsLib === 'undefined') {
@@ -35,46 +36,60 @@ export async function parsePdfDocument(arrayBuffer, filename) {
             viewport.width > viewport.height ? 'landscape' : 'portrait'
         );
 
-        // Extract Text Content with Coordinates
+        // 1. Extract Real Image Bounding Boxes from Operator List
+        const extractedImages = await extractPdfImages(page, viewport);
+
+        // 2. Extract Text Content with Coordinates
         const textContent = await page.getTextContent({
             normalizeWhitespace: true,
             disableCombineTextItems: false
         });
 
-        // Group into lines then group adjacent lines into semantic paragraphs
+        // Group into lines
         const rawItems = textContent.items || [];
         const lines = groupTextItemsIntoLines(rawItems, viewport.height);
-        const elements = groupLinesIntoParagraphs(lines, viewport.height);
 
-        // Detect if page has Kop Surat (header lines at y < 95)
-        const hasKopHeader = lines.some(l => l.y < 95);
-        if (hasKopHeader) {
-            // Add Interactive Logo Kiri (Logo Kampus)
+        // 3. Run Universal Semantic Zone Detector
+        const structure = detectDocumentStructure(lines, extractedImages, { width: viewport.width, height: viewport.height });
+
+        // 4. Add Dynamic Kop Logos (Derived from actual images in top zone)
+        const logoCandidates = extractedImages.filter(img => img.isLogo);
+
+        if (logoCandidates.length > 0) {
+            // Sort left-to-right
+            logoCandidates.sort((a, b) => a.x - b.x);
+            logoCandidates.forEach((img, idx) => {
+                const isLeft = img.x < (viewport.width / 2);
+                const title = isLeft ? 'Logo Kiri (Kampus / Instansi)' : 'Logo Kanan (Organisasi / Kabinet)';
+                pageModel.elements.push(createElementModel('kop_logo', {
+                    text: isLeft ? 'Logo Kampus (Kiri)' : 'Logo Organisasi (Kanan)',
+                    x: img.x,
+                    y: img.y,
+                    width: img.width,
+                    height: img.height,
+                    extra: {
+                        logoPosition: isLeft ? 'left' : 'right',
+                        title: title,
+                        objId: img.objId,
+                        pdfX: img.pdfX,
+                        pdfY: img.pdfY
+                    }
+                }));
+            });
+        } else if (structure.kopZone.lines.length > 0) {
+            // Fallback for documents with text kop but vector/missing images
             pageModel.elements.push(createElementModel('kop_logo', {
                 text: 'Logo Kampus (Kiri)',
-                x: 46,
-                y: 5,
-                width: 98,
-                height: 90,
-                extra: {
-                    logoPosition: 'left',
-                    title: 'Logo Kiri (Kampus / Instansi)'
-                }
-            }));
-
-            // Add Interactive Logo Kanan (Logo Organisasi / Kabinet)
-            pageModel.elements.push(createElementModel('kop_logo', {
-                text: 'Logo Organisasi (Kanan)',
-                x: 448,
-                y: 5,
-                width: 98,
-                height: 90,
-                extra: {
-                    logoPosition: 'right',
-                    title: 'Logo Kanan (Organisasi / Kabinet)'
-                }
+                x: 45,
+                y: Math.max(10, structure.kopZone.lines[0]?.y - 15 || 15),
+                width: 80,
+                height: 80,
+                extra: { logoPosition: 'left', title: 'Logo Kiri (Kampus / Instansi)' }
             }));
         }
+
+        // 5. Add Structured Lines and Flowable Paragraphs
+        const elements = groupLinesIntoParagraphs(lines, viewport.height);
 
         elements.forEach((elData, idx) => {
             const el = createElementModel(elData.isParagraph ? 'paragraph' : 'text', {
@@ -109,8 +124,77 @@ export async function parsePdfDocument(arrayBuffer, filename) {
 }
 
 /**
+ * Traverses PDF.js operator list to recover exact dimensions and positions of embedded images.
+ */
+export async function extractPdfImages(page, viewport) {
+    if (!page.getOperatorList) return [];
+    try {
+        const ops = await page.getOperatorList();
+        const OPS = window.pdfjsLib?.OPS || {};
+        const images = [];
+
+        let ctm = [1, 0, 0, 1, 0, 0];
+        const stack = [];
+
+        for (let i = 0; i < ops.fnArray.length; i++) {
+            const fn = ops.fnArray[i];
+            const args = ops.argsArray[i];
+
+            if (fn === OPS.save) {
+                stack.push([...ctm]);
+            } else if (fn === OPS.restore) {
+                if (stack.length > 0) ctm = stack.pop();
+            } else if (fn === OPS.transform) {
+                ctm = multiplyTransform(ctm, args);
+            } else if (fn === OPS.paintImageXObject || fn === OPS.paintInlineImageXObject || fn === OPS.paintJpegXObject) {
+                const objId = args?.[0] || ('img_' + i);
+                const pdfWidth = Math.round(Math.hypot(ctm[0], ctm[1]));
+                const pdfHeight = Math.round(Math.hypot(ctm[2], ctm[3]));
+                const pdfX = ctm[4];
+                const pdfY = ctm[5];
+
+                const webY = Math.round(viewport.height - (pdfY + pdfHeight));
+                const webX = Math.round(pdfX);
+
+                if (pdfWidth >= 16 && pdfHeight >= 16) {
+                    const isTopArea = (webY < viewport.height * 0.28);
+                    const isWatermark = (pdfWidth > viewport.width * 0.4 && pdfHeight > viewport.height * 0.25);
+                    const isLogo = isTopArea && !isWatermark;
+
+                    images.push({
+                        objId,
+                        x: Math.max(0, webX),
+                        y: Math.max(0, webY),
+                        width: pdfWidth,
+                        height: pdfHeight,
+                        pdfX,
+                        pdfY,
+                        isLogo,
+                        isWatermark
+                    });
+                }
+            }
+        }
+        return images;
+    } catch (err) {
+        console.warn('Operator list image extraction fallback:', err);
+        return [];
+    }
+}
+
+function multiplyTransform(m1, m2) {
+    return [
+        m1[0] * m2[0] + m1[2] * m2[1],
+        m1[1] * m2[0] + m1[3] * m2[1],
+        m1[0] * m2[2] + m1[2] * m2[3],
+        m1[1] * m2[2] + m1[3] * m2[3],
+        m1[0] * m2[4] + m1[2] * m2[5] + m1[4],
+        m1[1] * m2[4] + m1[3] * m2[5] + m1[5]
+    ];
+}
+
+/**
  * Intelligent grouping of text items into single lines
- * to make in-place clicking feel natural like selecting words/sentences.
  */
 function groupTextItemsIntoLines(items, pageHeight) {
     if (!items || items.length === 0) return [];
@@ -179,12 +263,10 @@ function groupTextItemsIntoLines(items, pageHeight) {
 /**
  * Intelligent Layout-Aware Paragraph Grouping:
  * Merges consecutive lines that belong to the same body paragraph
- * so that users can edit entire paragraphs with natural text reflow like in Word.
  */
 function groupLinesIntoParagraphs(lines, pageHeight) {
     if (!lines || lines.length === 0) return [];
 
-    // Sort lines by vertical position (y) ascending
     const sortedLines = [...lines].sort((a, b) => {
         if (Math.abs(a.y - b.y) <= 3) return a.x - b.x;
         return a.y - b.y;
@@ -213,20 +295,18 @@ function groupLinesIntoParagraphs(lines, pageHeight) {
         const bothAreWide = (line.width > 220 || prev.width > 220);
         const sameFontSize = Math.abs(line.fontSize - prev.fontSize) <= 1.5;
 
-        // Never merge Kop Surat (top 95pt) into a prose paragraph!
-        const isKopSurat = (line.y < 95 || prev.y < 95);
-        // Never merge labels, letterheads, or metadata lines
+        // Never merge Kop Surat (top 25% of page) into a prose paragraph
+        const isKopSurat = (line.y < pageHeight * 0.22 || prev.y < pageHeight * 0.22);
         const hasLabel = isLabelOrMetadata(line.text) || isLabelOrMetadata(prev.text) || isKopSurat;
 
         if (isVerticallyAdjacent && sameFontSize && !hasLabel && (bothAreWide || (sameLeftMargin && line.text.length > 30))) {
-            // Merge into current paragraph
             current.lines.push(line);
             current.text += ' ' + line.text;
             current.rawItems.push(...line.rawItems);
             current.x = Math.min(current.x, line.x);
             current.width = Math.max(current.width, (line.x + line.width) - current.x);
             current.height = (line.y + line.height) - current.y;
-            current.pdfY = Math.min(current.pdfY, line.pdfY); // Lowest pdfY baseline
+            current.pdfY = Math.min(current.pdfY, line.pdfY);
             current.lineHeight = baselineDiff;
             current.isParagraph = true;
         } else {
