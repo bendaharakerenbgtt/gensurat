@@ -1,6 +1,6 @@
 /**
  * DOCX Import Adapter - UDE-001
- * Uses JSZip and DOMParser to parse Word OOXML document.xml, styles, and media.
+ * Uses JSZip and DOMParser to parse Word OOXML document.xml, headers, styles, and media.
  */
 import { createDocumentModel, createPageModel, createElementModel } from './dim.js';
 
@@ -87,6 +87,13 @@ export async function parseDocxDocument(arrayBuffer, filename) {
     let currentPage = createPageModel(currentPageIndex, pageWidth, pageHeight);
     docModel.pages.push(currentPage);
 
+    // 1. Extract Headers (Kop Logos and Kop text from word/header*.xml)
+    const headerElements = await parseDocxHeaders(zip, parser);
+    if (headerElements.length > 0) {
+        currentPage.elements.push(...headerElements);
+    }
+
+    // 2. Extract Body Elements
     let elementIndex = 0;
     const childNodes = body.childNodes;
 
@@ -134,6 +141,91 @@ export async function parseDocxDocument(arrayBuffer, filename) {
 
     docModel.metadata.pageCount = docModel.pages.length;
     return docModel;
+}
+
+async function parseDocxHeaders(zip, parser) {
+    const headerElements = [];
+    const headerFiles = Object.keys(zip.files).filter(k => /^word\/header\d+\.xml$/i.test(k));
+
+    for (const hPath of headerFiles) {
+        const hFile = zip.file(hPath);
+        if (!hFile) continue;
+        const hXmlStr = await hFile.async('string');
+        const hDoc = parser.parseFromString(hXmlStr, 'application/xml');
+
+        // Check for header relationships
+        const relsPath = hPath.replace('word/', 'word/_rels/') + '.rels';
+        const relsFile = zip.file(relsPath);
+        const relsMap = {};
+        if (relsFile) {
+            const relsStr = await relsFile.async('string');
+            const relsDoc = parser.parseFromString(relsStr, 'application/xml');
+            const relNodes = relsDoc.getElementsByTagName('Relationship');
+            for (let i = 0; i < relNodes.length; i++) {
+                relsMap[relNodes[i].getAttribute('Id')] = relNodes[i].getAttribute('Target');
+            }
+        }
+
+        // 1. Look for drawing images (Kop logos & watermarks)
+        const blipNodes = hDoc.getElementsByTagNameNS('*', 'blip');
+        for (let i = 0; i < blipNodes.length; i++) {
+            const embedId = blipNodes[i].getAttribute('r:embed') || blipNodes[i].getAttribute('embed');
+            const target = relsMap[embedId];
+            if (target) {
+                const mediaPath = target.startsWith('media/') ? ('word/' + target) : (target.startsWith('word/') ? target : ('word/media/' + target.split('/').pop()));
+                const mediaFile = zip.file(mediaPath);
+                if (mediaFile) {
+                    const u8 = await mediaFile.async('uint8array');
+                    const b64 = uint8ToBase64(u8);
+                    const ext = mediaPath.split('.').pop().toLowerCase();
+                    const mime = ext === 'png' ? 'image/png' : 'image/jpeg';
+                    const dataUrl = `data:${mime};base64,${b64}`;
+
+                    const isLeft = (i === 0);
+                    const logoEl = createElementModel('kop_logo', {
+                        text: isLeft ? 'Logo Kampus (Kiri)' : 'Logo Organisasi (Kanan)',
+                        x: isLeft ? 50 : 450,
+                        y: 15,
+                        width: 80,
+                        height: 75,
+                        extra: {
+                            isHeader: true,
+                            headerFile: hPath,
+                            relId: embedId,
+                            mediaPath: mediaPath,
+                            imageBytes: u8,
+                            mimeType: mime,
+                            newImageSrc: dataUrl,
+                            title: isLeft ? 'Logo Kiri (Kampus / Instansi)' : 'Logo Kanan (Organisasi / Kabinet)'
+                        }
+                    });
+                    logoEl.id = 'docx_header_logo_' + i;
+                    headerElements.push(logoEl);
+                }
+            }
+        }
+
+        // 2. Look for header text paragraphs
+        const pNodes = hDoc.getElementsByTagNameNS('*', 'p');
+        for (let pIdx = 0; pIdx < pNodes.length; pIdx++) {
+            const pInfo = parseParagraphNode(pNodes[pIdx], 'hdr_' + pIdx);
+            if (pInfo && pInfo.text && pInfo.text.trim()) {
+                pInfo.extra = { ...(pInfo.extra || {}), isHeader: true, headerFile: hPath };
+                headerElements.push(pInfo);
+            }
+        }
+    }
+
+    return headerElements;
+}
+
+function uint8ToBase64(u8) {
+    let binary = '';
+    const len = u8.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(u8[i]);
+    }
+    return window.btoa(binary);
 }
 
 function parseParagraphNode(pNode, index) {
