@@ -216,6 +216,10 @@ export class InspectorPanel {
                             <i class="fa-solid fa-rotate-left"></i> Kembalikan ke Logo Asli
                         </button>
                     ` : ''}
+
+                    <button type="button" id="btn_typesafe_assist" class="w-full py-1.5 bg-neutral-900 hover:bg-purple-950/40 text-purple-300 border border-purple-800/60 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors">
+                        <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i> Bantu Deteksi dengan TypeSafe AI
+                    </button>
                 </div>
 
                 <div class="p-3 bg-neutral-950/60 border border-neutral-800/80 rounded-lg text-[11px] text-neutral-400 space-y-1">
@@ -265,6 +269,26 @@ export class InspectorPanel {
             resetBtn.addEventListener('click', () => {
                 if (this.onLogoReset) {
                     this.onLogoReset(element.id);
+                }
+            });
+        }
+
+        const typeSafeBtn = document.getElementById('btn_typesafe_assist');
+        if (typeSafeBtn) {
+            typeSafeBtn.addEventListener('click', async () => {
+                try {
+                    const apiKey = localStorage.getItem('TYPESAFE_API_KEY');
+                    if (!apiKey) {
+                        const entered = prompt('Masukkan TypeSafe API Key Anda (atau kosongkan untuk batal):');
+                        if (entered) {
+                            localStorage.setItem('TYPESAFE_API_KEY', entered.trim());
+                        } else {
+                            return;
+                        }
+                    }
+                    alert('TypeSafe AI siap menganalisis batas logo kop surat ini.');
+                } catch (err) {
+                    alert('TypeSafe error: ' + err.message);
                 }
             });
         }
