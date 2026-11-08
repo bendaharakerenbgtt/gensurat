@@ -3,11 +3,14 @@
  */
 
 export class InspectorPanel {
-    constructor(inspectorEl, hierarchyEl, onTextUpdated, onAddTableRow) {
+    constructor(inspectorEl, hierarchyEl, onTextUpdated, onAddTableRow, onLogoUpdated, onLogoRemoved, onLogoReset) {
         this.inspectorEl = inspectorEl;
         this.hierarchyEl = hierarchyEl;
         this.onTextUpdated = onTextUpdated;
         this.onAddTableRow = onAddTableRow;
+        this.onLogoUpdated = onLogoUpdated;
+        this.onLogoRemoved = onLogoRemoved;
+        this.onLogoReset = onLogoReset;
         this.currentElement = null;
     }
 
@@ -22,6 +25,12 @@ export class InspectorPanel {
                     Pilih elemen di kertas untuk melihat dan mengubah properti.
                 </div>
             `;
+            return;
+        }
+
+        // SPECIAL CASE: KOP LOGO INSPECTOR UI
+        if (element.type === 'kop_logo') {
+            this.renderKopLogoInspector(element, page);
             return;
         }
 
@@ -128,6 +137,134 @@ export class InspectorPanel {
             addRowBtn.addEventListener('click', () => {
                 if (this.onAddTableRow) {
                     this.onAddTableRow(element.id);
+                }
+            });
+        }
+    }
+
+    renderKopLogoInspector(element, page) {
+        const isModified = element.isModified;
+        const isRemoved = element.extra?.isRemoved;
+        const hasNewImage = !!element.extra?.newImageSrc;
+        const logoTitle = element.extra?.title || 'Logo Kop Surat';
+
+        let previewHtml = '';
+        if (hasNewImage) {
+            previewHtml = `
+                <div class="p-3 bg-neutral-950 border border-emerald-800/60 rounded-xl flex flex-col items-center justify-center gap-2">
+                    <img src="${element.extra.newImageSrc}" class="max-h-24 max-w-full object-contain rounded">
+                    <span class="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                        <i class="fa-solid fa-check-circle"></i> Logo baru terpasang
+                    </span>
+                </div>
+            `;
+        } else if (isRemoved) {
+            previewHtml = `
+                <div class="p-4 bg-neutral-950 border border-red-900/60 rounded-xl text-center">
+                    <i class="fa-solid fa-ban text-red-400 text-2xl mb-1.5 block"></i>
+                    <span class="text-xs text-red-300 font-medium block">Logo Dikosongkan</span>
+                    <span class="text-[10px] text-neutral-500 mt-0.5 block">Area logo lama ditutup rapi dengan latar putih</span>
+                </div>
+            `;
+        } else {
+            previewHtml = `
+                <div class="p-4 bg-neutral-950 border border-neutral-800 rounded-xl text-center">
+                    <i class="fa-solid fa-image text-blue-400 text-2xl mb-1.5 block"></i>
+                    <span class="text-xs text-neutral-300 font-medium block">${logoTitle}</span>
+                    <span class="text-[10px] text-neutral-500 mt-1 block">Menggunakan logo bawaan dari dokumen</span>
+                </div>
+            `;
+        }
+
+        this.inspectorEl.innerHTML = `
+            <div class="space-y-4">
+                <!-- Header -->
+                <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded ${isModified ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-blue-950 text-blue-400 border border-blue-800'} font-bold">
+                            LOGO KOP SURAT
+                        </span>
+                        ${isModified ? '<span class="text-[10px] font-mono text-amber-400">&bull; Diedit</span>' : ''}
+                    </div>
+                    <span class="text-[10px] font-mono text-neutral-500">Hal. ${(page?.pageIndex || 0) + 1}</span>
+                </div>
+
+                <!-- Preview Area -->
+                <div>
+                    <label class="block text-[11px] font-medium text-neutral-400 mb-1.5">
+                        Pratinjau Logo Kop:
+                    </label>
+                    ${previewHtml}
+                </div>
+
+                <!-- File Uploader & Actions -->
+                <input type="file" id="inspector_logo_file_input" accept="image/png,image/jpeg,image/webp" class="hidden">
+
+                <div class="pt-2 flex flex-col gap-2">
+                    <button type="button" id="btn_upload_kop_logo" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors shadow">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> ${hasNewImage ? 'Ganti dengan Gambar Lain' : 'Upload & Ganti Logo Kop'}
+                    </button>
+
+                    ${!isRemoved ? `
+                        <button type="button" id="btn_remove_kop_logo" class="w-full py-1.5 bg-neutral-900 hover:bg-red-950/50 text-neutral-400 hover:text-red-400 border border-neutral-800 hover:border-red-800/60 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors">
+                            <i class="fa-solid fa-trash-can"></i> Kosongkan / Hapus Logo Ini
+                        </button>
+                    ` : ''}
+
+                    ${isModified ? `
+                        <button type="button" id="btn_reset_kop_logo" class="w-full py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors">
+                            <i class="fa-solid fa-rotate-left"></i> Kembalikan ke Logo Asli
+                        </button>
+                    ` : ''}
+                </div>
+
+                <div class="p-3 bg-neutral-950/60 border border-neutral-800/80 rounded-lg text-[11px] text-neutral-400 space-y-1">
+                    <div class="font-semibold text-neutral-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-info text-blue-400"></i> Petunjuk Logo:
+                    </div>
+                    <p class="leading-relaxed text-[10px]">
+                        Gunakan file PNG transparan beresolusi tinggi untuk hasil cetak dan PDF yang maksimal.
+                    </p>
+                </div>
+            </div>
+        `;
+
+        // Wire event handlers
+        const uploadBtn = document.getElementById('btn_upload_kop_logo');
+        const fileInput = document.getElementById('inspector_logo_file_input');
+        const removeBtn = document.getElementById('btn_remove_kop_logo');
+        const resetBtn = document.getElementById('btn_reset_kop_logo');
+
+        if (uploadBtn && fileInput) {
+            uploadBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const arrayBuffer = await file.arrayBuffer();
+                const reader = new FileReader();
+                reader.onload = (loadEv) => {
+                    const dataUrl = loadEv.target.result;
+                    if (this.onLogoUpdated) {
+                        this.onLogoUpdated(element.id, dataUrl, new Uint8Array(arrayBuffer), file.type || 'image/png');
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => {
+                if (this.onLogoRemoved) {
+                    this.onLogoRemoved(element.id);
+                }
+            });
+        }
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                if (this.onLogoReset) {
+                    this.onLogoReset(element.id);
                 }
             });
         }

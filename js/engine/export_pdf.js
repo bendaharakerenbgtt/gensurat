@@ -30,49 +30,143 @@ export async function exportToPdf(docModel, customFilename) {
             if (!targetPdfPage) continue;
 
             const modifiedElements = pageModel.elements.filter(el => el.isModified);
+            const shiftedElements = pageModel.elements.filter(el => (el.cumulativeShift || 0) > 0 && !el.isModified);
 
-            for (const el of modifiedElements) {
-                const pdfX = el.sourceRef?.pdfX !== undefined ? el.sourceRef.pdfX : el.rect.x;
-                const pdfY = el.sourceRef?.pdfY !== undefined ? el.sourceRef.pdfY : (pageModel.height - el.rect.y - el.fontSize);
-
-                const width = Math.max(el.rect.width, (el.sourceRef?.pdfWidth || 60)) + 6;
-                const height = Math.max(el.rect.height, (el.sourceRef?.pdfHeight || el.fontSize)) + 4;
-
-                // 1. Draw Whiteout Rectangle
-                targetPdfPage.drawRectangle({
-                    x: Math.max(0, pdfX - 2),
-                    y: Math.max(0, pdfY - 2),
-                    width: width,
-                    height: height,
-                    color: rgb(1, 1, 1),
-                    opacity: 1.0,
-                    borderWidth: 0
-                });
-
-                // 2. Select Font
-                let selectedFont = fontTimes;
+            const getFont = (el) => {
                 if (el.fontFamily.toLowerCase().includes('arial') || el.fontFamily.toLowerCase().includes('sans')) {
-                    selectedFont = (el.fontWeight === 'bold') ? fontHelveticaBold : fontHelvetica;
-                } else {
-                    selectedFont = (el.fontWeight === 'bold') ? fontTimesBold : fontTimes;
+                    return (el.fontWeight === 'bold') ? fontHelveticaBold : fontHelvetica;
                 }
+                return (el.fontWeight === 'bold') ? fontTimesBold : fontTimes;
+            };
 
-                // 3. Draw New Text (with intelligent word-wrapping for multi-line paragraphs)
+            // =========================================================================
+            // PHASE 1: DRAW ALL WHITEOUT RECTANGLES FIRST (Prevents text clipping)
+            // =========================================================================
+
+            // 1A. Whiteout for Kop Logos (Removed or Replaced)
+            for (const el of modifiedElements) {
+                if (el.type === 'kop_logo' && (el.extra?.isRemoved || el.extra?.imageBytes)) {
+                    const pdfY = (pageModel.height || 841.89) - el.rect.y - el.rect.height;
+                    targetPdfPage.drawRectangle({
+                        x: Math.max(0, el.rect.x - 4),
+                        y: Math.max(0, pdfY - 4),
+                        width: el.rect.width + 8,
+                        height: el.rect.height + 8,
+                        color: rgb(1, 1, 1),
+                        borderWidth: 0
+                    });
+                }
+            }
+
+            // 1B. Whiteout for Modified Paragraphs & Text
+            for (const el of modifiedElements) {
+                if (el.type === 'kop_logo') continue;
+
                 const isParagraph = el.type === 'paragraph' || el.sourceRef?.isParagraph;
+                const isKopText = (el.rect.y < 95);
+                const selectedFont = getFont(el);
 
                 if (isParagraph) {
-                    const maxWidth = width - 4;
-                    const words = el.text.split(/\s+/);
+                    const whiteoutX = Math.max(0, el.rect.x - 6);
+                    const totalHeight = el.expandedHeight || el.rect.height;
+                    const whiteoutY = (pageModel.height || 841.89) - el.rect.y - totalHeight;
+                    targetPdfPage.drawRectangle({
+                        x: whiteoutX,
+                        y: Math.max(0, whiteoutY - 2),
+                        width: el.rect.width + 12,
+                        height: totalHeight + 6,
+                        color: rgb(1, 1, 1),
+                        borderWidth: 0
+                    });
+                } else {
+                    const measuredTextWidth = selectedFont.widthOfTextAtSize(el.text, Math.max(7, el.fontSize));
+                    let whiteoutX = el.rect.x - 4;
+                    if (isKopText) {
+                        const pageWidth = pageModel.width || 595.28;
+                        const centeredX = (pageWidth - measuredTextWidth) / 2;
+                        whiteoutX = Math.min(centeredX, el.rect.x) - 6;
+                    }
+                    const whiteoutWidth = Math.max(el.rect.width, measuredTextWidth) + 14;
+                    const lineHeight = el.sourceRef?.lineHeight || (el.fontSize * 1.15);
+                    const whiteoutHeight = Math.min(el.rect.height + 2, lineHeight);
+                    const whiteoutY = (pageModel.height || 841.89) - el.rect.y - whiteoutHeight + 1;
+                    targetPdfPage.drawRectangle({
+                        x: Math.max(0, whiteoutX),
+                        y: Math.max(0, whiteoutY),
+                        width: whiteoutWidth,
+                        height: whiteoutHeight,
+                        color: rgb(1, 1, 1),
+                        borderWidth: 0
+                    });
+                }
+            }
+
+            // 1C. Whiteout for Shifted Elements (Old Positions)
+            for (const el of shiftedElements) {
+                const whiteoutX = Math.max(0, el.rect.x - 4);
+                const oldPdfY = el.sourceRef?.pdfY !== undefined ? el.sourceRef.pdfY : (pageModel.height - el.rect.y - el.fontSize);
+                targetPdfPage.drawRectangle({
+                    x: whiteoutX,
+                    y: Math.max(0, oldPdfY - 2),
+                    width: el.rect.width + 8,
+                    height: el.rect.height + 4,
+                    color: rgb(1, 1, 1),
+                    borderWidth: 0
+                });
+            }
+
+            // =========================================================================
+            // PHASE 2: DRAW ALL NEW CONTENT (Images, Paragraphs, Single Texts, Shifted)
+            // =========================================================================
+
+            // 2A. Draw Replaced Kop Logos
+            for (const el of modifiedElements) {
+                if (el.type === 'kop_logo' && el.extra?.imageBytes && !el.extra?.isRemoved) {
+                    const pdfY = (pageModel.height || 841.89) - el.rect.y - el.rect.height;
+                    try {
+                        let logoImg = null;
+                        if (el.extra.mimeType && el.extra.mimeType.includes('png')) {
+                            logoImg = await pdfDoc.embedPng(el.extra.imageBytes);
+                        } else {
+                            logoImg = await pdfDoc.embedJpg(el.extra.imageBytes);
+                        }
+                        targetPdfPage.drawImage(logoImg, {
+                            x: el.rect.x,
+                            y: pdfY,
+                            width: el.rect.width,
+                            height: el.rect.height
+                        });
+                    } catch (logoErr) {
+                        console.warn('Failed to embed logo in PDF:', logoErr);
+                    }
+                }
+            }
+
+            // 2B. Draw Modified Paragraphs and Single Text Lines
+            for (const el of modifiedElements) {
+                if (el.type === 'kop_logo') continue;
+
+                const isParagraph = el.type === 'paragraph' || el.sourceRef?.isParagraph;
+                const isKopText = (el.rect.y < 95);
+                const selectedFont = getFont(el);
+
+                if (isParagraph) {
+                    const indent = (el.sourceRef?.firstLineIndent !== undefined) ? el.sourceRef.firstLineIndent : 20;
+                    const words = el.text.split(/\s+/).filter(Boolean);
                     let currentLine = '';
+                    let isFirstLine = true;
                     let currentLineY = (pageModel.height || 841.89) - el.rect.y - (el.fontSize * 0.95);
                     const lineHeight = el.sourceRef?.lineHeight || (el.fontSize * 1.45);
 
                     for (const word of words) {
                         const testLine = currentLine ? (currentLine + ' ' + word) : word;
+                        const maxLineWidth = isFirstLine ? (el.rect.width - indent) : el.rect.width;
                         const testWidth = selectedFont.widthOfTextAtSize(testLine, Math.max(7, el.fontSize));
-                        if (testWidth > maxWidth && currentLine) {
+
+                        if (testWidth > maxLineWidth && currentLine) {
+                            const lineX = isFirstLine ? (el.rect.x + indent) : el.rect.x;
                             targetPdfPage.drawText(currentLine, {
-                                x: pdfX,
+                                x: lineX,
                                 y: currentLineY,
                                 size: Math.max(7, el.fontSize),
                                 font: selectedFont,
@@ -80,14 +174,16 @@ export async function exportToPdf(docModel, customFilename) {
                             });
                             currentLineY -= lineHeight;
                             currentLine = word;
+                            isFirstLine = false;
                         } else {
                             currentLine = testLine;
                         }
                     }
 
                     if (currentLine) {
+                        const lineX = isFirstLine ? (el.rect.x + indent) : el.rect.x;
                         targetPdfPage.drawText(currentLine, {
-                            x: pdfX,
+                            x: lineX,
                             y: currentLineY,
                             size: Math.max(7, el.fontSize),
                             font: selectedFont,
@@ -95,14 +191,36 @@ export async function exportToPdf(docModel, customFilename) {
                         });
                     }
                 } else {
+                    const measuredTextWidth = selectedFont.widthOfTextAtSize(el.text, Math.max(7, el.fontSize));
+                    let drawX = el.rect.x;
+                    if (isKopText) {
+                        const pageWidth = pageModel.width || 595.28;
+                        drawX = (pageWidth - measuredTextWidth) / 2;
+                    }
+                    const pdfY = (pageModel.height || 841.89) - el.rect.y - (el.fontSize * 0.85);
                     targetPdfPage.drawText(el.text, {
-                        x: pdfX,
+                        x: drawX,
                         y: pdfY,
                         size: Math.max(7, el.fontSize),
                         font: selectedFont,
                         color: rgb(0.05, 0.05, 0.05)
                     });
                 }
+            }
+
+            // 2C. Draw Shifted Elements at New Downward Positions
+            for (const el of shiftedElements) {
+                const oldPdfY = el.sourceRef?.pdfY !== undefined ? el.sourceRef.pdfY : (pageModel.height - el.rect.y - el.fontSize);
+                const newPdfY = oldPdfY - el.cumulativeShift;
+                const selectedFont = getFont(el);
+
+                targetPdfPage.drawText(el.text, {
+                    x: el.rect.x,
+                    y: newPdfY,
+                    size: Math.max(7, el.fontSize),
+                    font: selectedFont,
+                    color: rgb(0.05, 0.05, 0.05)
+                });
             }
 
             // 4. Draw Added Signatures / Stamps / Images

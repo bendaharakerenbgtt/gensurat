@@ -40,6 +40,24 @@ function initEngine() {
                 mutationEngine.addTableRow(tableId);
                 showStatusBadge('Baris baru berhasil ditambahkan ke tabel!');
             }
+        },
+        (elementId, dataUrl, imageBytes, mimeType) => {
+            if (mutationEngine) {
+                mutationEngine.updateKopLogo(elementId, dataUrl, imageBytes, mimeType);
+                showStatusBadge('Logo Kop Surat berhasil diperbarui!');
+            }
+        },
+        (elementId) => {
+            if (mutationEngine) {
+                mutationEngine.removeKopLogo(elementId);
+                showStatusBadge('Logo Kop Surat dikosongkan.');
+            }
+        },
+        (elementId) => {
+            if (mutationEngine) {
+                mutationEngine.resetKopLogo(elementId);
+                showStatusBadge('Logo Kop dikembalikan ke asli.');
+            }
         }
     );
 

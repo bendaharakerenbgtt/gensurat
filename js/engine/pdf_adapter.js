@@ -46,6 +46,36 @@ export async function parsePdfDocument(arrayBuffer, filename) {
         const lines = groupTextItemsIntoLines(rawItems, viewport.height);
         const elements = groupLinesIntoParagraphs(lines, viewport.height);
 
+        // Detect if page has Kop Surat (header lines at y < 95)
+        const hasKopHeader = lines.some(l => l.y < 95);
+        if (hasKopHeader) {
+            // Add Interactive Logo Kiri (Logo Kampus)
+            pageModel.elements.push(createElementModel('kop_logo', {
+                text: 'Logo Kampus (Kiri)',
+                x: 46,
+                y: 5,
+                width: 98,
+                height: 90,
+                extra: {
+                    logoPosition: 'left',
+                    title: 'Logo Kiri (Kampus / Instansi)'
+                }
+            }));
+
+            // Add Interactive Logo Kanan (Logo Organisasi / Kabinet)
+            pageModel.elements.push(createElementModel('kop_logo', {
+                text: 'Logo Organisasi (Kanan)',
+                x: 448,
+                y: 5,
+                width: 98,
+                height: 90,
+                extra: {
+                    logoPosition: 'right',
+                    title: 'Logo Kanan (Organisasi / Kabinet)'
+                }
+            }));
+        }
+
         elements.forEach((elData, idx) => {
             const el = createElementModel(elData.isParagraph ? 'paragraph' : 'text', {
                 text: elData.text,
@@ -65,7 +95,8 @@ export async function parsePdfDocument(arrayBuffer, filename) {
                     pdfHeight: elData.height,
                     lineHeight: elData.lineHeight || (elData.fontSize * 1.45),
                     isParagraph: elData.isParagraph,
-                    linesCount: elData.lines?.length || 1
+                    linesCount: elData.lines?.length || 1,
+                    firstLineIndent: Math.max(0, (elData.lines?.[0]?.x || elData.x) - elData.x)
                 }
             });
             pageModel.elements.push(el);
@@ -87,27 +118,34 @@ function groupTextItemsIntoLines(items, pageHeight) {
     const lines = [];
     let currentLine = null;
 
-    // Filter out completely whitespace items
-    const validItems = items.filter(it => it.str && it.str.trim().length > 0);
+    items.forEach((it) => {
+        if (!it.str && it.width === 0) return;
 
-    validItems.forEach((it, idx) => {
         const tx = it.transform[4];
         const ty = it.transform[5];
-        // Calculate font size from vertical transform scale
         const fontSize = Math.max(8, Math.round(Math.hypot(it.transform[2], it.transform[3])));
         const itemHeight = it.height || fontSize;
         const itemWidth = it.width || (it.str.length * fontSize * 0.55);
-
-        // Convert PDF coordinates (origin bottom-left) to Web Canvas coordinates (origin top-left)
         const webY = pageHeight - ty - (fontSize * 0.85);
+
+        // Preserve whitespace
+        if (it.str === ' ' || it.str === '\u00A0') {
+            if (currentLine && !currentLine.text.endsWith(' ')) {
+                currentLine.text += ' ';
+            }
+            return;
+        }
+
+        if (it.str.trim().length === 0) return;
 
         if (currentLine &&
             Math.abs(currentLine.pdfY - ty) <= 3 && // Same horizontal baseline
-            (tx - (currentLine.x + currentLine.width)) <= (fontSize * 1.5) && // Reasonably close horizontally
+            (tx - (currentLine.x + currentLine.width)) <= (fontSize * 2.0) &&
             (tx >= currentLine.x - 2)) {
-            // Merge into current line
-            const spaceNeeded = (tx - (currentLine.x + currentLine.width)) > (fontSize * 0.25) ? ' ' : '';
-            currentLine.text += spaceNeeded + it.str;
+            // Check if space needed between words
+            const gap = tx - (currentLine.x + currentLine.width);
+            const needsSpace = (gap >= 1.0) && !currentLine.text.endsWith(' ') && !it.str.startsWith(' ');
+            currentLine.text += (needsSpace ? ' ' : '') + it.str;
             currentLine.width = (tx + itemWidth) - currentLine.x;
             currentLine.height = Math.max(currentLine.height, itemHeight);
             currentLine.rawItems.push({ ...it, webY, fontSize, tx, ty });
@@ -175,8 +213,10 @@ function groupLinesIntoParagraphs(lines, pageHeight) {
         const bothAreWide = (line.width > 220 || prev.width > 220);
         const sameFontSize = Math.abs(line.fontSize - prev.fontSize) <= 1.5;
 
+        // Never merge Kop Surat (top 95pt) into a prose paragraph!
+        const isKopSurat = (line.y < 95 || prev.y < 95);
         // Never merge labels, letterheads, or metadata lines
-        const hasLabel = isLabelOrMetadata(line.text) || isLabelOrMetadata(prev.text);
+        const hasLabel = isLabelOrMetadata(line.text) || isLabelOrMetadata(prev.text) || isKopSurat;
 
         if (isVerticallyAdjacent && sameFontSize && !hasLabel && (bothAreWide || (sameLeftMargin && line.text.length > 30))) {
             // Merge into current paragraph

@@ -98,11 +98,20 @@ export class MutationEngine {
         }
 
         if (targetEl) {
-            targetEl.text = lastAction.oldText;
-            targetEl.isModified = (targetEl.text !== targetEl.originalText);
+            if (lastAction.type === 'UPDATE_KOP_LOGO' || lastAction.type === 'REMOVE_KOP_LOGO') {
+                targetEl.extra = targetEl.extra || {};
+                targetEl.extra.newImageSrc = lastAction.oldSrc;
+                targetEl.extra.imageBytes = lastAction.oldBytes;
+                targetEl.extra.mimeType = lastAction.oldMime;
+                targetEl.extra.isRemoved = lastAction.oldRemoved;
+                targetEl.isModified = !!(lastAction.oldSrc || lastAction.oldRemoved);
+            } else {
+                targetEl.text = lastAction.oldText;
+                targetEl.isModified = (targetEl.text !== targetEl.originalText);
 
-            if (this.docModel.source.format === 'docx' && targetEl.sourceRef?.xmlNode) {
-                this.syncDocxXmlNode(targetEl.sourceRef.xmlNode, lastAction.oldText);
+                if (this.docModel.source.format === 'docx' && targetEl.sourceRef?.xmlNode) {
+                    this.syncDocxXmlNode(targetEl.sourceRef.xmlNode, lastAction.oldText);
+                }
             }
 
             this.docModel.redoStack.push(lastAction);
@@ -129,11 +138,24 @@ export class MutationEngine {
         }
 
         if (targetEl) {
-            targetEl.text = action.newText;
-            targetEl.isModified = true;
+            if (action.type === 'UPDATE_KOP_LOGO') {
+                targetEl.extra = targetEl.extra || {};
+                targetEl.extra.newImageSrc = action.newSrc;
+                targetEl.extra.imageBytes = action.newBytes;
+                targetEl.extra.mimeType = action.newMime;
+                targetEl.extra.isRemoved = false;
+                targetEl.isModified = true;
+            } else if (action.type === 'REMOVE_KOP_LOGO') {
+                targetEl.extra = targetEl.extra || {};
+                targetEl.extra.isRemoved = true;
+                targetEl.isModified = true;
+            } else {
+                targetEl.text = action.newText;
+                targetEl.isModified = true;
 
-            if (this.docModel.source.format === 'docx' && targetEl.sourceRef?.xmlNode) {
-                this.syncDocxXmlNode(targetEl.sourceRef.xmlNode, action.newText);
+                if (this.docModel.source.format === 'docx' && targetEl.sourceRef?.xmlNode) {
+                    this.syncDocxXmlNode(targetEl.sourceRef.xmlNode, action.newText);
+                }
             }
 
             this.docModel.undoStack.push(action);
@@ -296,6 +318,117 @@ export class MutationEngine {
                     return;
                 }
             }
+        }
+    }
+
+    /**
+     * Update Kop Logo Image
+     */
+    updateKopLogo(elementId, newImageSrc, imageBytes, mimeType) {
+        if (!this.docModel) return;
+        let targetEl = null;
+        for (const page of this.docModel.pages) {
+            for (const el of page.elements) {
+                if (el.id === elementId && el.type === 'kop_logo') {
+                    targetEl = el;
+                    break;
+                }
+            }
+            if (targetEl) break;
+        }
+        if (!targetEl) return;
+
+        const mutationRecord = {
+            elementId,
+            type: 'UPDATE_KOP_LOGO',
+            oldSrc: targetEl.extra?.newImageSrc,
+            oldBytes: targetEl.extra?.imageBytes,
+            oldMime: targetEl.extra?.mimeType,
+            oldRemoved: targetEl.extra?.isRemoved,
+            newSrc: newImageSrc,
+            newBytes: imageBytes,
+            newMime: mimeType,
+            timestamp: Date.now()
+        };
+        this.docModel.undoStack.push(mutationRecord);
+        this.docModel.redoStack = [];
+
+        targetEl.extra = targetEl.extra || {};
+        targetEl.extra.newImageSrc = newImageSrc;
+        targetEl.extra.imageBytes = imageBytes;
+        targetEl.extra.mimeType = mimeType;
+        targetEl.extra.isRemoved = false;
+        targetEl.isModified = true;
+
+        if (this.onStateChanged) {
+            this.onStateChanged(this.docModel, mutationRecord);
+        }
+    }
+
+    /**
+     * Remove / Blank-out Kop Logo
+     */
+    removeKopLogo(elementId) {
+        if (!this.docModel) return;
+        let targetEl = null;
+        for (const page of this.docModel.pages) {
+            for (const el of page.elements) {
+                if (el.id === elementId && el.type === 'kop_logo') {
+                    targetEl = el;
+                    break;
+                }
+            }
+            if (targetEl) break;
+        }
+        if (!targetEl) return;
+
+        const mutationRecord = {
+            elementId,
+            type: 'REMOVE_KOP_LOGO',
+            oldSrc: targetEl.extra?.newImageSrc,
+            oldBytes: targetEl.extra?.imageBytes,
+            oldMime: targetEl.extra?.mimeType,
+            oldRemoved: targetEl.extra?.isRemoved,
+            newRemoved: true,
+            timestamp: Date.now()
+        };
+        this.docModel.undoStack.push(mutationRecord);
+        this.docModel.redoStack = [];
+
+        targetEl.extra = targetEl.extra || {};
+        targetEl.extra.isRemoved = true;
+        targetEl.isModified = true;
+
+        if (this.onStateChanged) {
+            this.onStateChanged(this.docModel, mutationRecord);
+        }
+    }
+
+    /**
+     * Reset Kop Logo to original
+     */
+    resetKopLogo(elementId) {
+        if (!this.docModel) return;
+        let targetEl = null;
+        for (const page of this.docModel.pages) {
+            for (const el of page.elements) {
+                if (el.id === elementId && el.type === 'kop_logo') {
+                    targetEl = el;
+                    break;
+                }
+            }
+            if (targetEl) break;
+        }
+        if (!targetEl) return;
+
+        delete targetEl.extra.newImageSrc;
+        delete targetEl.extra.imageBytes;
+        delete targetEl.extra.mimeType;
+        delete targetEl.extra.isRemoved;
+        targetEl.isModified = false;
+
+        if (this.onStateChanged) {
+            this.onStateChanged(this.docModel, { type: 'RESET_KOP_LOGO', elementId });
         }
     }
 }

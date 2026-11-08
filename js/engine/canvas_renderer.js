@@ -87,35 +87,146 @@ export class CanvasRenderer {
             await pdfPage.render(renderContext).promise;
             pageWrapper.appendChild(canvas);
 
-            // 2. Interactive Text Overlay
+            // 2. Interactive Text Overlay & Flowable Layout
             const overlay = document.createElement('div');
             overlay.className = 'absolute inset-0 w-full h-full z-10';
 
+            let cumulativeShift = 0;
+
             pageData.elements.forEach((el) => {
+                // A. Handle Kop Logo Target
+                if (el.type === 'kop_logo') {
+                    const logoBox = document.createElement('div');
+                    logoBox.id = 'target_' + el.id;
+                    logoBox.className = 'pdf-interactive-target kop-logo-target absolute cursor-pointer border-2 border-dashed border-blue-400/80 bg-blue-500/10 hover:bg-blue-500/25 rounded flex items-center justify-center p-1 transition-all z-20';
+                    logoBox.style.left = (el.rect.x * this.scale) + 'px';
+                    logoBox.style.top = (el.rect.y * this.scale) + 'px';
+                    logoBox.style.width = (el.rect.width * this.scale) + 'px';
+                    logoBox.style.height = (el.rect.height * this.scale) + 'px';
+                    logoBox.title = el.extra?.title || 'Logo Kop Surat';
+
+                    if (this.selectedElementId === el.id) logoBox.classList.add('active-selected');
+
+                    if (el.extra?.isRemoved) {
+                        logoBox.innerHTML = `
+                            <div class="modified-whiteout-patch absolute -inset-1 bg-white" style="z-index: 1;"></div>
+                            <span class="text-[9px] font-bold text-neutral-400 text-center leading-tight relative z-10">
+                                <i class="fa-solid fa-ban mb-0.5 block text-xs text-neutral-500"></i>
+                                Logo Dihapus
+                            </span>
+                        `;
+                    } else if (el.extra?.newImageSrc) {
+                        logoBox.innerHTML = `
+                            <div class="modified-whiteout-patch absolute -inset-1 bg-white" style="z-index: 1;"></div>
+                            <img src="${el.extra.newImageSrc}" style="width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2;">
+                        `;
+                    } else {
+                        logoBox.innerHTML = `
+                            <span class="text-[9px] font-bold text-blue-300 text-center leading-tight">
+                                <i class="fa-solid fa-camera mb-0.5 block text-xs"></i>
+                                ${el.extra?.title || 'Logo Kop'}
+                            </span>
+                        `;
+                    }
+
+                    logoBox.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.selectElement(el.id, pageWrapper);
+                    });
+
+                    overlay.appendChild(logoBox);
+                    return;
+                }
+
+                // B. Handle Flowable Paragraphs & Subsequent Elements
+                let currentHeight = el.rect.height;
+                let isExpanded = false;
+
+                if (el.isModified && (el.type === 'paragraph' || el.sourceRef?.isParagraph)) {
+                    const fontFam = el.fontFamily || 'Times New Roman';
+                    const lineHeightRatio = 1.45;
+                    const calculatedHeight = measureParagraphHeight(el.text, el.rect.width, el.fontSize, fontFam, lineHeightRatio);
+
+                    if (calculatedHeight > el.rect.height) {
+                        currentHeight = calculatedHeight;
+                        isExpanded = true;
+                    }
+                }
+
+                const effectiveY = el.rect.y + cumulativeShift;
+                const isParagraph = el.type === 'paragraph' || el.sourceRef?.isParagraph;
+                const isKopText = (el.rect.y < 95);
+                const fontFam = el.fontFamily || 'Times New Roman';
+                const alignment = isKopText ? 'center' : (isParagraph ? 'justify' : 'left');
+
+                let targetWidth = Math.max(20, el.rect.width * this.scale) + 'px';
+                let targetLeft = (el.rect.x * this.scale) + 'px';
+                let targetTop = (effectiveY * this.scale) + 'px';
+                let targetHeight = (currentHeight * this.scale) + 'px';
+
                 const target = document.createElement('div');
                 target.id = 'target_' + el.id;
                 target.className = 'pdf-interactive-target absolute cursor-pointer transition-all';
-                target.style.left = (el.rect.x * this.scale) + 'px';
-                target.style.top = (el.rect.y * this.scale) + 'px';
-                target.style.width = Math.max(20, el.rect.width * this.scale) + 'px';
-                target.style.height = (el.rect.height * this.scale) + 'px';
+                target.style.left = targetLeft;
+                target.style.top = targetTop;
+                target.style.width = targetWidth;
+                target.style.height = targetHeight;
+                target.style.zIndex = '10';
                 target.title = el.text;
+
+                if (el.isModified && isKopText) {
+                    target.style.left = ((pageData.width * this.scale) / 2) + 'px';
+                    target.style.transform = 'translateX(-50%)';
+                    target.style.width = 'auto';
+                    target.style.minWidth = (el.rect.width * this.scale + 16) + 'px';
+                    target.style.height = (el.rect.height * this.scale) + 'px';
+                    target.style.top = (effectiveY * this.scale) + 'px';
+                } else if (el.isModified && !isParagraph) {
+                    target.style.width = 'auto';
+                    target.style.minWidth = (el.rect.width * this.scale + 10) + 'px';
+                    target.style.height = (el.rect.height * this.scale) + 'px';
+                    target.style.top = (effectiveY * this.scale) + 'px';
+                }
 
                 if (this.selectedElementId === el.id) {
                     target.classList.add('active-selected');
                 }
 
-                // If element has been modified, render whiteout mask + updated text with natural reflow!
-                if (el.isModified) {
+                const isPushedDown = cumulativeShift > 0 && !el.isModified;
+
+                // Render whiteout & text for modified or pushed down elements
+                if (el.isModified || isPushedDown) {
                     target.classList.add('is-modified');
-                    const isParagraph = el.type === 'paragraph' || el.sourceRef?.isParagraph;
-                    const fontFam = el.fontFamily || 'Times New Roman';
+
+                    // Erase old position from canvas background if element was pushed down OR modified
+                    const oldPosWhiteout = document.createElement('div');
+                    oldPosWhiteout.className = 'absolute bg-white pointer-events-none';
+                    oldPosWhiteout.style.left = (el.rect.x * this.scale - 4) + 'px';
+                    oldPosWhiteout.style.top = (el.rect.y * this.scale - 1) + 'px';
+                    oldPosWhiteout.style.width = (el.rect.width * this.scale + 8) + 'px';
+                    oldPosWhiteout.style.height = (el.rect.height * this.scale + 2) + 'px';
+                    oldPosWhiteout.style.zIndex = '5';
+                    overlay.appendChild(oldPosWhiteout);
+
                     target.innerHTML = `
                         <div class="modified-whiteout-patch absolute inset-0 bg-white" style="z-index: 1;"></div>
-                        <div class="relative z-10 text-neutral-900" style="font-size: ${Math.max(8, el.fontSize * this.scale)}pt; font-family: '${fontFam}', serif; line-height: 1.45; text-align: ${isParagraph ? 'justify' : 'left'}; word-break: break-word; white-space: ${isParagraph ? 'normal' : 'nowrap'}; padding: 0 1px;">
+                        <div class="relative z-10 text-neutral-900" style="font-size: ${Math.max(8, el.fontSize * this.scale)}pt; font-family: '${fontFam}', serif; line-height: ${isParagraph ? '1.45' : '1.1'}; text-align: ${alignment}; word-break: break-word; white-space: ${isParagraph ? 'normal' : 'nowrap'}; padding: 0 4px;">
                             ${escapeHtml(el.text)}
                         </div>
                     `;
+                }
+
+                if (isExpanded) {
+                    const deltaH = currentHeight - el.rect.height;
+                    cumulativeShift += deltaH;
+                    el.effectiveShift = deltaH;
+                    el.expandedHeight = currentHeight;
+                } else if (cumulativeShift > 0) {
+                    el.shiftedY = effectiveY;
+                    el.cumulativeShift = cumulativeShift;
+                } else {
+                    el.shiftedY = undefined;
+                    el.cumulativeShift = 0;
                 }
 
                 // Click event
@@ -355,4 +466,34 @@ function escapeHtml(str) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+}
+
+function measureParagraphHeight(text, widthPt, fontSizePt, fontFamily = 'Times New Roman', lineHeightRatio = 1.45) {
+    if (!text) return fontSizePt * lineHeightRatio;
+    let measurer = document.getElementById('ude_text_measurer');
+    if (!measurer) {
+        measurer = document.createElement('div');
+        measurer.id = 'ude_text_measurer';
+        measurer.style.cssText = `
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            visibility: hidden;
+            pointer-events: none;
+            word-break: break-word;
+            white-space: normal;
+            text-align: justify;
+            box-sizing: border-box;
+            padding: 0 1px;
+            margin: 0;
+        `;
+        document.body.appendChild(measurer);
+    }
+    measurer.style.width = widthPt + 'px';
+    measurer.style.fontSize = fontSizePt + 'pt';
+    measurer.style.fontFamily = `"${fontFamily}", serif`;
+    measurer.style.lineHeight = String(lineHeightRatio);
+    measurer.innerText = text;
+    const measuredHeight = measurer.getBoundingClientRect().height;
+    return Math.ceil(measuredHeight) + 8;
 }
