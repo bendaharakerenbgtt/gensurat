@@ -58,9 +58,11 @@ export class CanvasRenderer {
 
             // Create Page Sheet Wrapper
             const pageWrapper = document.createElement('div');
-            pageWrapper.className = 'canvas-page-wrapper pdf-mode relative shadow-2xl bg-white mb-8 mx-auto';
+            pageWrapper.className = 'canvas-page-wrapper pdf-mode relative shadow-2xl bg-white mb-8 mx-auto shrink-0';
             pageWrapper.style.width = (pageData.width * this.scale) + 'px';
             pageWrapper.style.height = (pageData.height * this.scale) + 'px';
+            pageWrapper.style.minWidth = (pageData.width * this.scale) + 'px';
+            pageWrapper.style.minHeight = (pageData.height * this.scale) + 'px';
             pageWrapper.dataset.pageIndex = pIdx;
 
             // Page Number Badge
@@ -147,8 +149,10 @@ export class CanvasRenderer {
 
         docModel.pages.forEach((pageData, pIdx) => {
             const pageWrapper = document.createElement('div');
-            pageWrapper.className = 'canvas-page-wrapper docx-mode relative shadow-2xl bg-white mb-8 mx-auto text-neutral-900';
+            pageWrapper.className = 'canvas-page-wrapper docx-mode relative shadow-2xl bg-white mb-8 mx-auto text-neutral-900 shrink-0';
             pageWrapper.style.width = (setup.width * this.scale) + 'px';
+            pageWrapper.style.minWidth = (setup.width * this.scale) + 'px';
+            pageWrapper.style.height = (setup.height * this.scale) + 'px';
             pageWrapper.style.minHeight = (setup.height * this.scale) + 'px';
             pageWrapper.style.padding = `${setup.marginTop * this.scale}px ${setup.marginRight * this.scale}px ${setup.marginBottom * this.scale}px ${setup.marginLeft * this.scale}px`;
             pageWrapper.dataset.pageIndex = pIdx;

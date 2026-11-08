@@ -11,6 +11,7 @@
 
 /* Page Sheet Wrapper */
 .canvas-page-wrapper {
+    flex-shrink: 0 !important;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
     transition: transform 0.15s ease-out;
 }
