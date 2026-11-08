@@ -134,6 +134,35 @@ export class CanvasRenderer {
                         this.selectElement(el.id, pageWrapper);
                     });
 
+                    // Direct Drag & Drop replacement on paper
+                    logoBox.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        logoBox.classList.add('border-emerald-400', 'bg-emerald-500/20');
+                    });
+                    logoBox.addEventListener('dragleave', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        logoBox.classList.remove('border-emerald-400', 'bg-emerald-500/20');
+                    });
+                    logoBox.addEventListener('drop', async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        logoBox.classList.remove('border-emerald-400', 'bg-emerald-500/20');
+                        const file = e.dataTransfer.files[0];
+                        if (file && file.type.startsWith('image/')) {
+                            const arrayBuffer = await file.arrayBuffer();
+                            const reader = new FileReader();
+                            reader.onload = (loadEv) => {
+                                const dataUrl = loadEv.target.result;
+                                if (window.mutationEngineInstance) {
+                                    window.mutationEngineInstance.updateKopLogo(el.id, dataUrl, new Uint8Array(arrayBuffer), file.type || 'image/png');
+                                }
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+
                     overlay.appendChild(logoBox);
                     return;
                 }
