@@ -1,17 +1,11 @@
-const CACHE_NAME = 'dana-imip-cache-v3';
+const CACHE_NAME = 'gensurat-cache-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/dasboard.html',
-  '/laporan-keuangan.html',
-  '/lihat-kegiatan.html',
-  '/detail-kegiatan.html',
-  '/riwayat-transaksi.html',
-  '/pembayaran-kas.html',
   '/buat-surat.html',
   '/folder-surat.html',
+  '/css/style.css',
   '/manifest.json',
-  '/bendahara.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
 ];

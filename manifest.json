@@ -1,17 +1,17 @@
 {
-  "name": "DANA IMIP - Transparansi Keuangan LDK IMIP",
-  "short_name": "DANA IMIP",
-  "description": "Sistem transparansi keuangan, rekap kas, dan laporan keuangan organisasi LDK IMIP Polimedia.",
-  "start_url": "/dasboard.html",
-  "id": "/dasboard.html",
+  "name": "GenSurat - Generator Surat & Lampiran Resmi",
+  "short_name": "GenSurat",
+  "description": "Generator surat resmi organisasi, berita acara, perizinan, dan lampiran dengan penyimpanan lokal 100%.",
+  "start_url": "/index.html",
+  "id": "/index.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#080C14",
-  "theme_color": "#080C14",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
   "categories": [
-    "finance",
-    "productivity"
+    "productivity",
+    "utilities"
   ],
   "lang": "id",
   "icons": [
@@ -36,19 +36,14 @@
   ],
   "shortcuts": [
     {
-      "name": "Dashboard",
-      "url": "/dasboard.html",
-      "description": "Lihat ringkasan saldo dan grafik kas"
+      "name": "Buat Surat Baru",
+      "url": "/buat-surat.html?editor=1",
+      "description": "Buat lembar surat resmi baru"
     },
     {
-      "name": "Laporan Keuangan",
-      "url": "/laporan-keuangan.html",
-      "description": "Analisis dan tren keuangan"
-    },
-    {
-      "name": "Bayar Kas",
-      "url": "/pembayaran-kas.html",
-      "description": "Konfirmasi pembayaran kas anggota"
+      "name": "Folder Arsip Surat",
+      "url": "/folder-surat.html",
+      "description": "Buka folder dan arsip surat tersimpan"
     }
   ]
 }
