@@ -3144,12 +3144,78 @@
             </div>
 
             <div class="space-y-4">
-                <!-- 1. BACKGROUND KERTAS (WATERMARK) -->
+                <!-- 1. LOGO KABINET DI ATAS KANAN KOP -->
+                <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-shapes text-blue-400 text-sm"></i>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">1. Logo Kabinet (Diatas Kanan Kop)</span>
+                        </div>
+                        <span class="text-[10px] text-neutral-500 font-mono">Template Bawaan: Kosong</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-16 h-16 rounded-xl bg-neutral-900 border border-neutral-800 p-1 flex items-center justify-center shrink-0 overflow-hidden relative" style="background-image: linear-gradient(45deg, #1c1917 25%, transparent 25%), linear-gradient(-45deg, #1c1917 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1c1917 75%), linear-gradient(-45deg, transparent 75%, #1c1917 75%); background-size: 10px 10px; background-position: 0 0, 0 5px, 5px -5px, -5px 0px;">
+                            <img id="preview_thumb_kabinet" src="" alt="Preview Logo Kabinet" class="w-full h-full object-contain hidden">
+                            <div id="notice_kabinet_none" class="flex flex-col items-center justify-center text-center p-1 border-2 border-dashed border-neutral-700 rounded-lg w-full h-full text-neutral-400">
+                                <i class="fa-solid fa-plus text-xs mb-0.5 text-neutral-500"></i>
+                                <span class="text-[8px] font-bold leading-tight">Kotak Kosong</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 space-y-2">
+                            <p class="text-[11px] text-neutral-400">Logo kabinet kepengurusan di pojok kanan kop surat. Jika kosong, tampil kotak placeholder yang dapat diketuk langsung.</p>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <label class="px-3 py-1.5 rounded-lg bg-white text-black font-bold hover:bg-neutral-200 text-xs flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 transition-all">
+                                    <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
+                                    <span>Unggah Logo Kabinet</span>
+                                    <input type="file" id="input_file_logo_kabinet" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="handleUploadLogoKabinet(event)">
+                                </label>
+                                <button type="button" onclick="resetLogoKabinetDefault()" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium transition-colors cursor-pointer">
+                                    Kosongkan (Placeholder)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. LOGO ORGANISASI DI ATAS KANAN KOP -->
+                <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-sitemap text-blue-400 text-sm"></i>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">2. Logo Organisasi (Diatas Kanan Kop)</span>
+                        </div>
+                        <span class="text-[10px] text-neutral-500 font-mono">Template Bawaan: Kosong</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-16 h-16 rounded-xl bg-neutral-900 border border-neutral-800 p-1 flex items-center justify-center shrink-0 overflow-hidden relative" style="background-image: linear-gradient(45deg, #1c1917 25%, transparent 25%), linear-gradient(-45deg, #1c1917 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1c1917 75%), linear-gradient(-45deg, transparent 75%, #1c1917 75%); background-size: 10px 10px; background-position: 0 0, 0 5px, 5px -5px, -5px 0px;">
+                            <img id="preview_thumb_imip" src="" alt="Preview Logo Organisasi" class="w-full h-full object-contain hidden">
+                            <div id="notice_imip_none" class="flex flex-col items-center justify-center text-center p-1 border-2 border-dashed border-neutral-700 rounded-lg w-full h-full text-neutral-400">
+                                <i class="fa-solid fa-plus text-xs mb-0.5 text-neutral-500"></i>
+                                <span class="text-[8px] font-bold leading-tight">Kotak Kosong</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 space-y-2">
+                            <p class="text-[11px] text-neutral-400">Logo organisasi Anda di sebelah kiri logo kabinet. Jika kosong, tampil kotak placeholder yang dapat diketuk langsung.</p>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <label class="px-3 py-1.5 rounded-lg bg-white text-black font-bold hover:bg-neutral-200 text-xs flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 transition-all">
+                                    <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
+                                    <span>Unggah Logo Organisasi</span>
+                                    <input type="file" id="input_file_logo_imip" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="handleUploadLogoImip(event)">
+                                </label>
+                                <button type="button" onclick="resetLogoImipDefault()" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium transition-colors cursor-pointer">
+                                    Kosongkan (Placeholder)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. BACKGROUND KERTAS (WATERMARK) -->
                 <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <i class="fa-solid fa-stamp text-blue-400 text-sm"></i>
-                            <span class="text-xs font-bold text-white uppercase tracking-wider">1. Background Kertas (Watermark)</span>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">3. Background Kertas (Watermark)</span>
                         </div>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" id="toggle_watermark_active" onchange="handleWatermarkActiveToggle(this.checked)" class="accent-neutral-200 rounded">
@@ -3224,72 +3290,6 @@
 
                             <!-- Live Tag Badge -->
                             <span class="absolute bottom-1 right-2 text-[9px] font-mono text-neutral-400 bg-white/80 px-1 rounded shadow-2xs z-20">Pratinjau Kertas Langsung</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. LOGO KABINET DI ATAS KANAN KOP -->
-                <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-shapes text-blue-400 text-sm"></i>
-                            <span class="text-xs font-bold text-white uppercase tracking-wider">2. Logo Kabinet (Diatas Kanan Kop)</span>
-                        </div>
-                        <span class="text-[10px] text-neutral-500 font-mono">Template Bawaan: Kosong</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-16 h-16 rounded-xl bg-neutral-900 border border-neutral-800 p-1 flex items-center justify-center shrink-0 overflow-hidden relative" style="background-image: linear-gradient(45deg, #1c1917 25%, transparent 25%), linear-gradient(-45deg, #1c1917 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1c1917 75%), linear-gradient(-45deg, transparent 75%, #1c1917 75%); background-size: 10px 10px; background-position: 0 0, 0 5px, 5px -5px, -5px 0px;">
-                            <img id="preview_thumb_kabinet" src="" alt="Preview Logo Kabinet" class="w-full h-full object-contain hidden">
-                            <div id="notice_kabinet_none" class="flex flex-col items-center justify-center text-center p-1 border-2 border-dashed border-neutral-700 rounded-lg w-full h-full text-neutral-400">
-                                <i class="fa-solid fa-plus text-xs mb-0.5 text-neutral-500"></i>
-                                <span class="text-[8px] font-bold leading-tight">Kotak Kosong</span>
-                            </div>
-                        </div>
-                        <div class="flex-1 space-y-2">
-                            <p class="text-[11px] text-neutral-400">Logo kabinet kepengurusan di pojok kanan kop surat. Jika kosong, tampil kotak placeholder yang dapat diketuk langsung.</p>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <label class="px-3 py-1.5 rounded-lg bg-white text-black font-bold hover:bg-neutral-200 text-xs flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 transition-all">
-                                    <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
-                                    <span>Unggah Logo Kabinet</span>
-                                    <input type="file" id="input_file_logo_kabinet" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="handleUploadLogoKabinet(event)">
-                                </label>
-                                <button type="button" onclick="resetLogoKabinetDefault()" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium transition-colors cursor-pointer">
-                                    Kosongkan (Placeholder)
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. LOGO ORGANISASI DI ATAS KANAN KOP -->
-                <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-sitemap text-blue-400 text-sm"></i>
-                            <span class="text-xs font-bold text-white uppercase tracking-wider">3. Logo Organisasi (Diatas Kanan Kop)</span>
-                        </div>
-                        <span class="text-[10px] text-neutral-500 font-mono">Template Bawaan: Kosong</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-16 h-16 rounded-xl bg-neutral-900 border border-neutral-800 p-1 flex items-center justify-center shrink-0 overflow-hidden relative" style="background-image: linear-gradient(45deg, #1c1917 25%, transparent 25%), linear-gradient(-45deg, #1c1917 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1c1917 75%), linear-gradient(-45deg, transparent 75%, #1c1917 75%); background-size: 10px 10px; background-position: 0 0, 0 5px, 5px -5px, -5px 0px;">
-                            <img id="preview_thumb_imip" src="" alt="Preview Logo Organisasi" class="w-full h-full object-contain hidden">
-                            <div id="notice_imip_none" class="flex flex-col items-center justify-center text-center p-1 border-2 border-dashed border-neutral-700 rounded-lg w-full h-full text-neutral-400">
-                                <i class="fa-solid fa-plus text-xs mb-0.5 text-neutral-500"></i>
-                                <span class="text-[8px] font-bold leading-tight">Kotak Kosong</span>
-                            </div>
-                        </div>
-                        <div class="flex-1 space-y-2">
-                            <p class="text-[11px] text-neutral-400">Logo organisasi Anda di sebelah kiri logo kabinet. Jika kosong, tampil kotak placeholder yang dapat diketuk langsung.</p>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <label class="px-3 py-1.5 rounded-lg bg-white text-black font-bold hover:bg-neutral-200 text-xs flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 transition-all">
-                                    <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
-                                    <span>Unggah Logo Organisasi</span>
-                                    <input type="file" id="input_file_logo_imip" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="handleUploadLogoImip(event)">
-                                </label>
-                                <button type="button" onclick="resetLogoImipDefault()" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium transition-colors cursor-pointer">
-                                    Kosongkan (Placeholder)
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
