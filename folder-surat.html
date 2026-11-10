@@ -7,14 +7,24 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GenSurat">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <!-- Instant Non-Blocking Theme Initialization -->
     <script>
-        if (localStorage.getItem('theme') !== 'dark') {
-            document.documentElement.classList.add('light-mode');
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.remove('light-mode');
-            document.documentElement.classList.add('dark');
-        }
+        (function() {
+            try {
+                var saved = localStorage.getItem('theme');
+                var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+                var isLight = saved === 'light' || (!saved && prefersLight);
+                var target = isLight ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', target);
+                if (isLight) {
+                    document.documentElement.classList.add('light-mode', 'theme-light');
+                    document.documentElement.classList.remove('dark', 'theme-dark');
+                } else {
+                    document.documentElement.classList.remove('light-mode', 'theme-light');
+                    document.documentElement.classList.add('dark', 'theme-dark');
+                }
+            } catch (e) {}
+        })();
     </script>
     <link class="head-theme-sync" rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/></svg>" type="image/jpeg">
     <meta charset="UTF-8">
@@ -30,6 +40,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
     <style>
         :root {
             --bg-main: #080C14;
@@ -255,8 +266,21 @@
                 <i class="fa-solid fa-pen-nib text-xs"></i>
                 <span class="hidden sm:inline">Buka Editor</span>
             </a>
-            <button type="button" onclick="toggleTheme(event)" aria-label="Ubah Tema" class="w-8 h-8 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors" title="Ubah Tema">
-                <i id="themeIcon" class="fa-solid fa-sun text-xs"></i>
+            <button type="button" onclick="toggleTheme(event)" class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Beralih tema" title="Beralih tema">
+                <svg class="theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
             </button>
         </div>
     </header>
@@ -326,8 +350,24 @@
         </div>
     </main>
 
-    <footer class="py-4 text-center border-t border-neutral-900/60 mt-10">
-        <p class="text-[10px] text-neutral-500 font-mono">GenSurat &middot; Generator Dokumen &amp; Surat Resmi Organisasi &middot; Penyimpanan Lokal 100%</p>
+    <!-- FOOTER WITH LEGAL & PRIVACY LINKS -->
+    <footer class="border-t border-neutral-900 py-6 px-6 text-center text-xs text-neutral-500 font-mono space-y-2.5 mt-10 transition-colors">
+        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-5 text-xs font-sans font-semibold">
+            <button type="button" onclick="openLegalModal('terms')" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-file-contract text-neutral-400"></i> Syarat &amp; Ketentuan
+            </button>
+            <span class="text-neutral-700">&middot;</span>
+            <button type="button" onclick="openLegalModal('privacy')" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-shield-halved text-blue-400"></i> Kebijakan Privasi
+            </button>
+            <span class="text-neutral-700">&middot;</span>
+            <button type="button" onclick="openLegalModal('security')" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-emerald-400/90 hover:text-emerald-300">
+                <i class="fa-solid fa-lock"></i> 100% Penyimpanan Lokal
+            </button>
+        </div>
+        <p class="text-[11px] text-neutral-500">
+            GenSurat &middot; Generator Dokumen &amp; Surat Resmi Organisasi &middot; Client-Side Sandbox Storage
+        </p>
     </footer>
 
     <!-- MODAL BUAT SURAT BARU -->
@@ -964,33 +1004,16 @@
             window.location.href = `buat-surat.html?new=1&type=${encodeURIComponent(selectedType)}&title=${encodeURIComponent(title)}`;
         }
 
-        // Theme Toggle Functionality
+        // Theme Toggle Functionality handled via js/theme-transition.js
         function toggleTheme(event) {
-            if (event) event.preventDefault();
-            const isLight = document.documentElement.classList.contains('light-mode');
-            if (isLight) {
-                document.documentElement.classList.remove('light-mode');
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.classList.add('light-mode');
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
+            if (window.GenSuratTheme) {
+                window.GenSuratTheme.toggle(event);
             }
-            syncThemeIcons();
         }
 
         function syncThemeIcons() {
-            const isLight = document.documentElement.classList.contains('light-mode');
-            const icon = document.getElementById('themeIcon');
-            if (icon) {
-                if (isLight) {
-                    icon.classList.remove('fa-sun');
-                    icon.classList.add('fa-moon');
-                } else {
-                    icon.classList.remove('fa-moon');
-                    icon.classList.add('fa-sun');
-                }
+            if (window.GenSuratTheme) {
+                window.GenSuratTheme.syncThemeIcons && window.GenSuratTheme.syncThemeIcons();
             }
         }
 
@@ -1075,6 +1098,8 @@
             renderDocumentsGrid();
         });
     </script>
+    <script src="js/theme-transition.js"></script>
+    <script src="js/legal.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

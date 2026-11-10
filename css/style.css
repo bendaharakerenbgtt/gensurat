@@ -1,115 +1,470 @@
 /* ==========================================================================
    GenSurat - Universal Surat Generator
-   Clean, Elegant Monochrome Theme & A4 Document Engine
+   Clean, Elegant Monochrome Nuance Theme & Authentic A4 Document Engine
+   Synchronized Nuance with InLiveIq (Deep Obsidian & Clean Slate)
    ========================================================================== */
 
-:root {
-    /* DARK THEME (Default) - Sophisticated Zinc / Slate Palette */
-    --bg-main: #09090b;
-    --bg-surface: #121215;
-    --bg-card: rgba(24, 24, 27, 0.92);
-    --border-card: rgba(255, 255, 255, 0.08);
-    --border-muted: rgba(255, 255, 255, 0.05);
-    
-    --text-primary: #fafafa;
-    --text-sec-100: #f4f4f5;
-    --text-sec-200: #e4e4e7;
-    --text-sec-300: #d4d4d8;
-    --text-sec-400: #a1a1aa;
-    --text-sec-500: #71717a;
-    
-    --accent-neutral: #e4e4e7;
-    --accent-bg: rgba(255, 255, 255, 0.08);
+/* --------------------------------------------------------------------------
+   Design Tokens & CSS Variables
+   -------------------------------------------------------------------------- */
+:root,
+:root[data-theme="dark"],
+body[data-theme="dark"],
+html:not(.light-mode) {
+    /* Deep Obsidian Dark Theme (White Accent Nuance from InLiveIq) */
+    --bg-main: #04070c;
+    --bg-surface: #0a0e18;
+    --bg-tertiary: #111624;
+    --bg-card: rgba(12, 16, 26, 0.90);
+    --bg-card-hover: rgba(18, 24, 38, 0.96);
+    --bg-glass: rgba(8, 12, 20, 0.85);
+
+    --text-primary: #ffffff;
+    --text-sec-100: #f4f6fa;
+    --text-sec-200: #e2e8f0;
+    --text-sec-300: #cbd5e1;
+    --text-sec-400: #9aa3b8;
+    --text-sec-500: #656e85;
+
+    --accent: #ffffff;
+    --accent-soft: rgba(255, 255, 255, 0.08);
+    --accent-hover: #e8ecf4;
     --accent-border: rgba(255, 255, 255, 0.2);
+
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-card: rgba(255, 255, 255, 0.12);
+    --border-strong: rgba(255, 255, 255, 0.28);
     --focus-ring: rgba(255, 255, 255, 0.25);
-    
-    --preview-desk-bg: #18181b;
+
+    --preview-desk-bg: #0d111c;
+    --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.45);
 }
 
+:root[data-theme="light"],
+body[data-theme="light"],
 html.light-mode {
-    /* LIGHT THEME - Crisp Architectural White & Neutral Slate */
-    --bg-main: #f8fafc;
+    /* Soft Architectural Slate Light Theme (from InLiveIq) */
+    --bg-main: #f5f6fa;
     --bg-surface: #ffffff;
+    --bg-tertiary: #dee4ef;
     --bg-card: #ffffff;
+    --bg-card-hover: #ffffff;
+    --bg-glass: rgba(245, 246, 250, 0.88);
+
+    --text-primary: #0f121d;
+    --text-sec-100: #1a2030;
+    --text-sec-200: #2d3748;
+    --text-sec-300: #4a5568;
+    --text-sec-400: #576175;
+    --text-sec-500: #838e9f;
+
+    --accent: #0f121d;
+    --accent-soft: rgba(15, 18, 29, 0.06);
+    --accent-hover: #262c3e;
+    --accent-border: rgba(15, 18, 29, 0.18);
+
+    --border-subtle: rgba(15, 18, 29, 0.08);
     --border-card: #e2e8f0;
-    --border-muted: #cbd5e1;
-    
-    --text-primary: #09090b;
-    --text-sec-100: #18181b;
-    --text-sec-200: #27272a;
-    --text-sec-300: #3f3f46;
-    --text-sec-400: #71717a;
-    --text-sec-500: #a1a1aa;
-    
-    --accent-neutral: #18181b;
-    --accent-bg: rgba(0, 0, 0, 0.05);
-    --accent-border: #d4d4d8;
-    --focus-ring: rgba(0, 0, 0, 0.15);
-    
-    --preview-desk-bg: #e2e8f0;
+    --border-strong: rgba(15, 18, 29, 0.24);
+    --focus-ring: rgba(15, 18, 29, 0.15);
+
+    --preview-desk-bg: #e5e9f0;
+    --shadow-card: 0 4px 20px -2px rgba(15, 18, 29, 0.05), 0 1px 3px rgba(15, 18, 29, 0.04);
 }
 
 body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: var(--bg-main);
     color: var(--text-primary);
-    transition: background-color 0.25s ease, color 0.25s ease;
+    line-height: 1.5;
     -webkit-text-size-adjust: 100% !important;
     text-size-adjust: 100% !important;
 }
 
-/* -------------------------------------------------------------
-   LIGHT MODE OVERRIDES
-   ------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   View Transitions API (GPU-Accelerated Circular Ripple Theme Transition)
+   -------------------------------------------------------------------------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+    z-index: 1;
+}
+
+::view-transition-new(root) {
+    z-index: 999999;
+}
+
+/* Universal Smooth Transition Fallback for other browsers */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+    transition: background-color 450ms cubic-bezier(0.22, 1, 0.36, 1),
+                background 450ms cubic-bezier(0.22, 1, 0.36, 1),
+                color 450ms cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 450ms cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 450ms cubic-bezier(0.22, 1, 0.36, 1),
+                fill 450ms cubic-bezier(0.22, 1, 0.36, 1),
+                stroke 450ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+    transition-delay: 0s !important;
+}
+
+/* Fallback Radial Ripple Overlay */
+.theme-ripple-fallback {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999990;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease 350ms;
+}
+
+/* --------------------------------------------------------------------------
+   Morphing Sun ↔ Moon Theme Toggle Button (InLiveIq Signature)
+   -------------------------------------------------------------------------- */
+.theme-toggle-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: var(--accent-soft);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), 
+                background-color 200ms ease, 
+                border-color 200ms ease, 
+                box-shadow 200ms ease;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.06);
+    background: rgba(255, 255, 255, 0.14);
+    border-color: var(--border-strong);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+:root[data-theme="light"] .theme-toggle-btn:hover,
+html.light-mode .theme-toggle-btn:hover {
+    background: rgba(15, 18, 29, 0.08);
+    border-color: rgba(15, 18, 29, 0.25);
+    box-shadow: 0 0 12px rgba(15, 18, 29, 0.08);
+}
+
+.theme-toggle-btn.toggling {
+    animation: themeBtnSpin 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes themeBtnSpin {
+    0% { transform: scale(0.9) rotate(0deg); }
+    60% { transform: scale(1.18) rotate(220deg); }
+    100% { transform: scale(1) rotate(360deg); }
+}
+
+.theme-icon-sun,
+.theme-icon-moon {
+    position: absolute;
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1), opacity 350ms ease;
+}
+
+/* Dark Mode: Sun visible, Moon hidden */
+:root[data-theme="dark"] .theme-icon-sun,
+:root:not([data-theme="light"]):not(.light-mode) .theme-icon-sun {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+:root[data-theme="dark"] .theme-icon-moon,
+:root:not([data-theme="light"]):not(.light-mode) .theme-icon-moon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.3);
+    pointer-events: none;
+}
+
+/* Light Mode: Moon visible, Sun hidden */
+:root[data-theme="light"] .theme-icon-sun,
+html.light-mode .theme-icon-sun {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.3);
+    pointer-events: none;
+}
+:root[data-theme="light"] .theme-icon-moon,
+html.light-mode .theme-icon-moon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+/* --------------------------------------------------------------------------
+   LIGHT MODE OVERRIDES & HARMONIZED STYLES
+   -------------------------------------------------------------------------- */
+html.light-mode body {
+    background-color: var(--bg-main) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Header Navbar */
 html.light-mode header {
-    background-color: rgba(255, 255, 255, 0.95) !important;
+    background-color: rgba(255, 255, 255, 0.90) !important;
     border-bottom-color: #e2e8f0 !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 1px 4px rgba(15, 18, 29, 0.04) !important;
 }
 
 html.light-mode header h1,
 html.light-mode header h1 span {
-    color: #09090b !important;
+    color: #0f121d !important;
 }
 
 html.light-mode header p {
-    color: #71717a !important;
+    color: #576175 !important;
 }
 
-html.light-mode .glass-card {
+html.light-mode header button:not(.theme-toggle-btn),
+html.light-mode header label {
     background-color: #ffffff !important;
     border-color: #e2e8f0 !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    color: #334155 !important;
 }
 
-html.light-mode .form-input,
+html.light-mode header button:hover:not(.theme-toggle-btn),
+html.light-mode header label:hover {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    color: #0f121d !important;
+}
+
+/* Dashboard Hero Card */
+html.light-mode .hero-banner-card,
+html.light-mode main > div:first-child {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 4px 20px -2px rgba(15, 18, 29, 0.05), 0 1px 3px rgba(15, 18, 29, 0.04) !important;
+}
+
+html.light-mode .hero-banner-card h2,
+html.light-mode main > div:first-child h2 {
+    color: #0f121d !important;
+}
+
+html.light-mode .hero-banner-card p,
+html.light-mode main > div:first-child p {
+    color: #576175 !important;
+}
+
+html.light-mode .hero-banner-card a[href*="folder"],
+html.light-mode main > div:first-child a[href*="folder"] {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    color: #1e293b !important;
+}
+
+html.light-mode .hero-banner-card a[href*="folder"]:hover,
+html.light-mode main > div:first-child a[href*="folder"]:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f121d !important;
+}
+
+html.light-mode .hero-banner-card a[href*="buat-surat"],
+html.light-mode main > div:first-child a[href*="buat-surat"] {
+    background-color: #0f121d !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(15, 18, 29, 0.15) !important;
+}
+
+html.light-mode .hero-banner-card a[href*="buat-surat"]:hover,
+html.light-mode main > div:first-child a[href*="buat-surat"]:hover {
+    background-color: #262c3e !important;
+}
+
+/* Search & Filter Toolbar */
+html.light-mode .filter-bar-container,
+html.light-mode .search-filter-wrapper > div:first-child {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 1px 3px rgba(15, 18, 29, 0.04) !important;
+}
+
+html.light-mode .doc-filter-btn {
+    color: #576175 !important;
+}
+
+html.light-mode .doc-filter-btn:hover {
+    color: #0f121d !important;
+}
+
+html.light-mode .doc-filter-btn.active {
+    background-color: #0f121d !important;
+    color: #ffffff !important;
+    box-shadow: 0 1px 4px rgba(15, 18, 29, 0.15) !important;
+}
+
+html.light-mode #doc_search_input,
+html.light-mode .search-input {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #0f121d !important;
+    box-shadow: 0 1px 3px rgba(15, 18, 29, 0.04) !important;
+}
+
+html.light-mode #doc_search_input::placeholder,
+html.light-mode .search-input::placeholder {
+    color: #838e9f !important;
+}
+
+html.light-mode #doc_search_input:focus,
+html.light-mode .search-input:focus {
+    border-color: #0f121d !important;
+    box-shadow: 0 0 0 3px rgba(15, 18, 29, 0.08) !important;
+}
+
+/* Document Cards in Grid */
+html.light-mode .doc-item-card,
+html.light-mode #documents_cards_grid > div {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 2px 10px rgba(15, 18, 29, 0.03) !important;
+}
+
+html.light-mode .doc-item-card:hover,
+html.light-mode #documents_cards_grid > div:hover {
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 8px 24px rgba(15, 18, 29, 0.08) !important;
+}
+
+html.light-mode .doc-item-card h3 a,
+html.light-mode #documents_cards_grid > div h3 a {
+    color: #0f121d !important;
+}
+
+html.light-mode .doc-item-card h3 a:hover,
+html.light-mode #documents_cards_grid > div h3 a:hover {
+    color: #2563eb !important;
+}
+
+html.light-mode .doc-item-card .font-mono,
+html.light-mode #documents_cards_grid > div .font-mono {
+    color: #576175 !important;
+}
+
+html.light-mode .doc-item-card .border-t,
+html.light-mode #documents_cards_grid > div .border-t {
+    border-top-color: #f1f5f9 !important;
+}
+
+html.light-mode .doc-badge-pill {
+    background-color: #f1f5f9 !important;
+    color: #0f121d !important;
+    border-color: #e2e8f0 !important;
+}
+
+html.light-mode .doc-card-open-btn {
+    background-color: #0f121d !important;
+    color: #ffffff !important;
+}
+
+html.light-mode .doc-card-open-btn:hover {
+    background-color: #262c3e !important;
+}
+
+html.light-mode .doc-card-action-btn {
+    color: #64748b !important;
+}
+
+html.light-mode .doc-card-action-btn:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f121d !important;
+}
+
+/* Empty State */
+html.light-mode #documents_empty_state {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+
+html.light-mode #documents_empty_state h3 {
+    color: #0f121d !important;
+}
+
+html.light-mode #documents_empty_state p {
+    color: #576175 !important;
+}
+
+/* Modals & Forms */
+html.light-mode .modal-card-box,
+html.light-mode #modal_create_new_doc > div,
+html.light-mode #modal_profil_organisasi > div,
+html.light-mode #modal_legal_notice > div,
+html.light-mode #modal_preflight_warning > div {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #0f121d !important;
+    box-shadow: 0 25px 60px -15px rgba(15, 18, 29, 0.22) !important;
+}
+
+html.light-mode .modal-subcard,
+html.light-mode #modal_profil_organisasi form > div,
+html.light-mode #modal_create_new_doc label.relative {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    color: #0f121d !important;
+}
+
 html.light-mode input[type="text"],
 html.light-mode input[type="number"],
 html.light-mode input[type="tel"],
 html.light-mode input[type="date"],
 html.light-mode select,
 html.light-mode textarea {
-    background-color: #f8fafc !important;
+    background-color: #ffffff !important;
     border-color: #cbd5e1 !important;
-    color: #09090b !important;
+    color: #0f121d !important;
 }
 
-html.light-mode .form-input:focus,
 html.light-mode input:focus,
 html.light-mode select:focus,
 html.light-mode textarea:focus {
-    background-color: #ffffff !important;
-    border-color: #09090b !important;
-    box-shadow: 0 0 0 2px rgba(9, 9, 11, 0.12) !important;
+    border-color: #0f121d !important;
+    box-shadow: 0 0 0 2.5px rgba(15, 18, 29, 0.12) !important;
 }
 
+/* Footer */
+html.light-mode footer {
+    background-color: rgba(255, 255, 255, 0.6) !important;
+    border-top-color: #e2e8f0 !important;
+    color: #576175 !important;
+}
+
+html.light-mode footer a {
+    color: #576175 !important;
+}
+
+html.light-mode footer a:hover {
+    color: #0f121d !important;
+}
+
+/* Preview Sheet Desk Container */
 html.light-mode #preview_sheet_outer_box {
-    background-color: #e4e4e7 !important;
+    background-color: var(--preview-desk-bg) !important;
     border-color: #cbd5e1 !important;
 }
 
 /* -------------------------------------------------------------
    AUTHENTIC A4 MULTI-PAGE SYSTEM (794px x 1123px, 12pt Times New Roman)
+   Preserved White Standard For Official Paper Documents
    ------------------------------------------------------------- */
 .spz-page-sheet {
     background-color: #FFFFFF !important;
@@ -222,7 +577,7 @@ html.light-mode .preview-editable.active-editing {
     outline: 2px solid #09090b !important;
 }
 
-/* Placeholder hint in preview (Section 8a) */
+/* Placeholder hint in preview */
 .preview-placeholder-hint {
     color: #a1a1aa !important;
     border-bottom: 1px dashed #cbd5e1;
@@ -290,7 +645,8 @@ html.light-mode #page_stepper_tabs::-webkit-scrollbar-thumb {
     .spz-sheet-badge, .mb-6, .lg\:col-span-5, #workspace_form_section, #page_stepper_tabs, 
     .workspace-toolbar, #form_step_banner, #page_stepper_card, #preview_toolbar_top, 
     #view_folder_dokumen, #editor_top_doc_bar, #modal_create_new_doc, #nav_btn_folder, 
-    #nav_btn_editor, #preview_quick_edit_popover, #modal_preflight_warning, #modal_profil_organisasi {
+    #nav_btn_editor, #preview_quick_edit_popover, #modal_preflight_warning, #modal_profil_organisasi,
+    #modal_legal_notice, #modal_terms_full, .theme-toggle-btn {
         display: none !important;
     }
     .preview-editable {

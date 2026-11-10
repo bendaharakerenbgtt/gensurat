@@ -5,16 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GenSurat - Arsip & Manajemen Surat Organisasi</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/></svg>">
+    <meta name="theme-color" content="#04070c">
 
-    <!-- Instant Theme Detection -->
+    <!-- Instant Non-Blocking Theme Initialization -->
     <script>
-        if (localStorage.getItem('theme') === 'light') {
-            document.documentElement.classList.add('light-mode');
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.remove('light-mode');
-            document.documentElement.classList.add('dark');
-        }
+        (function() {
+            try {
+                var saved = localStorage.getItem('theme');
+                var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+                var isLight = saved === 'light' || (!saved && prefersLight);
+                var target = isLight ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', target);
+                if (isLight) {
+                    document.documentElement.classList.add('light-mode', 'theme-light');
+                    document.documentElement.classList.remove('dark', 'theme-dark');
+                } else {
+                    document.documentElement.classList.remove('light-mode', 'theme-light');
+                    document.documentElement.classList.add('dark', 'theme-dark');
+                }
+            } catch (e) {}
+        })();
     </script>
 
     <!-- External Assets -->
@@ -28,16 +38,16 @@
     <!-- Local Master Stylesheet -->
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col transition-colors selection:bg-neutral-800 selection:text-white">
 
     <!-- TOP HEADER NAVBAR -->
-    <header class="sticky top-0 z-40 backdrop-blur-xl bg-neutral-950/80 border-b border-neutral-900 px-4 sm:px-8 py-3.5 flex items-center justify-between">
+    <header class="sticky top-0 z-40 backdrop-blur-xl px-4 sm:px-8 py-3.5 flex items-center justify-between border-b transition-colors">
         <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white shadow-xs">
                 <i class="fa-solid fa-file-signature text-base"></i>
             </div>
             <div>
-                <h1 class="text-sm sm:text-base font-black tracking-tight text-white flex items-center gap-1.5">
+                <h1 class="text-sm sm:text-base font-black tracking-tight flex items-center gap-1.5">
                     Gen<span class="text-neutral-400">Surat</span>
                 </h1>
                 <p class="text-[10px] text-neutral-500 font-mono">Generator Dokumen &amp; Surat Resmi Organisasi &middot; Penyimpanan Lokal 100%</p>
@@ -45,7 +55,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <button type="button" onclick="exportAllDocumentsJson()" class="px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-bold text-neutral-300 hover:text-white flex items-center gap-1.5 transition-colors" title="Cadangkan semua dokumen ke file JSON">
+            <button type="button" onclick="exportAllDocumentsJson()" class="px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-bold text-neutral-300 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer" title="Cadangkan semua dokumen ke file JSON">
                 <i class="fa-solid fa-download text-neutral-400 text-xs"></i>
                 <span class="hidden sm:inline">Cadangan JSON</span>
             </button>
@@ -54,12 +64,27 @@
                 <span class="hidden sm:inline">Pulihkan</span>
                 <input type="file" accept=".json,application/json" onchange="handleImportJsonFile(event)" class="hidden">
             </label>
-            <button type="button" onclick="openProfileModal()" class="px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-bold text-neutral-300 hover:text-white flex items-center gap-1.5 transition-colors" title="Pengaturan Profil Organisasi">
+            <button type="button" onclick="openProfileModal()" class="px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-bold text-neutral-300 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer" title="Pengaturan Profil Organisasi">
                 <i class="fa-solid fa-sliders text-neutral-400 text-xs"></i>
                 <span class="hidden sm:inline">Profil</span>
             </button>
-            <button type="button" onclick="toggleTheme(event)" aria-label="Ubah Tema" class="w-8 h-8 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-300 hover:bg-neutral-800 transition-colors" title="Ubah Tema">
-                <i class="fa-solid fa-sun text-xs theme-toggle-icon"></i>
+            <button type="button" onclick="toggleTheme(event)" class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Beralih tema" title="Beralih tema">
+                <!-- Sun Icon (Active in Dark Mode) -->
+                <svg class="theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <!-- Moon Icon (Active in Light Mode) -->
+                <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
             </button>
         </div>
     </header>
@@ -68,10 +93,10 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-7 space-y-6">
 
         <!-- DASHBOARD HERO & ACTION BAR -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-neutral-900/90 border border-neutral-800 shadow-xl backdrop-blur-md">
+        <div class="hero-banner-card flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-neutral-900/90 border border-neutral-800 shadow-xl backdrop-blur-md transition-colors">
             <div class="space-y-1">
                 <h2 class="text-base sm:text-lg font-black text-white">Arsip Surat Organisasi</h2>
-                <p class="text-xs text-neutral-400">Seluruh dokumen disimpan secara aman di perangkat lokal Anda tanpa server pihak ketiga.</p>
+                <p class="text-xs text-neutral-400">Seluruh dokumen disimpan secara aman di perangkat lokal Anda tanpa peladen pihak ketiga.</p>
             </div>
             <div class="flex items-center gap-2.5">
                 <a href="folder-surat.html" class="px-4 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 hover:text-white border border-neutral-700 font-bold text-xs shadow-md flex items-center gap-2 transition-all" title="Buka Folder Arsip Surat">
@@ -86,16 +111,16 @@
         </div>
 
         <!-- SEARCH & FILTER TOOLBAR -->
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-1.5 bg-neutral-900 p-1 rounded-xl border border-neutral-800 w-full sm:w-auto">
-                <button type="button" onclick="filterDocsByType('ALL')" class="doc-filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-white/10 transition-all" data-filter="ALL">Semua</button>
-                <button type="button" onclick="filterDocsByType('SPZ')" class="doc-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold text-neutral-400 hover:text-white transition-all" data-filter="SPZ">Perizinan (SPZ)</button>
-                <button type="button" onclick="filterDocsByType('SBA')" class="doc-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold text-neutral-400 hover:text-white transition-all" data-filter="SBA">Berita Acara (SBA)</button>
+        <div class="search-filter-wrapper flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="filter-bar-container flex items-center gap-1.5 bg-neutral-900 p-1 rounded-xl border border-neutral-800 w-full sm:w-auto transition-colors">
+                <button type="button" onclick="filterDocsByType('ALL')" class="doc-filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold transition-all" data-filter="ALL">Semua</button>
+                <button type="button" onclick="filterDocsByType('SPZ')" class="doc-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all" data-filter="SPZ">Perizinan (SPZ)</button>
+                <button type="button" onclick="filterDocsByType('SBA')" class="doc-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all" data-filter="SBA">Berita Acara (SBA)</button>
             </div>
 
             <div class="relative w-full sm:w-72">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-xs"></i>
-                <input type="text" id="doc_search_input" oninput="handleSearchInput(this.value)" placeholder="Cari judul, nomor surat, perihal..." class="w-full pl-9 pr-3 py-2 bg-neutral-900 border border-neutral-800 rounded-xl text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white transition-colors">
+                <input type="text" id="doc_search_input" oninput="handleSearchInput(this.value)" placeholder="Cari judul, nomor surat, perihal..." class="search-input w-full pl-9 pr-3 py-2 bg-neutral-900 border border-neutral-800 rounded-xl text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white transition-colors">
             </div>
         </div>
 
@@ -113,21 +138,36 @@
                 <h3 class="text-sm font-bold text-white">Belum Ada Dokumen Surat</h3>
                 <p class="text-xs text-neutral-500 max-w-sm mx-auto">Mulai buat surat perizinan kampus (SPZ) atau berita acara kegiatan (SBA) pertama Anda.</p>
             </div>
-            <button type="button" onclick="openCreateNewDocModal()" class="px-4 py-2 rounded-xl bg-white text-black font-black text-xs hover:bg-neutral-200 transition-all">
+            <button type="button" onclick="openCreateNewDocModal()" class="px-4 py-2 rounded-xl bg-white text-black font-black text-xs hover:bg-neutral-200 transition-all cursor-pointer">
                 + Buat Surat Baru
             </button>
         </div>
 
     </main>
 
-    <!-- FOOTER -->
-    <footer class="border-t border-neutral-900 py-4 px-6 text-center text-xs text-neutral-500 font-mono">
-        GenSurat &middot; Generator Dokumen &amp; Surat Resmi Organisasi &middot; Penyimpanan Lokal 100%
+    <!-- FOOTER WITH LEGAL & PRIVACY LINKS -->
+    <footer class="border-t border-neutral-900 py-6 px-6 text-center text-xs text-neutral-500 font-mono space-y-2.5 transition-colors">
+        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-5 text-xs font-sans font-semibold">
+            <button type="button" onclick="openLegalModal('terms')" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-file-contract text-neutral-400"></i> Syarat &amp; Ketentuan
+            </button>
+            <span class="text-neutral-700">&middot;</span>
+            <button type="button" onclick="openLegalModal('privacy')" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-shield-halved text-blue-400"></i> Kebijakan Privasi
+            </button>
+            <span class="text-neutral-700">&middot;</span>
+            <button type="button" onclick="openLegalModal('security')" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-emerald-400/90 hover:text-emerald-300">
+                <i class="fa-solid fa-lock"></i> 100% Penyimpanan Lokal
+            </button>
+        </div>
+        <p class="text-[11px] text-neutral-500">
+            GenSurat &middot; Generator Dokumen &amp; Surat Resmi Organisasi &middot; Client-Side Sandbox Storage
+        </p>
     </footer>
 
     <!-- MODAL: BUAT DOKUMEN BARU -->
     <div id="modal_create_new_doc" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative space-y-4">
+        <div class="modal-card-box bg-neutral-900 border border-neutral-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative space-y-4">
             <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
                 <div class="flex items-center gap-2.5">
                     <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white">
@@ -151,13 +191,13 @@
                             <input type="radio" name="new_doc_type" value="SPZ" class="sr-only" checked>
                             <span class="text-xs font-black text-white">SPZ</span>
                             <span class="text-[11px] text-neutral-300 font-semibold mt-0.5">Surat Perizinan</span>
-                            <span class="text-[9.5px] text-neutral-500 mt-1">Peminjaman fasilitas, barang, & kepanitiaan</span>
+                            <span class="text-[9.5px] text-neutral-500 mt-1">Peminjaman fasilitas, barang, &amp; kepanitiaan</span>
                         </label>
                         <label class="relative flex flex-col p-3 rounded-xl border border-neutral-800 bg-neutral-950 cursor-pointer hover:border-white transition-all">
                             <input type="radio" name="new_doc_type" value="SBA" class="sr-only">
                             <span class="text-xs font-black text-white">SBA</span>
                             <span class="text-[11px] text-neutral-300 font-semibold mt-0.5">Surat Berita Acara</span>
-                            <span class="text-[9.5px] text-neutral-500 mt-1">Laporan kegiatan, keuangan, & nota</span>
+                            <span class="text-[9.5px] text-neutral-500 mt-1">Laporan kegiatan, keuangan, &amp; nota</span>
                         </label>
                     </div>
                 </div>
@@ -169,7 +209,7 @@
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-800">
                     <button type="button" onclick="closeCreateNewDocModal()" class="px-4 py-2 rounded-xl text-neutral-400 hover:text-white bg-neutral-800">Batal</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-white text-black font-black hover:bg-neutral-200 shadow-md">Buat & Buka Editor</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-white text-black font-black hover:bg-neutral-200 shadow-md">Buat &amp; Buka Editor</button>
                 </div>
             </form>
         </div>
@@ -177,14 +217,14 @@
 
     <!-- MODAL: PROFIL ORGANISASI -->
     <div id="modal_profil_organisasi" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 max-h-[92vh] overflow-y-auto shadow-2xl relative space-y-4">
+        <div class="modal-card-box bg-neutral-900 border border-neutral-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 max-h-[92vh] overflow-y-auto shadow-2xl relative space-y-4">
             <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
                 <div class="flex items-center gap-2.5">
                     <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white">
                         <i class="fa-solid fa-sliders text-base"></i>
                     </div>
                     <div>
-                        <h3 class="text-sm font-black text-white">Pengaturan Profil & Kop Surat</h3>
+                        <h3 class="text-sm font-black text-white">Pengaturan Profil &amp; Kop Surat</h3>
                         <p class="text-[11px] text-neutral-400">Sesuaikan logo, teks kop surat, dan penanda tangan default</p>
                     </div>
                 </div>
@@ -195,7 +235,7 @@
 
             <form onsubmit="handleSaveProfileSubmit(event)" class="space-y-4 text-xs">
                 <!-- 1. KAMPUS -->
-                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
+                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5 modal-subcard">
                     <span class="text-xs font-bold text-white block">1. Identitas Kampus</span>
                     <div>
                         <label class="text-[11px] text-neutral-400 block mb-1">Nama Kampus</label>
@@ -222,7 +262,7 @@
                 </div>
 
                 <!-- 2. ORGANISASI -->
-                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
+                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5 modal-subcard">
                     <span class="text-xs font-bold text-white block">2. Identitas Organisasi</span>
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
@@ -265,8 +305,8 @@
                 </div>
 
                 <!-- 3. KABINET & WATERMARK -->
-                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
-                    <span class="text-xs font-bold text-white block">3. Logo Kabinet & Watermark</span>
+                <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5 modal-subcard">
+                    <span class="text-xs font-bold text-white block">3. Logo Kabinet &amp; Watermark</span>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <img id="prev_kabinet_logo" src="" alt="Logo Kabinet" class="h-10 w-auto object-contain">
@@ -313,6 +353,8 @@
     <!-- Storage and Dashboard Logic Scripts -->
     <script src="js/storage.js"></script>
     <script src="js/profil.js"></script>
+    <script src="js/theme-transition.js"></script>
+    <script src="js/legal.js"></script>
     <script>
         let currentFilter = 'ALL';
         let searchQuery = '';
@@ -356,10 +398,10 @@
                 const perihal = (doc.formData && (doc.formData.spz_input_fasilitas || doc.formData.field_perihal)) ? (doc.formData.spz_input_fasilitas || doc.formData.field_perihal) : (isSpz ? 'Peminjaman Fasilitas' : 'Laporan Kegiatan');
 
                 html += `
-                    <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-all flex flex-col justify-between space-y-4 group">
+                    <div class="doc-item-card p-5 rounded-2xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-all flex flex-col justify-between space-y-4 group shadow-sm">
                         <div class="space-y-2">
                             <div class="flex items-center justify-between">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-black font-mono uppercase ${isSpz ? 'bg-white/10 text-white' : 'bg-white/10 text-white'} border border-neutral-700">
+                                <span class="doc-badge-pill px-2 py-0.5 rounded text-[10px] font-black font-mono uppercase bg-white/10 text-white border border-neutral-700">
                                     ${doc.type}
                                 </span>
                                 <span class="text-[10px] text-neutral-500 font-mono">
@@ -370,24 +412,24 @@
                                 <a href="buat-surat.html?id=${doc.id}">${escapeHtml(doc.title || 'Surat Tanpa Judul')}</a>
                             </h3>
                             <div class="text-[11px] text-neutral-400 space-y-0.5 font-mono">
-                                <p class="truncate"><i class="fa-solid fa-hashtag text-[9px] mr-1 text-neutral-600"></i> ${escapeHtml(noSurat)}</p>
-                                <p class="truncate"><i class="fa-regular fa-calendar text-[9px] mr-1 text-neutral-600"></i> ${escapeHtml(tgl)}</p>
-                                <p class="truncate"><i class="fa-solid fa-file-lines text-[9px] mr-1 text-neutral-600"></i> ${escapeHtml(perihal)}</p>
+                                <p class="truncate"><i class="fa-solid fa-hashtag text-[9px] mr-1 text-neutral-500"></i> ${escapeHtml(noSurat)}</p>
+                                <p class="truncate"><i class="fa-regular fa-calendar text-[9px] mr-1 text-neutral-500"></i> ${escapeHtml(tgl)}</p>
+                                <p class="truncate"><i class="fa-solid fa-file-lines text-[9px] mr-1 text-neutral-500"></i> ${escapeHtml(perihal)}</p>
                             </div>
                         </div>
 
                         <div class="flex items-center justify-between pt-3 border-t border-neutral-800/80">
-                            <a href="buat-surat.html?id=${doc.id}" class="px-3.5 py-1.5 rounded-xl bg-white text-black font-bold text-xs hover:bg-neutral-200 transition-colors flex items-center gap-1.5">
+                            <a href="buat-surat.html?id=${doc.id}" class="doc-card-open-btn px-3.5 py-1.5 rounded-xl bg-white text-black font-bold text-xs hover:bg-neutral-200 transition-colors flex items-center gap-1.5 shadow-xs">
                                 <i class="fa-solid fa-pen-to-square text-xs"></i> Buka Editor
                             </a>
                             <div class="flex items-center gap-1">
-                                <button type="button" onclick="handleDuplicateDoc('${doc.id}')" class="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors" title="Duplikat Surat">
+                                <button type="button" onclick="handleDuplicateDoc('${doc.id}')" class="doc-card-action-btn p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors" title="Duplikat Surat">
                                     <i class="fa-solid fa-copy text-xs"></i>
                                 </button>
-                                <button type="button" onclick="handleRenameDoc('${doc.id}', '${escapeHtml(doc.title)}')" class="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors" title="Ganti Nama">
+                                <button type="button" onclick="handleRenameDoc('${doc.id}', '${escapeHtml(doc.title)}')" class="doc-card-action-btn p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors" title="Ganti Nama">
                                     <i class="fa-solid fa-pen text-xs"></i>
                                 </button>
-                                <button type="button" onclick="handleDeleteDoc('${doc.id}')" class="p-1.5 rounded-lg text-neutral-400 hover:text-red-400 hover:bg-neutral-800 transition-colors" title="Hapus Dokumen">
+                                <button type="button" onclick="handleDeleteDoc('${doc.id}')" class="doc-card-action-btn p-1.5 rounded-lg text-neutral-400 hover:text-red-400 hover:bg-neutral-800 transition-colors" title="Hapus Dokumen">
                                     <i class="fa-solid fa-trash-can text-xs"></i>
                                 </button>
                             </div>
@@ -403,9 +445,9 @@
             currentFilter = type;
             document.querySelectorAll('.doc-filter-btn').forEach(btn => {
                 if (btn.getAttribute('data-filter') === type) {
-                    btn.className = 'doc-filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-white/10 transition-all';
+                    btn.classList.add('active');
                 } else {
-                    btn.className = 'doc-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold text-neutral-400 hover:text-white transition-all';
+                    btn.classList.remove('active');
                 }
             });
             renderDocuments();
@@ -522,31 +564,6 @@
             window.location.href = `buat-surat.html?id=${newDoc.id}`;
         }
 
-        function toggleTheme(event) {
-            const isDark = !document.documentElement.classList.contains('light-mode');
-            if (isDark) {
-                document.documentElement.classList.add('light-mode');
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem(THEME_STORAGE_KEY, 'light');
-            } else {
-                document.documentElement.classList.remove('light-mode');
-                document.documentElement.classList.add('dark');
-                localStorage.setItem(THEME_STORAGE_KEY, 'dark');
-            }
-            syncThemeIcons();
-        }
-
-        function syncThemeIcons() {
-            const isLight = document.documentElement.classList.contains('light-mode');
-            document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
-                if (isLight) {
-                    icon.className = 'fa-solid fa-moon theme-toggle-icon text-neutral-600';
-                } else {
-                    icon.className = 'fa-solid fa-sun theme-toggle-icon text-neutral-300';
-                }
-            });
-        }
-
         function escapeHtml(str) {
             if (!str) return '';
             return str.toString()
@@ -558,13 +575,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-            if (savedTheme === 'light') {
-                document.documentElement.classList.add('light-mode');
-                document.documentElement.classList.remove('dark');
-            }
-            syncThemeIcons();
-
             // Seed initial document if empty
             const docs = getSavedDocuments();
             if (docs.length === 0) {

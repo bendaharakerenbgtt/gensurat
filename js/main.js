@@ -555,6 +555,10 @@ function setLayoutMode(mode) {
 }
 
 function toggleTheme(event) {
+    if (window.GenSuratTheme) {
+        window.GenSuratTheme.toggle(event);
+        return;
+    }
     const isDark = !document.documentElement.classList.contains('light-mode');
     if (isDark) {
         document.documentElement.classList.add('light-mode');
@@ -569,6 +573,10 @@ function toggleTheme(event) {
 }
 
 function syncThemeIcons() {
+    if (window.GenSuratTheme && window.GenSuratTheme.syncThemeIcons) {
+        window.GenSuratTheme.syncThemeIcons();
+        return;
+    }
     const isLight = document.documentElement.classList.contains('light-mode');
     document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
         if (isLight) {
