@@ -3125,6 +3125,24 @@
                 </button>
             </div>
 
+            <!-- LIVE KOP PREVIEW SIMULATOR CARD -->
+            <div class="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-eye text-blue-400 text-xs"></i>
+                        <span class="text-xs font-bold text-white uppercase tracking-wider">Pratinjau Hasil Kop Surat Langsung</span>
+                    </div>
+                    <span id="kop_preview_mode_badge" class="text-[9.5px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">Standar Resmi</span>
+                </div>
+                <!-- Mini Kop Paper Frame -->
+                <div class="bg-white rounded-lg p-2.5 sm:p-3 border border-neutral-300 shadow-sm overflow-hidden select-none">
+                    <div id="modal_live_kop_container" class="relative w-full">
+                        <!-- Rendered dynamically by sinkronkanFormKustomisasiLogo() -->
+                    </div>
+                </div>
+                <p class="text-[10px] text-neutral-400 leading-tight">Pratinjau di atas menampilkan susunan nyata kop surat dengan logo organisasi &amp; kabinet Anda.</p>
+            </div>
+
             <div class="space-y-4">
                 <!-- 1. BACKGROUND KERTAS (WATERMARK) -->
                 <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-3">
@@ -3298,11 +3316,21 @@
                 </div>
 
                 <!-- 5. BANNER KOP UTUH (OPSIONAL) -->
-                <div class="p-3.5 rounded-xl bg-neutral-950/40 border border-neutral-800/80 space-y-2">
+                <div class="p-3.5 rounded-xl bg-neutral-950/40 border border-neutral-800/80 space-y-3">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-neutral-300">Opsi Lanjutan: Gunakan Banner Kop Utuh</span>
                         <span class="text-[10px] text-neutral-500 font-mono">2910 x 474 px</span>
                     </div>
+
+                    <!-- Mini Preview Banner Utuh -->
+                    <div id="box_preview_banner_utuh" class="relative rounded-lg border border-neutral-800 bg-neutral-900/60 p-2 overflow-hidden flex items-center justify-center">
+                        <img id="preview_thumb_kop_banner" src="" alt="Pratinjau Banner Kop Utuh" class="w-full h-auto max-h-16 object-contain hidden rounded">
+                        <div id="notice_banner_utuh_none" class="py-2.5 text-center text-neutral-500 text-[11px] font-mono">
+                            <i class="fa-solid fa-image text-neutral-600 mb-1 block text-sm"></i>
+                            <span>Belum ada banner utuh khusus (Menggunakan kop susunan otomatis)</span>
+                        </div>
+                    </div>
+
                     <div class="flex items-center gap-2 flex-wrap">
                         <label class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-[11px] font-semibold flex items-center gap-1.5 cursor-pointer">
                             <i class="fa-solid fa-image text-neutral-400 text-xs"></i>
@@ -5653,8 +5681,82 @@
 
             // 4. Banner Kop
             const bannerImg = document.getElementById('preview_thumb_kop_banner');
-            const curBanner = localStorage.getItem('custom_kop_banner') || 'surat/assets/kop_spz_official.png';
-            if (bannerImg) bannerImg.src = curBanner;
+            const noticeBannerNone = document.getElementById('notice_banner_utuh_none');
+            const curBanner = localStorage.getItem('custom_kop_banner');
+            if (bannerImg && noticeBannerNone) {
+                if (curBanner) {
+                    bannerImg.src = curBanner;
+                    bannerImg.classList.remove('hidden');
+                    noticeBannerNone.classList.add('hidden');
+                } else {
+                    bannerImg.classList.add('hidden');
+                    noticeBannerNone.classList.remove('hidden');
+                }
+            }
+
+            // 5. Live Kop Simulator Preview in Modal
+            const modalKopContainer = document.getElementById('modal_live_kop_container');
+            const kopModeBadge = document.getElementById('kop_preview_mode_badge');
+            if (modalKopContainer) {
+                if (curBanner) {
+                    modalKopContainer.innerHTML = `
+                        <div style="position: relative; width: 100%;">
+                            <img src="${curBanner}" alt="Pratinjau Banner Kop Utuh" style="width: 100%; height: auto; display: block; object-fit: contain;">
+                        </div>
+                    `;
+                    if (kopModeBadge) {
+                        kopModeBadge.textContent = 'Banner Utuh Aktif';
+                        kopModeBadge.className = 'text-[9.5px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+                    }
+                } else {
+                    let orgSlot = '';
+                    if (curImip) {
+                        orgSlot = `
+                            <div style="height: 100%; max-width: 48%; display: flex; align-items: center; justify-content: center;">
+                                <img src="${curImip}" alt="Logo Organisasi" style="max-height: 84%; max-width: 100%; object-fit: contain; display: block;">
+                            </div>
+                        `;
+                    } else {
+                        orgSlot = `
+                            <div class="border border-dashed border-neutral-400 rounded p-0.5 flex flex-col items-center justify-center bg-neutral-50/90 text-center" style="height: 82%; width: 48%; box-sizing: border-box;">
+                                <span style="font-size: 5.5pt; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: #475569; line-height: 1;">Logo Org</span>
+                                <span style="font-size: 4.5pt; font-family: 'Plus Jakarta Sans', sans-serif; color: #94a3b8; line-height: 1;">(Kosong)</span>
+                            </div>
+                        `;
+                    }
+
+                    let kabinetSlot = '';
+                    if (curKabinet) {
+                        kabinetSlot = `
+                            <div style="height: 100%; max-width: 48%; display: flex; align-items: center; justify-content: center;">
+                                <img src="${curKabinet}" alt="Logo Kabinet" style="max-height: 84%; max-width: 100%; object-fit: contain; display: block;">
+                            </div>
+                        `;
+                    } else {
+                        kabinetSlot = `
+                            <div class="border border-dashed border-neutral-400 rounded p-0.5 flex flex-col items-center justify-center bg-neutral-50/90 text-center" style="height: 82%; width: 48%; box-sizing: border-box;">
+                                <span style="font-size: 5.5pt; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: #475569; line-height: 1;">Logo Kabinet</span>
+                                <span style="font-size: 4.5pt; font-family: 'Plus Jakarta Sans', sans-serif; color: #94a3b8; line-height: 1;">(Kosong)</span>
+                            </div>
+                        `;
+                    }
+
+                    modalKopContainer.innerHTML = `
+                        <div style="position: relative; width: 100%;">
+                            <img src="surat/assets/kop_spz_official.png" alt="Kop Resmi" style="width: 100%; height: auto; display: block; object-fit: contain;">
+                            <div style="position: absolute; right: 1.2%; top: 3.5%; width: 28.5%; height: 83%; background: #ffffff; display: flex; align-items: center; justify-content: flex-end; gap: 6px; z-index: 5; padding-right: 4px; box-sizing: border-box;">
+                                ${orgSlot}
+                                ${kabinetSlot}
+                            </div>
+                        </div>
+                    `;
+                    if (kopModeBadge) {
+                        const hasAny = curImip || curKabinet;
+                        kopModeBadge.textContent = hasAny ? 'Kop Susunan Kustom' : 'Standar Resmi (Template Kosong)';
+                        kopModeBadge.className = hasAny ? 'text-[9.5px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'text-[9.5px] font-mono px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700';
+                    }
+                }
+            }
         }
 
         // Helper to resize large image dataURL to keep localStorage light (< 200KB)
