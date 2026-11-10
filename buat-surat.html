@@ -1940,20 +1940,18 @@
                                 </div>
                                 <input type="hidden" id="field_ttd1_nim" value="NIM. 2590331052">
                             </div>
-                            <!-- TTD Basah Ketua Pelaksana -->
+                            <!-- TTD Digital / Basah Ketua Pelaksana -->
                             <div class="pt-2 border-t border-neutral-800/80 flex flex-col gap-1.5">
                                 <div class="flex items-center justify-between">
                                     <label class="text-[10px] text-neutral-300 font-semibold flex items-center gap-1.5">
-                                        <i class="fa-solid fa-file-signature text-neutral-400 text-[10px]"></i> TTD Basah (Scan/Gambar)
+                                        <i class="fa-solid fa-file-signature text-neutral-400 text-[10px]"></i> TTD Digital / Basah
                                     </label>
-                                    <button type="button" onclick="setPresetTtd('field_ttd1_img', 'fadly')" class="text-[9px] text-blue-400 hover:text-white font-mono underline" title="Gunakan tanda tangan asli Fadly Ahmad Chandi">
-                                        Contoh TTD 1
-                                    </button>
+                                    <span class="text-[9.5px] text-neutral-400 font-mono">Bawaan: Kosong</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <input type="file" id="upload_ttd1_file" accept="image/*" class="hidden" onchange="handleTtdFileUpload(event, 'field_ttd1_img')">
-                                    <button type="button" onclick="document.getElementById('upload_ttd1_file').click()" class="flex-1 py-1 px-2.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[10.5px] font-medium flex items-center justify-center gap-1.5 transition-colors">
-                                        <i class="fa-solid fa-cloud-arrow-up text-[10px] text-blue-400"></i> Unggah Gambar TTD
+                                    <button type="button" onclick="document.getElementById('upload_ttd1_file').click()" class="flex-1 py-1.5 px-3 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[10.5px] font-medium flex items-center justify-center gap-1.5 transition-colors">
+                                        <i class="fa-solid fa-cloud-arrow-up text-[10px] text-blue-400"></i> Klik untuk Upload TTD
                                     </button>
                                 </div>
                                 <div id="preview_ttd1_thumb" class="hidden p-1.5 rounded-lg bg-neutral-950 border border-neutral-800 flex items-center justify-between">
@@ -2006,20 +2004,18 @@
                                 </div>
                                 <input type="hidden" id="field_ttd2_nim" value="NIM. 2490444040">
                             </div>
-                            <!-- TTD Basah Ketua Umum -->
+                            <!-- TTD Digital / Basah Ketua Organisasi -->
                             <div class="pt-2 border-t border-neutral-800/80 flex flex-col gap-1.5">
                                 <div class="flex items-center justify-between">
                                     <label class="text-[10px] text-neutral-300 font-semibold flex items-center gap-1.5">
-                                        <i class="fa-solid fa-file-signature text-neutral-400 text-[10px]"></i> TTD Basah (Scan/Gambar)
+                                        <i class="fa-solid fa-file-signature text-neutral-400 text-[10px]"></i> TTD Digital / Basah
                                     </label>
-                                    <button type="button" onclick="setPresetTtd('field_ttd2_img', 'hafiz')" class="text-[9px] text-blue-400 hover:text-white font-mono underline" title="Gunakan tanda tangan asli Hafiz Alfariz">
-                                        Contoh TTD 2
-                                    </button>
+                                    <span class="text-[9.5px] text-neutral-400 font-mono">Bawaan: Kosong</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <input type="file" id="upload_ttd2_file" accept="image/*" class="hidden" onchange="handleTtdFileUpload(event, 'field_ttd2_img')">
-                                    <button type="button" onclick="document.getElementById('upload_ttd2_file').click()" class="flex-1 py-1 px-2.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[10.5px] font-medium flex items-center justify-center gap-1.5 transition-colors">
-                                        <i class="fa-solid fa-cloud-arrow-up text-[10px] text-blue-400"></i> Unggah Gambar TTD
+                                    <button type="button" onclick="document.getElementById('upload_ttd2_file').click()" class="flex-1 py-1.5 px-3 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[10.5px] font-medium flex items-center justify-center gap-1.5 transition-colors">
+                                        <i class="fa-solid fa-cloud-arrow-up text-[10px] text-blue-400"></i> Klik untuk Upload TTD
                                     </button>
                                 </div>
                                 <div id="preview_ttd2_thumb" class="hidden p-1.5 rounded-lg bg-neutral-950 border border-neutral-800 flex items-center justify-between">
@@ -2031,27 +2027,24 @@
                         </div>
                     </div>
 
-                    <!-- Stempel / Cap Resmi Organisasi -->
-                    <div class="p-3 rounded-lg bg-neutral-900/60 border border-neutral-800 flex flex-col gap-2 mb-3">
+                    <!-- Stempel / Cap Resmi Organisasi (Hanya untuk SPM) -->
+                    <div id="card_stempel_section" class="p-3 rounded-lg bg-neutral-900/60 border border-neutral-800 flex flex-col gap-2 mb-3">
                         <div class="flex items-center justify-between border-b border-neutral-800/80 pb-1.5">
                             <span class="text-[11px] font-black text-blue-400 uppercase font-mono flex items-center gap-1.5">
-                                <i class="fa-solid fa-stamp text-[11px]"></i> Stempel / Cap Resmi Organisasi
+                                <i class="fa-solid fa-stamp text-[11px]"></i> Stempel / Cap Resmi Ormawa (Khusus SPM)
                             </span>
                             <label class="flex items-center gap-1.5 text-[10px] text-neutral-400 cursor-pointer select-none">
-                                <input type="checkbox" id="field_use_stempel" onchange="updatePreview(); triggerAutoSave();" class="rounded border-neutral-700 text-blue-500 focus:ring-neutral-400 w-3 h-3" checked>
+                                <input type="checkbox" id="field_use_stempel" onchange="updatePreview(); triggerAutoSave();" class="rounded border-neutral-700 text-blue-500 focus:ring-neutral-400 w-3 h-3">
                                 Bubuhi Stempel
                             </label>
                         </div>
                         <div class="flex items-center justify-between text-[10px] text-neutral-400">
-                            <span>Stempel resmi akan otomatis ditempel di atas tanda tangan Ketua Umum.</span>
-                            <button type="button" onclick="setPresetTtd('field_stempel_img', 'stempel')" class="text-[9px] text-blue-400 hover:text-white font-mono underline shrink-0 ml-2">
-                                Stempel Resmi
-                            </button>
+                            <span>Stempel resmi akan otomatis ditempel di atas tanda tangan Ketua Umum (SPM).</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <input type="file" id="upload_stempel_file" accept="image/*" class="hidden" onchange="handleTtdFileUpload(event, 'field_stempel_img')">
-                            <button type="button" onclick="document.getElementById('upload_stempel_file').click()" class="flex-1 py-1 px-2.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[10.5px] font-medium flex items-center justify-center gap-1.5 transition-colors">
-                                <i class="fa-solid fa-cloud-arrow-up text-[10px] text-blue-400"></i> Ganti Stempel Lain
+                            <button type="button" onclick="document.getElementById('upload_stempel_file').click()" class="flex-1 py-1.5 px-3 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[10.5px] font-medium flex items-center justify-center gap-1.5 transition-colors">
+                                <i class="fa-solid fa-cloud-arrow-up text-[10px] text-blue-400"></i> Klik untuk Upload Cap Ormawa
                             </button>
                         </div>
                         <div id="preview_stempel_thumb" class="hidden p-1.5 rounded-lg bg-neutral-950 border border-neutral-800 flex items-center justify-between">
@@ -3820,16 +3813,12 @@
         function toggleQuickStempel(checked) {
             const el = document.getElementById('field_use_stempel');
             if (el) el.checked = checked;
-            const fImg = document.getElementById('field_stempel_img');
-            if (checked && fImg && !fImg.value) {
-                fImg.value = SAMPLE_STEMPEL_IMIP_BASE64;
-            }
             updateTtdThumbnails();
             refreshQuickTtdPjThumbs();
             if (typeof updatePreview === 'function') updatePreview();
             if (typeof triggerAutoSave === 'function') triggerAutoSave();
             if (typeof showToast === 'function') {
-                showToast(checked ? 'Stempel ormawa aktif di atas tanda tangan' : 'Stempel dinonaktifkan', 'info');
+                showToast(checked ? 'Stempel ormawa aktif (silakan upload jika belum ada gambar cap)' : 'Stempel dinonaktifkan', 'info');
             }
         }
         window.toggleQuickStempel = toggleQuickStempel;
@@ -4254,16 +4243,7 @@
                 if (document.getElementById('field_ttd_mpm_active')) document.getElementById('field_ttd_mpm_active').checked = false;
                 if (document.getElementById('field_ttd_bem_active')) document.getElementById('field_ttd_bem_active').checked = false;
 
-                // Populate default sample wet signatures & stamp if empty
-                const fTtd1Img = document.getElementById('field_ttd1_img');
-                if (fTtd1Img && !fTtd1Img.value) fTtd1Img.value = SAMPLE_TTD_FADLY_BASE64;
-                const fTtd2Img = document.getElementById('field_ttd2_img');
-                if (fTtd2Img && !fTtd2Img.value) fTtd2Img.value = SAMPLE_TTD_HAFIZ_BASE64;
-                const fStempelImg = document.getElementById('field_stempel_img');
-                if (fStempelImg && !fStempelImg.value) fStempelImg.value = SAMPLE_STEMPEL_IMIP_BASE64;
-                const fUseStempel = document.getElementById('field_use_stempel');
-                if (fUseStempel) fUseStempel.checked = true;
-
+                // TTD digital dan cap ormawa dikosongkan secara default (unggah manual sesuai kebutuhan pengguna)
                 if (typeof updateTtdThumbnails === 'function') updateTtdThumbnails();
             } else {
                 if (cardSudLampiran) cardSudLampiran.classList.add('hidden');
@@ -4484,6 +4464,18 @@
             const cardMengetahui = document.getElementById('card_ttd_mengetahui');
             const cardOrmawa = document.getElementById('card_ttd_ormawa_mpm_bem');
             const cardWadir = document.getElementById('ttd_wadir_block');
+            const cardStempelSection = document.getElementById('card_stempel_section');
+
+            // Cap / Stempel Ormawa HANYA ADA DI SPM
+            if (cardStempelSection) {
+                if (currentSuratType === 'SPM') {
+                    cardStempelSection.classList.remove('hidden');
+                } else {
+                    cardStempelSection.classList.add('hidden');
+                    const useStempelInput = document.getElementById('field_use_stempel');
+                    if (useStempelInput) useStempelInput.checked = false;
+                }
+            }
 
             if (isSud) {
                 if (cardMengetahui) cardMengetahui.classList.add('hidden');
@@ -10418,11 +10410,11 @@
             const isTtd2Active = document.getElementById('field_ttd2_active') ? document.getElementById('field_ttd2_active').checked : true;
             // SUD Resmi hanya menggunakan TTD Tingkat 1 (Hormat Kami: Ketua Pelaksana & Ketua Umum), tanpa Dosen Pembina & Wakil Direktur
 
-            // Wet signature images & stamp
-            const ttd1Img = document.getElementById('field_ttd1_img')?.value || SAMPLE_TTD_FADLY_BASE64;
-            const ttd2Img = document.getElementById('field_ttd2_img')?.value || SAMPLE_TTD_HAFIZ_BASE64;
-            const stempelImg = document.getElementById('field_stempel_img')?.value || SAMPLE_STEMPEL_IMIP_BASE64;
-            const useStempel = document.getElementById('field_use_stempel') ? document.getElementById('field_use_stempel').checked : true;
+            // Wet signature images (default kosong, diisi via upload) & Stempel hanya ada di SPM
+            const ttd1Img = document.getElementById('field_ttd1_img')?.value || '';
+            const ttd2Img = document.getElementById('field_ttd2_img')?.value || '';
+            const stempelImg = '';
+            const useStempel = false;
 
             const incLampiran = isSudLampiranActive();
             const lampiranJudul = document.getElementById('field_sud_lampiran_judul')?.value.trim() || 'Rundown Day 2';
@@ -10524,15 +10516,28 @@
                             ${(() => {
                                 if (!isTtd1Active && !isTtd2Active) return '';
                                 let content = '';
+                                const ttd1SlotHtml = ttd1Img 
+                                    ? `<img src="${ttd1Img}" alt="TTD Ketua Pelaksana" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` 
+                                    : `<div class="print:hidden" onclick="document.getElementById('upload_ttd1_file').click()" title="Klik untuk upload TTD Digital" style="border: 1px dashed #94a3b8; border-radius: 6px; padding: 4pt 8pt; display: inline-flex; align-items: center; gap: 4px; font-size: 8pt; color: #64748b; background: rgba(241, 245, 249, 0.6); cursor: pointer; user-select: none;">
+                                         <i class="fa-solid fa-cloud-arrow-up text-[9px] text-blue-500"></i>
+                                         <span>+ Klik upload TTD</span>
+                                       </div>`;
+
+                                const ttd2SlotHtml = ttd2Img 
+                                    ? `<img src="${ttd2Img}" alt="TTD Ketua Umum" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` 
+                                    : `<div class="print:hidden" onclick="document.getElementById('upload_ttd2_file').click()" title="Klik untuk upload TTD Digital" style="border: 1px dashed #94a3b8; border-radius: 6px; padding: 4pt 8pt; display: inline-flex; align-items: center; gap: 4px; font-size: 8pt; color: #64748b; background: rgba(241, 245, 249, 0.6); cursor: pointer; user-select: none;">
+                                         <i class="fa-solid fa-cloud-arrow-up text-[9px] text-blue-500"></i>
+                                         <span>+ Klik upload TTD</span>
+                                       </div>`;
+
                                 if (isTtd1Active && isTtd2Active) {
                                     content = `
                                         <tr>
-                                            <!-- Ketua Organisasi (Kiri, berstempel) -->
+                                            <!-- Ketua Organisasi (Kiri) -->
                                             <td style="width: 50%; vertical-align: top; line-height: 1.25; position: relative;">
                                                 ${formatTtdJabatan(ttd2Jabatan)}
                                                 <div style="position: relative; height: 56pt; margin: 2pt 0; display: flex; align-items: center; justify-content: center;">
-                                                    ${ttd2Img ? `<img src="${ttd2Img}" alt="TTD Ketua Umum" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` : ''}
-                                                ${(stempelImg && useStempel) ? `<img src="${stempelImg}" alt="Stempel UKM" style="position: absolute; left: 50%; top: 50%; transform: translate(-65%, -50%); max-height: 56pt; max-width: 80pt; object-fit: contain; opacity: 0.92; pointer-events: none; z-index: 3; mix-blend-mode: multiply;">` : ''}
+                                                    ${ttd2SlotHtml}
                                                 </div>
                                                 <p style="margin: 0; font-weight: bold; text-decoration: underline; line-height: 1.25;">${formatInlineRichText(ttd2Nama)}</p>
                                                 <p style="margin: 0; line-height: 1.25;">${formatInlineRichText(ttd2Nim)}</p>
@@ -10541,7 +10546,7 @@
                                             <td style="width: 50%; vertical-align: top; line-height: 1.25; position: relative;">
                                                 ${formatTtdJabatan(ttd1Jabatan)}
                                                 <div style="position: relative; height: 56pt; margin: 2pt 0; display: flex; align-items: center; justify-content: center;">
-                                                    ${ttd1Img ? `<img src="${ttd1Img}" alt="TTD Ketua Pelaksana" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` : ''}
+                                                    ${ttd1SlotHtml}
                                                 </div>
                                                 <p style="margin: 0; font-weight: bold; text-decoration: underline; line-height: 1.25;">${formatInlineRichText(ttd1Nama)}</p>
                                                 <p style="margin: 0; line-height: 1.25;">${formatInlineRichText(ttd1Nim)}</p>
@@ -10554,8 +10559,7 @@
                                             <td style="width: 100%; vertical-align: top; text-align: center; line-height: 1.25; position: relative;">
                                                 ${formatTtdJabatan(ttd2Jabatan)}
                                                 <div style="position: relative; height: 56pt; margin: 2pt 0; display: flex; align-items: center; justify-content: center;">
-                                                    ${ttd2Img ? `<img src="${ttd2Img}" alt="TTD Ketua Umum" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` : ''}
-                                                ${(stempelImg && useStempel) ? `<img src="${stempelImg}" alt="Stempel UKM" style="position: absolute; left: 50%; top: 50%; transform: translate(-65%, -50%); max-height: 56pt; max-width: 80pt; object-fit: contain; opacity: 0.92; pointer-events: none; z-index: 3; mix-blend-mode: multiply;">` : ''}
+                                                    ${ttd2SlotHtml}
                                                 </div>
                                                 <p style="margin: 0; font-weight: bold; text-decoration: underline; line-height: 1.25;">${formatInlineRichText(ttd2Nama)}</p>
                                                 <p style="margin: 0; line-height: 1.25;">${formatInlineRichText(ttd2Nim)}</p>
@@ -10568,7 +10572,7 @@
                                             <td style="width: 100%; vertical-align: top; text-align: center; line-height: 1.25; position: relative;">
                                                 ${formatTtdJabatan(ttd1Jabatan)}
                                                 <div style="position: relative; height: 56pt; margin: 2pt 0; display: flex; align-items: center; justify-content: center;">
-                                                    ${ttd1Img ? `<img src="${ttd1Img}" alt="TTD Ketua Pelaksana" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` : ''}
+                                                    ${ttd1SlotHtml}
                                                 </div>
                                                 <p style="margin: 0; font-weight: bold; text-decoration: underline; line-height: 1.25;">${formatInlineRichText(ttd1Nama)}</p>
                                                 <p style="margin: 0; line-height: 1.25;">${formatInlineRichText(ttd1Nim)}</p>
@@ -10850,9 +10854,23 @@
                             ${(() => {
                                 if (!isTtd1Active && !isTtd2Active) return '';
                                 const ttd1Img = document.getElementById('field_ttd1_img')?.value || '';
-                                const ttd2Img = document.getElementById('field_ttd2_img')?.value || SAMPLE_TTD_HAFIZ_BASE64;
-                                const stempelImg = document.getElementById('field_stempel_img')?.value || SAMPLE_STEMPEL_IMIP_BASE64;
-                                const useStempel = document.getElementById('field_use_stempel') ? document.getElementById('field_use_stempel').checked : true;
+                                const ttd2Img = document.getElementById('field_ttd2_img')?.value || '';
+                                const stempelImg = document.getElementById('field_stempel_img')?.value || '';
+                                const useStempel = document.getElementById('field_use_stempel') ? document.getElementById('field_use_stempel').checked : false;
+
+                                const ttd1SlotHtml = ttd1Img 
+                                    ? `<img src="${ttd1Img}" alt="TTD Ketua Pelaksana" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` 
+                                    : `<div class="print:hidden" onclick="document.getElementById('upload_ttd1_file').click()" title="Klik untuk upload TTD Digital" style="border: 1px dashed #94a3b8; border-radius: 6px; padding: 4pt 8pt; display: inline-flex; align-items: center; gap: 4px; font-size: 8pt; color: #64748b; background: rgba(241, 245, 249, 0.6); cursor: pointer; user-select: none;">
+                                         <i class="fa-solid fa-cloud-arrow-up text-[9px] text-blue-500"></i>
+                                         <span>+ Klik upload TTD</span>
+                                       </div>`;
+
+                                const ttd2SlotHtml = ttd2Img 
+                                    ? `<img src="${ttd2Img}" alt="TTD Ketua Umum" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` 
+                                    : `<div class="print:hidden" onclick="document.getElementById('upload_ttd2_file').click()" title="Klik untuk upload TTD Digital" style="border: 1px dashed #94a3b8; border-radius: 6px; padding: 4pt 8pt; display: inline-flex; align-items: center; gap: 4px; font-size: 8pt; color: #64748b; background: rgba(241, 245, 249, 0.6); cursor: pointer; user-select: none;">
+                                         <i class="fa-solid fa-cloud-arrow-up text-[9px] text-blue-500"></i>
+                                         <span>+ Klik upload TTD</span>
+                                       </div>`;
 
                                 let content = '';
                                 if (isTtd1Active && isTtd2Active) {
@@ -10866,8 +10884,8 @@
                                             <td style="width: 48%; vertical-align: top; line-height: 1.25; position: relative;">
                                                 ${formatTtdJabatan(ttd2Jabatan)}
                                                 <div style="position: relative; height: 56pt; margin: 2pt 0; display: flex; align-items: center; justify-content: center;">
-                                                    ${ttd2Img ? `<img src="${ttd2Img}" alt="TTD Ketua Umum" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` : ''}
-                                                ${(stempelImg && useStempel) ? `<img src="${stempelImg}" alt="Stempel UKM" style="position: absolute; left: 50%; top: 50%; transform: translate(-65%, -50%); max-height: 56pt; max-width: 80pt; object-fit: contain; opacity: 0.92; pointer-events: none; z-index: 3; mix-blend-mode: multiply;">` : ''}
+                                                    ${ttd2SlotHtml}
+                                                    ${(stempelImg && useStempel) ? `<img src="${stempelImg}" alt="Stempel UKM" style="position: absolute; left: 50%; top: 50%; transform: translate(-65%, -50%); max-height: 56pt; max-width: 80pt; object-fit: contain; opacity: 0.92; pointer-events: none; z-index: 3; mix-blend-mode: multiply;">` : ''}
                                                 </div>
                                                 <p style="margin: 0; font-weight: bold; text-decoration: underline; line-height: 1.25;">${formatInlineRichText(ttd2Nama)}</p>
                                                 <p style="margin: 0; line-height: 1.25;">${formatInlineRichText(ttd2Nim)}</p>
@@ -10876,7 +10894,7 @@
                                             <td style="width: 48%; vertical-align: top; line-height: 1.25; position: relative;">
                                                 ${formatTtdJabatan(ttd1Jabatan)}
                                                 <div style="position: relative; height: 56pt; margin: 2pt 0; display: flex; align-items: center; justify-content: center;">
-                                                    ${ttd1Img ? `<img src="${ttd1Img}" alt="TTD Ketua Pelaksana" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` : ''}
+                                                    ${ttd1SlotHtml}
                                                 </div>
                                                 <p style="margin: 0; font-weight: bold; text-decoration: underline; line-height: 1.25;">${formatInlineRichText(ttd1Nama) || '&nbsp;'}</p>
                                                 <p style="margin: 0; line-height: 1.25;">${formatInlineRichText(ttd1Nim) || '&nbsp;'}</p>
@@ -10889,8 +10907,8 @@
                                             <td style="width: 100%; vertical-align: top; line-height: 1.25; text-align: center; position: relative;">
                                                 ${formatTtdJabatan(ttd2Jabatan)}
                                                 <div style="position: relative; height: 56pt; margin: 2pt 0; display: flex; align-items: center; justify-content: center;">
-                                                    ${ttd2Img ? `<img src="${ttd2Img}" alt="TTD Ketua Umum" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` : ''}
-                                                ${(stempelImg && useStempel) ? `<img src="${stempelImg}" alt="Stempel UKM" style="position: absolute; left: 50%; top: 50%; transform: translate(-65%, -50%); max-height: 56pt; max-width: 80pt; object-fit: contain; opacity: 0.92; pointer-events: none; z-index: 3; mix-blend-mode: multiply;">` : ''}
+                                                    ${ttd2SlotHtml}
+                                                    ${(stempelImg && useStempel) ? `<img src="${stempelImg}" alt="Stempel UKM" style="position: absolute; left: 50%; top: 50%; transform: translate(-65%, -50%); max-height: 56pt; max-width: 80pt; object-fit: contain; opacity: 0.92; pointer-events: none; z-index: 3; mix-blend-mode: multiply;">` : ''}
                                                 </div>
                                                 <p style="margin: 0; font-weight: bold; text-decoration: underline; line-height: 1.25;">${formatInlineRichText(ttd2Nama)}</p>
                                                 <p style="margin: 0; line-height: 1.25;">${formatInlineRichText(ttd2Nim)}</p>
@@ -10903,7 +10921,7 @@
                                             <td style="width: 100%; vertical-align: top; line-height: 1.25; text-align: center; position: relative;">
                                                 ${formatTtdJabatan(ttd1Jabatan)}
                                                 <div style="position: relative; height: 56pt; margin: 2pt 0; display: flex; align-items: center; justify-content: center;">
-                                                    ${ttd1Img ? `<img src="${ttd1Img}" alt="TTD Ketua Pelaksana" style="max-height: 50pt; max-width: 85%; object-fit: contain; pointer-events: none; z-index: 2; mix-blend-mode: multiply;">` : ''}
+                                                    ${ttd1SlotHtml}
                                                 </div>
                                                 <p style="margin: 0; font-weight: bold; text-decoration: underline; line-height: 1.25;">${formatInlineRichText(ttd1Nama) || '&nbsp;'}</p>
                                                 <p style="margin: 0; line-height: 1.25;">${formatInlineRichText(ttd1Nim) || '&nbsp;'}</p>
@@ -13448,14 +13466,10 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                 dRaw.field_ttd2_nim_angka = '2490444040';
             }
 
-            // Guarantee stempel for SUD and SPM
-            if (doc.type === 'SUD' || doc.type === 'SPM') {
-                if (dRaw.field_use_stempel === undefined) {
-                    dRaw.field_use_stempel = true;
-                }
-                if (!dRaw.field_stempel_img) {
-                    dRaw.field_stempel_img = SAMPLE_STEMPEL_IMIP_BASE64;
-                }
+            // Cap ormawa hanya ada di SPM dan tidak di-force isi sampel bawaan
+            if (doc.type !== 'SPM') {
+                dRaw.field_stempel_img = '';
+                dRaw.field_use_stempel = false;
             }
 
             // 1. Pilih jenis surat terlebih dahulu
@@ -14593,10 +14607,10 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                         field_ttd3_nim: 'NIP. 198005072023211013',
                         field_ttd_wadir_active: false,
                         field_use_kop: true,
-                        field_ttd1_img: SAMPLE_TTD_FADLY_BASE64,
-                        field_ttd2_img: SAMPLE_TTD_HAFIZ_BASE64,
-                        field_stempel_img: SAMPLE_STEMPEL_IMIP_BASE64,
-                        field_use_stempel: true,
+                        field_ttd1_img: '',
+                        field_ttd2_img: '',
+                        field_stempel_img: '',
+                        field_use_stempel: false,
                         field_sud_inc_lampiran: true,
                         field_sud_lampiran_judul: 'Rundown Day 2',
                         sudRundownList: JSON.parse(JSON.stringify(DEFAULT_SUD_RUNDOWN))
@@ -15706,11 +15720,8 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1 shrink-0">
-                                    <button type="button" onclick="document.getElementById('upload_ttd1_file').click();" class="py-1 px-2 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[9.5px] font-medium flex items-center gap-1 shadow-xs" title="Unggah file foto/scan TTD">
-                                        <i class="fa-solid fa-cloud-arrow-up text-blue-400 text-[9px]"></i> Ganti TTD
-                                    </button>
-                                    <button type="button" onclick="setPresetTtd('field_ttd1_img', '${defaultT1PresetKey}'); refreshQuickTtdPjThumbs();" class="py-1 px-1.5 rounded bg-white/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[9px] font-mono" title="Pakai contoh resmi">
-                                        Contoh
+                                    <button type="button" onclick="document.getElementById('upload_ttd1_file').click();" class="py-1 px-2.5 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[9.5px] font-medium flex items-center gap-1 shadow-xs" title="Upload TTD digital (PNG transparan disarankan)">
+                                        <i class="fa-solid fa-cloud-arrow-up text-blue-400 text-[9px]"></i> Upload TTD
                                     </button>
                                 </div>
                             </div>
@@ -15739,29 +15750,27 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                                         class="form-input text-xs py-1.5 px-2 bg-neutral-900 border-neutral-700 font-mono text-white rounded-lg focus:border-neutral-400">
                                 </div>
                             </div>
-                            <!-- KONTROL GANTI GAMBAR TTD KETUA UKM (HAFIZ) -->
+                            <!-- KONTROL GANTI GAMBAR TTD KETUA UKM -->
                             <div class="pt-1.5 border-t border-neutral-800/80 flex items-center justify-between gap-1.5">
                                 <div class="flex items-center gap-1 flex-1 min-w-0">
                                     <span class="text-[9px] text-neutral-400 font-mono">TTD:</span>
                                     <div id="quick_ttd2_thumb_box" class="flex items-center gap-1">
                                         ${ttd2Img ? `
-                                             <img src="${ttd2Img}" class="h-6 max-w-[46px] object-contain bg-white rounded px-0.5 border border-neutral-700" alt="Contoh TTD 2">
+                                             <img src="${ttd2Img}" class="h-6 max-w-[46px] object-contain bg-white rounded px-0.5 border border-neutral-700" alt="TTD 2">
                                              <button type="button" onclick="clearTtdImage('field_ttd2_img'); refreshQuickTtdPjThumbs();" class="text-[9px] text-rose-400 hover:text-rose-300 font-mono ml-0.5">Hapus</button>
                                          ` : '<span class="text-[9px] text-neutral-500 font-mono italic">Kosong</span>'}
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1 shrink-0">
-                                    <button type="button" onclick="document.getElementById('upload_ttd2_file').click();" class="py-1 px-2 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[9.5px] font-medium flex items-center gap-1 shadow-xs" title="Unggah file foto/scan TTD">
-                                        <i class="fa-solid fa-cloud-arrow-up text-blue-400 text-[9px]"></i> Ganti TTD
-                                    </button>
-                                    <button type="button" onclick="setPresetTtd('field_ttd2_img', 'hafiz'); refreshQuickTtdPjThumbs();" class="py-1 px-1.5 rounded bg-white/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[9px] font-mono" title="Pakai contoh TTD">
-                                        Hafiz
+                                    <button type="button" onclick="document.getElementById('upload_ttd2_file').click();" class="py-1 px-2.5 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[9.5px] font-medium flex items-center gap-1 shadow-xs" title="Upload TTD digital (PNG transparan disarankan)">
+                                        <i class="fa-solid fa-cloud-arrow-up text-blue-400 text-[9px]"></i> Upload TTD
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 3. CAP / STEMPEL ORMAWA RESMI -->
+                        ${currentSuratType === 'SPM' ? `
+                        <!-- 3. CAP / STEMPEL ORMAWA RESMI (KHUSUS SPM) -->
                         <div class="p-2.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1.5">
@@ -15787,15 +15796,13 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1 shrink-0">
-                                    <button type="button" onclick="document.getElementById('upload_stempel_file').click();" class="py-1 px-2 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[9.5px] font-medium flex items-center gap-1 shadow-xs" title="Unggah stempel sendiri">
-                                        <i class="fa-solid fa-cloud-arrow-up text-blue-400 text-[9px]"></i> Ganti Cap
-                                    </button>
-                                    <button type="button" onclick="setPresetTtd('field_stempel_img', 'stempel'); refreshQuickTtdPjThumbs();" class="py-1 px-1.5 rounded bg-white/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[9px] font-mono" title="Pakai Stempel Resmi 2026">
-                                        IMIP
+                                    <button type="button" onclick="document.getElementById('upload_stempel_file').click();" class="py-1 px-2.5 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-[9.5px] font-medium flex items-center gap-1 shadow-xs" title="Upload cap/stempel resmi ormawa">
+                                        <i class="fa-solid fa-cloud-arrow-up text-blue-400 text-[9px]"></i> Upload Cap
                                     </button>
                                 </div>
                             </div>
                         </div>
+                        ` : ''}
                     </div>
                 `;
             }
@@ -16752,7 +16759,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
             } else if (isSud || isSpm) {
                 defaultT1Nama = 'Fadly Ahmad Chandi';
                 defaultT1Nim = '2490345034';
-                defaultT1Img = SAMPLE_TTD_FADLY_BASE64;
+                defaultT1Img = '';
             }
 
             const t1Nama = document.getElementById('field_ttd1_nama');
@@ -16769,15 +16776,15 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
             if (t1Nama) t1Nama.value = defaultT1Nama;
             if (t1NimAngka) t1NimAngka.value = defaultT1Nim;
             if (t1Nim) t1Nim.value = 'NIM. ' + defaultT1Nim;
-            if (t1Img && defaultT1Img) t1Img.value = defaultT1Img;
+            if (t1Img) t1Img.value = defaultT1Img;
 
             if (t2Nama) t2Nama.value = 'Hafiz Alfariz';
             if (t2NimAngka) t2NimAngka.value = '2490444040';
             if (t2Nim) t2Nim.value = 'NIM. 2490444040';
-            if (t2Img) t2Img.value = SAMPLE_TTD_HAFIZ_BASE64;
+            if (t2Img) t2Img.value = '';
 
-            if (stImg) stImg.value = SAMPLE_STEMPEL_IMIP_BASE64;
-            if (uStempel) uStempel.checked = true;
+            if (stImg) stImg.value = '';
+            if (uStempel) uStempel.checked = false;
 
             updateTtdThumbnails();
             if (typeof refreshQuickTtdPjThumbs === 'function') refreshQuickTtdPjThumbs();
