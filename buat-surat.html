@@ -5593,6 +5593,9 @@
         // MODAL KUSTOMISASI LOGO & BACKGROUND HANDLERS
         // ==========================================
         function bukaModalKustomisasiLogo() {
+            if (typeof closePreviewQuickEdit === 'function') {
+                closePreviewQuickEdit();
+            }
             const modal = document.getElementById('modal_kustomisasi_logo');
             if (!modal) return;
             modal.classList.remove('hidden');
@@ -14620,6 +14623,10 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
             paper.addEventListener('click', (e) => {
                 const editable = e.target.closest('.preview-editable');
                 if (!editable) return;
+                // Khusus untuk kop surat, biarkan langsung ditangani modal kustomisasi logo & kop
+                if (editable.classList.contains('spz-kop-container') || editable.getAttribute('data-edit-type') === 'kop') {
+                    return;
+                }
                 e.preventDefault();
                 e.stopPropagation();
                 openPreviewQuickEdit(editable);
