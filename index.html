@@ -247,17 +247,14 @@
                     </div>
                     <div class="flex items-center justify-between pt-1">
                         <div class="flex items-center gap-3">
-                            <img id="prev_kampus_logo" src="assets/logo_polimedia.png" alt="Logo Kampus" class="h-10 w-auto object-contain">
-                            <label class="px-2.5 py-1 rounded bg-neutral-800 hover:bg-neutral-700 text-[11px] font-bold text-neutral-300 cursor-pointer">
-                                Ganti Logo Kampus
-                                <input type="file" accept="image/*" onchange="handleProfileImageUpload(event, 'kampus_logo')" class="hidden">
-                            </label>
-                            <button type="button" onclick="removeProfileImage('kampus_logo')" class="text-neutral-500 hover:text-white text-[11px]">Reset</button>
+                            <img id="prev_kampus_logo" src="assets/logo_polimedia.png" alt="Logo Kampus Politeknik Negeri Media Kreatif" class="h-10 w-auto object-contain">
+                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-neutral-800/80 border border-neutral-700/60 text-[11px] font-bold text-amber-300 shadow-xs">
+                                <i class="fa-solid fa-lock text-[10px]"></i>
+                                <span>Logo Resmi PoliMedia (Permanen / Baku)</span>
+                            </div>
                         </div>
-                        <label class="flex items-center gap-1.5 text-neutral-400 cursor-pointer">
-                            <input type="checkbox" id="prof_kampus_logo_active" class="rounded border-neutral-700 text-white w-4 h-4 cursor-pointer">
-                            <span>Tampilkan di Kop</span>
-                        </label>
+                        <input type="checkbox" id="prof_kampus_logo_active" class="hidden" checked>
+                        <span class="text-[10px] text-neutral-400 font-mono">Tetap</span>
                     </div>
                 </div>
 

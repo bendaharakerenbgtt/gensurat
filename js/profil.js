@@ -286,6 +286,12 @@ function handleProfileImageUpload(event, fieldKey) {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
 
+    // PoliMedia Campus Logo is permanent and cannot be changed
+    if (fieldKey === 'kampus_logo') {
+        if (typeof showToast === 'function') showToast('Logo resmi PoliMedia bersifat baku dan tidak dapat diganti.', 'info');
+        return;
+    }
+
     const reader = new FileReader();
     reader.onload = function(e) {
         const base64 = e.target.result;
@@ -296,7 +302,8 @@ function handleProfileImageUpload(event, fieldKey) {
         if (fieldKey === 'org_logo') prof.org_logo_active = true;
         if (fieldKey === 'kabinet_logo') prof.kabinet_logo_active = true;
         if (fieldKey === 'watermark_image') prof.watermark_active = true;
-        if (fieldKey === 'kampus_logo') prof.kampus_logo_active = true;
+        prof.kampus_logo = 'assets/logo_polimedia.png';
+        prof.kampus_logo_active = true;
 
         saveOrganizationProfile(prof);
         

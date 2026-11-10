@@ -278,9 +278,32 @@ html.light-mode .modal-card-box .w-10.h-10 i {
 }
 
 /* --------------------------------------------------------------------------
+   Kop Surat Placeholder Box for Empty Logos (Interactive, Hidden in Print)
+   -------------------------------------------------------------------------- */
+.kop-logo-placeholder {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+}
+
+.kop-logo-placeholder:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+}
+
+@media print {
+    .kop-logo-placeholder,
+    [class*="kop-logo-placeholder"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
    CTA Button Contrast Safeguards (Prevent Invisible White Text on White BG)
    -------------------------------------------------------------------------- */
 /* Dark Mode: White CTA buttons MUST have pitch-black text and icons */
+button.bg-white,
+a.bg-white,
 :root[data-theme="dark"] button.bg-white,
 :root[data-theme="dark"] a.bg-white,
 html:not(.light-mode) button.bg-white,
@@ -288,6 +311,8 @@ html:not(.light-mode) a.bg-white {
     color: #04070c !important;
 }
 
+button.bg-white *,
+a.bg-white *,
 :root[data-theme="dark"] button.bg-white *,
 :root[data-theme="dark"] a.bg-white *,
 html:not(.light-mode) button.bg-white *,

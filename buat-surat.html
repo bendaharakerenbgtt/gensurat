@@ -1196,7 +1196,7 @@
         <div class="flex items-center gap-2">
             <button type="button" onclick="bukaModalKustomisasiLogo()" class="px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs" title="Ganti Logo Kabinet, Logo Organisasi & Background Kertas">
                 <i class="fa-solid fa-palette text-xs"></i>
-                <span class="hidden sm:inline">Ganti Gambar Kabinet</span>
+                <span class="hidden sm:inline">Kustomisasi Logo &amp; Kop</span>
             </button>
             <button type="button" onclick="toggleTheme(event)" class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Beralih tema" title="Beralih tema">
                 <svg class="theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
@@ -1411,10 +1411,10 @@
                             <i id="icon_mobile_zoom_toggle" class="fa-solid fa-compress text-neutral-400 text-[10px]"></i>
                             <span id="label_mobile_zoom_toggle">Pas Layar</span>
                         </button>
-                        <!-- Button Ganti Gambar Kabinet -->
+                        <!-- Button Kustomisasi Logo & Kop -->
                         <button type="button" onclick="bukaModalKustomisasiLogo()" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 border border-neutral-700 text-neutral-200 hover:border-neutral-500 hover:text-white text-[10.5px] sm:text-[11px] font-bold shadow-xs active:scale-95 transition-all" title="Ganti Logo Kabinet, Logo Organisasi & Background Kertas">
                             <i class="fa-solid fa-palette text-neutral-400 text-[10px]"></i>
-                            <span>Ganti Gambar Kabinet</span>
+                            <span>Kustomisasi Logo &amp; Kop</span>
                         </button>
                         <!-- Quick Click-to-Edit Indicator Pill -->
                         <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 border border-white/20 text-neutral-300 text-[10.5px] sm:text-[11px] font-medium shadow-xs">
@@ -3116,55 +3116,64 @@
                         <i class="fa-solid fa-palette"></i>
                     </div>
                     <div>
-                        <h3 class="text-base font-black text-white">Ganti Gambar Kabinet &amp; Kop Surat</h3>
-                        <p class="text-xs text-neutral-400">Ubah logo kabinet, logo organisasi, atau background watermark kertas</p>
+                        <h3 class="text-base font-black text-white">Kustomisasi Logo &amp; Kop Surat</h3>
+                        <p class="text-xs text-neutral-400">Atur logo kabinet, logo organisasi, atau background watermark kertas</p>
                     </div>
                 </div>
-                <button type="button" onclick="tutupModalKustomisasiLogo()" aria-label="Tutup" class="w-8 h-8 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center transition-colors">
+                <button type="button" onclick="tutupModalKustomisasiLogo()" aria-label="Tutup" class="w-8 h-8 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer">
                     <i class="fa-solid fa-xmark text-xs"></i>
                 </button>
             </div>
 
             <div class="space-y-4">
-                <!-- 1. BACKGROUND KABINET DI KERTAS (WATERMARK) -->
+                <!-- 1. BACKGROUND KERTAS (WATERMARK) -->
                 <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <i class="fa-solid fa-stamp text-blue-400 text-sm"></i>
-                            <span class="text-xs font-bold text-white uppercase tracking-wider">1. Background Kabinet di Kertas (Watermark)</span>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">1. Background Kertas (Watermark)</span>
                         </div>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" id="toggle_watermark_active" onchange="handleWatermarkActiveToggle(this.checked)" class="accent-neutral-200 rounded">
-                            <span class="text-[11px] text-neutral-400 font-medium">Tampilkan</span>
+                            <span class="text-[11px] text-neutral-400 font-medium">Tampilkan Watermark</span>
                         </label>
                     </div>
 
                     <div class="flex items-center gap-3">
                         <div class="w-20 h-20 rounded-xl bg-neutral-900 border border-neutral-800 p-1 flex items-center justify-center shrink-0 overflow-hidden relative" style="background-image: linear-gradient(45deg, #1c1917 25%, transparent 25%), linear-gradient(-45deg, #1c1917 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1c1917 75%), linear-gradient(-45deg, transparent 75%, #1c1917 75%); background-size: 10px 10px; background-position: 0 0, 0 5px, 5px -5px, -5px 0px;">
                             <img id="preview_thumb_watermark" src="surat/assets/watermark_spz.png" alt="Preview Watermark" class="w-full h-full object-contain">
+                            <div id="notice_watermark_none" class="hidden flex flex-col items-center justify-center text-center p-1 text-neutral-500">
+                                <i class="fa-solid fa-ban text-sm text-neutral-500 mb-1"></i>
+                                <span class="text-[9px] font-mono leading-tight">Tanpa Background</span>
+                            </div>
                         </div>
                         <div class="flex-1 space-y-2">
+                            <p class="text-[11px] text-neutral-400">Gambar watermark di tengah lembar surat. Dapat diganti gambar baru atau dimatikan jika tidak ingin memakai background.</p>
                             <div class="flex items-center gap-2 flex-wrap">
                                 <label class="px-3 py-1.5 rounded-lg bg-white text-black font-bold hover:bg-neutral-200 text-xs flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 transition-all">
                                     <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
                                     <span>Unggah Gambar Baru</span>
                                     <input type="file" id="input_file_watermark_kabinet" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="handleUploadWatermark(event)">
                                 </label>
-                                <button type="button" onclick="resetWatermarkDefault()" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium transition-colors">
-                                    Reset Default
+                                <button type="button" onclick="setWatermarkNone()" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer" title="Matikan watermark agar lembar surat bersih tanpa logo background">
+                                    <i class="fa-solid fa-ban text-[11px]"></i>
+                                    <span>Tanpa Background</span>
+                                </button>
+                                <button type="button" onclick="resetWatermarkDefault()" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 text-xs font-medium transition-colors cursor-pointer">
+                                    Reset Bawaan
                                 </button>
                             </div>
                             <!-- Preset Pilihan Cepat -->
                             <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
                                 <span class="text-[10px] text-neutral-500">Pilihan Cepat:</span>
-                                <button type="button" onclick="setWatermarkPreset('surat/assets/watermark_spz.png', '0.95')" class="px-2 py-0.5 rounded text-[10px] bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border border-neutral-700/60">
+                                <button type="button" onclick="setWatermarkNone()" class="px-2 py-0.5 rounded text-[10px] bg-neutral-800 hover:bg-neutral-700 text-amber-300 border border-neutral-700/60 cursor-pointer">
+                                    Tanpa Logo (Kosong)
+                                </button>
+                                <button type="button" onclick="setWatermarkPreset('surat/assets/watermark_spz.png', '0.95')" class="px-2 py-0.5 rounded text-[10px] bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border border-neutral-700/60 cursor-pointer">
                                     Watermark SPZ
                                 </button>
-                                <button type="button" onclick="setWatermarkPreset('assetkabinet/logokabinetblur.png', '0.25')" class="px-2 py-0.5 rounded text-[10px] bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border border-neutral-700/60">
+                                <button type="button" onclick="setWatermarkPreset('assetkabinet/logokabinetblur.png', '0.25')" class="px-2 py-0.5 rounded text-[10px] bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border border-neutral-700/60 cursor-pointer">
                                     Kabinet Blur
-                                </button>
-                                <button type="button" onclick="setWatermarkPreset('IMIP.png', '0.12')" class="px-2 py-0.5 rounded text-[10px] bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border border-neutral-700/60">
-                                    Logo IMIP
                                 </button>
                             </div>
                         </div>
@@ -3180,57 +3189,92 @@
 
                 <!-- 2. LOGO KABINET DI ATAS KANAN KOP -->
                 <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-3">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-shapes text-blue-400 text-sm"></i>
-                        <span class="text-xs font-bold text-white uppercase tracking-wider">2. Logo Kabinet (Diatas Kanan Kop)</span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-shapes text-blue-400 text-sm"></i>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">2. Logo Kabinet (Diatas Kanan Kop)</span>
+                        </div>
+                        <span class="text-[10px] text-neutral-500 font-mono">Template Bawaan: Kosong</span>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="w-16 h-16 rounded-xl bg-neutral-900 border border-neutral-800 p-1 flex items-center justify-center shrink-0 overflow-hidden relative" style="background-image: linear-gradient(45deg, #1c1917 25%, transparent 25%), linear-gradient(-45deg, #1c1917 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1c1917 75%), linear-gradient(-45deg, transparent 75%, #1c1917 75%); background-size: 10px 10px; background-position: 0 0, 0 5px, 5px -5px, -5px 0px;">
-                            <img id="preview_thumb_kabinet" src="assetkabinet/logokabinetjelas.png" alt="Preview Logo Kabinet" class="w-full h-full object-contain">
+                            <img id="preview_thumb_kabinet" src="" alt="Preview Logo Kabinet" class="w-full h-full object-contain hidden">
+                            <div id="notice_kabinet_none" class="flex flex-col items-center justify-center text-center p-1 border-2 border-dashed border-neutral-700 rounded-lg w-full h-full text-neutral-400">
+                                <i class="fa-solid fa-plus text-xs mb-0.5 text-neutral-500"></i>
+                                <span class="text-[8px] font-bold leading-tight">Kotak Kosong</span>
+                            </div>
                         </div>
                         <div class="flex-1 space-y-2">
-                            <p class="text-[11px] text-neutral-400">Logo kabinet kepengurusan aktif di pojok kanan atas kop surat (disarankan PNG transparan).</p>
+                            <p class="text-[11px] text-neutral-400">Logo kabinet kepengurusan di pojok kanan kop surat. Jika kosong, tampil kotak placeholder yang dapat diketuk langsung.</p>
                             <div class="flex items-center gap-2 flex-wrap">
                                 <label class="px-3 py-1.5 rounded-lg bg-white text-black font-bold hover:bg-neutral-200 text-xs flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 transition-all">
                                     <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
                                     <span>Unggah Logo Kabinet</span>
                                     <input type="file" id="input_file_logo_kabinet" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="handleUploadLogoKabinet(event)">
                                 </label>
-                                <button type="button" onclick="resetLogoKabinetDefault()" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium transition-colors">
-                                    Reset Bawaan
+                                <button type="button" onclick="resetLogoKabinetDefault()" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium transition-colors cursor-pointer">
+                                    Kosongkan (Placeholder)
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. LOGO IMIP DI ATAS KANAN KOP -->
+                <!-- 3. LOGO ORGANISASI DI ATAS KANAN KOP -->
                 <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-3">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-mosque text-blue-400 text-sm"></i>
-                        <span class="text-xs font-bold text-white uppercase tracking-wider">3. Logo Organisasi / Instansi (Diatas Kanan Kop)</span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-sitemap text-blue-400 text-sm"></i>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">3. Logo Organisasi (Diatas Kanan Kop)</span>
+                        </div>
+                        <span class="text-[10px] text-neutral-500 font-mono">Template Bawaan: Kosong</span>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="w-16 h-16 rounded-xl bg-neutral-900 border border-neutral-800 p-1 flex items-center justify-center shrink-0 overflow-hidden relative" style="background-image: linear-gradient(45deg, #1c1917 25%, transparent 25%), linear-gradient(-45deg, #1c1917 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1c1917 75%), linear-gradient(-45deg, transparent 75%, #1c1917 75%); background-size: 10px 10px; background-position: 0 0, 0 5px, 5px -5px, -5px 0px;">
-                            <img id="preview_thumb_imip" src="IMIP.png" alt="Preview Logo IMIP" class="w-full h-full object-contain">
+                            <img id="preview_thumb_imip" src="" alt="Preview Logo Organisasi" class="w-full h-full object-contain hidden">
+                            <div id="notice_imip_none" class="flex flex-col items-center justify-center text-center p-1 border-2 border-dashed border-neutral-700 rounded-lg w-full h-full text-neutral-400">
+                                <i class="fa-solid fa-plus text-xs mb-0.5 text-neutral-500"></i>
+                                <span class="text-[8px] font-bold leading-tight">Kotak Kosong</span>
+                            </div>
                         </div>
                         <div class="flex-1 space-y-2">
-                            <p class="text-[11px] text-neutral-400">Logo organisasi atau instansi di sebelah logo kabinet.</p>
+                            <p class="text-[11px] text-neutral-400">Logo organisasi Anda di sebelah kiri logo kabinet. Jika kosong, tampil kotak placeholder yang dapat diketuk langsung.</p>
                             <div class="flex items-center gap-2 flex-wrap">
                                 <label class="px-3 py-1.5 rounded-lg bg-white text-black font-bold hover:bg-neutral-200 text-xs flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 transition-all">
                                     <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
                                     <span>Unggah Logo Organisasi</span>
                                     <input type="file" id="input_file_logo_imip" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="handleUploadLogoImip(event)">
                                 </label>
-                                <button type="button" onclick="resetLogoImipDefault()" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium transition-colors">
-                                    Reset Bawaan
+                                <button type="button" onclick="resetLogoImipDefault()" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium transition-colors cursor-pointer">
+                                    Kosongkan (Placeholder)
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 4. BANNER KOP UTUH (OPSIONAL) -->
+                <!-- 4. LOGO POLIMEDIA (TETAP / TIDAK BISA DIGANTI) -->
+                <div class="p-3.5 rounded-xl bg-neutral-950/40 border border-neutral-800/80 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-graduation-cap text-amber-400 text-sm"></i>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">4. Logo Kampus PoliMedia (Kiri Kop)</span>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                            <i class="fa-solid fa-lock text-[9px]"></i> Permanen / Baku
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-14 h-14 rounded-xl bg-neutral-900 border border-neutral-800 p-1.5 flex items-center justify-center shrink-0">
+                            <img src="assets/logo_polimedia.png" alt="Logo Resmi PoliMedia" class="w-full h-full object-contain">
+                        </div>
+                        <p class="text-[11px] text-neutral-400 leading-relaxed">
+                            Logo resmi Politeknik Negeri Media Kreatif di pojok kiri atas kop bersifat baku dan tidak dapat diganti untuk menjaga standar format surat resmi kampus.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 5. BANNER KOP UTUH (OPSIONAL) -->
                 <div class="p-3.5 rounded-xl bg-neutral-950/40 border border-neutral-800/80 space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-neutral-300">Opsi Lanjutan: Gunakan Banner Kop Utuh</span>
@@ -3242,7 +3286,7 @@
                             <span>Unggah Banner Utuh</span>
                             <input type="file" id="input_file_kop_banner" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="handleUploadKopBanner(event)">
                         </label>
-                        <button type="button" onclick="resetKopBannerDefault()" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 text-[11px]">
+                        <button type="button" onclick="resetKopBannerDefault()" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 text-[11px] cursor-pointer">
                             Hapus Banner Utuh
                         </button>
                     </div>
@@ -3251,7 +3295,7 @@
 
             <!-- Footer Modal -->
             <div class="pt-3 border-t border-neutral-800 flex items-center justify-end gap-2">
-                <button type="button" onclick="tutupModalKustomisasiLogo()" class="px-5 py-2.5 rounded-xl bg-white text-black font-black hover:bg-neutral-200 text-xs shadow-md transition-all">
+                <button type="button" onclick="tutupModalKustomisasiLogo()" class="px-5 py-2.5 rounded-xl bg-white text-black font-black hover:bg-neutral-200 text-xs shadow-md transition-all cursor-pointer">
                     Selesai &amp; Terapkan
                 </button>
             </div>
@@ -5378,12 +5422,16 @@
         }
 
         function getCustomWatermarkImage() {
-            return localStorage.getItem('custom_watermark_kabinet') || 'surat/assets/watermark_spz.png';
+            const saved = localStorage.getItem('custom_watermark_kabinet');
+            if (saved !== null) return saved;
+            return 'surat/assets/watermark_spz.png';
         }
 
         function isWatermarkActive() {
             const val = localStorage.getItem('custom_watermark_active');
-            return val !== 'false';
+            if (val === 'false') return false;
+            const img = getCustomWatermarkImage();
+            return !!img;
         }
 
         function getWatermarkOpacity() {
@@ -5398,12 +5446,13 @@
         function getOfficialWatermarkHtml(topOffset = '145mm') {
             if (!isWatermarkActive()) return '';
             const wmSrc = getCustomWatermarkImage();
+            if (!wmSrc) return '';
             const opacity = getWatermarkOpacity();
             const size = getWatermarkSize();
 
             return `
-                <div class="spz-watermark-layer cursor-pointer hover:ring-2 hover:ring-blue-500/50 transition-all" onclick="bukaModalKustomisasiLogo()" title="Klik untuk ganti Background / Watermark Kabinet" style="position: absolute !important; top: ${topOffset} !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: ${size}px !important; height: ${size}px !important; max-width: ${size}px !important; max-height: ${size}px !important; pointer-events: auto !important; z-index: 1 !important; user-select: none !important; display: flex !important; align-items: center !important; justify-content: center !important; margin: 0 !important; padding: 0 !important;">
-                    <img src="${wmSrc}" alt="Watermark Kabinet" style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; opacity: ${opacity} !important; border: 0 !important;">
+                <div class="spz-watermark-layer cursor-pointer hover:ring-2 hover:ring-blue-500/50 transition-all" onclick="bukaModalKustomisasiLogo()" title="Klik untuk ganti atau matikan Background Watermark" style="position: absolute !important; top: ${topOffset} !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: ${size}px !important; height: ${size}px !important; max-width: ${size}px !important; max-height: ${size}px !important; pointer-events: auto !important; z-index: 1 !important; user-select: none !important; display: flex !important; align-items: center !important; justify-content: center !important; margin: 0 !important; padding: 0 !important;">
+                    <img src="${wmSrc}" alt="Watermark Kertas" style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; opacity: ${opacity} !important; border: 0 !important;">
                 </div>
             `;
         }
@@ -5416,7 +5465,7 @@
             const customKopBanner = localStorage.getItem('custom_kop_banner');
             if (customKopBanner) {
                 return `
-                    <div class="spz-kop-container preview-editable cursor-pointer hover:ring-2 hover:ring-blue-500/50 transition-all" onclick="bukaModalKustomisasiLogo()" data-edit-target="field_use_kop" data-edit-label="Kop Surat Resmi" data-edit-type="kop" title="Klik untuk pengaturan Kop &amp; Logo Kabinet" style="position: relative; margin-bottom: ${marginBottom}; width: 100%;">
+                    <div class="spz-kop-container preview-editable cursor-pointer hover:ring-2 hover:ring-blue-500/50 transition-all" onclick="bukaModalKustomisasiLogo()" data-edit-target="field_use_kop" data-edit-label="Kop Surat Resmi" data-edit-type="kop" title="Klik untuk pengaturan Kop Surat" style="position: relative; margin-bottom: ${marginBottom}; width: 100%;">
                         <img src="${customKopBanner}" alt="Kop Surat Resmi" style="width: 100%; height: auto; display: block; object-fit: contain;">
                     </div>
                 `;
@@ -5424,20 +5473,50 @@
 
             const customKabinet = getCustomLogoKabinet();
             const customImip = getCustomLogoImip();
-            const hasCustomLogos = !!(customKabinet || customImip);
 
-            let rightLogosOverlay = '';
-            if (hasCustomLogos) {
-                const imipSrc = customImip || 'IMIP.png';
-                const kabinetSrc = customKabinet || 'assetkabinet/logokabinetjelas.png';
-
-                rightLogosOverlay = `
-                    <div class="spz-kop-custom-right-logos" style="position: absolute; right: 1.5%; top: 4%; width: 27%; height: 82%; background: #ffffff; display: flex; align-items: center; justify-content: flex-end; gap: 8px; z-index: 5; padding-right: 2px;">
-                        <img src="${imipSrc}" alt="Logo IMIP" style="max-height: 85%; max-width: 46%; object-fit: contain; display: inline-block;">
-                        <img src="${kabinetSrc}" alt="Logo Kabinet" style="max-height: 85%; max-width: 48%; object-fit: contain; display: inline-block;">
+            // Slot 1: Logo Organisasi (sebelah kiri dari logo kabinet di sisi kanan banner)
+            let orgLogoSlot = '';
+            if (customImip) {
+                orgLogoSlot = `
+                    <div style="height: 100%; max-width: 48%; display: flex; align-items: center; justify-content: center;">
+                        <img src="${customImip}" alt="Logo Organisasi" style="max-height: 84%; max-width: 100%; object-fit: contain; display: block;">
+                    </div>
+                `;
+            } else {
+                orgLogoSlot = `
+                    <div onclick="event.stopPropagation(); bukaModalKustomisasiLogo();" class="kop-logo-placeholder group flex flex-col items-center justify-center border border-dashed border-neutral-400 hover:border-blue-500 rounded p-0.5 sm:p-1 transition-all cursor-pointer bg-neutral-50/90 hover:bg-blue-50/80 print:hidden" style="height: 82%; width: 48%; text-align: center; box-sizing: border-box;" title="Ketuk untuk ganti Logo Organisasi">
+                        <i class="fa-solid fa-plus text-[8px] text-neutral-500 group-hover:text-blue-600 mb-0.5"></i>
+                        <span style="font-size: 5.8pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; color: #334155; line-height: 1.1;" class="group-hover:text-blue-600">Logo Org</span>
+                        <span style="font-size: 4.6pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; color: #64748b; line-height: 1;">Ketuk ganti</span>
                     </div>
                 `;
             }
+
+            // Slot 2: Logo Kabinet (paling kanan)
+            let kabinetLogoSlot = '';
+            if (customKabinet) {
+                kabinetLogoSlot = `
+                    <div style="height: 100%; max-width: 48%; display: flex; align-items: center; justify-content: center;">
+                        <img src="${customKabinet}" alt="Logo Kabinet" style="max-height: 84%; max-width: 100%; object-fit: contain; display: block;">
+                    </div>
+                `;
+            } else {
+                kabinetLogoSlot = `
+                    <div onclick="event.stopPropagation(); bukaModalKustomisasiLogo();" class="kop-logo-placeholder group flex flex-col items-center justify-center border border-dashed border-neutral-400 hover:border-blue-500 rounded p-0.5 sm:p-1 transition-all cursor-pointer bg-neutral-50/90 hover:bg-blue-50/80 print:hidden" style="height: 82%; width: 48%; text-align: center; box-sizing: border-box;" title="Ketuk untuk ganti Logo Kabinet">
+                        <i class="fa-solid fa-plus text-[8px] text-neutral-500 group-hover:text-blue-600 mb-0.5"></i>
+                        <span style="font-size: 5.8pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; color: #334155; line-height: 1.1;" class="group-hover:text-blue-600">Logo Kabinet</span>
+                        <span style="font-size: 4.6pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; color: #64748b; line-height: 1;">Ketuk ganti</span>
+                    </div>
+                `;
+            }
+
+            // Always render white overlay to completely mask the hardcoded logos on the right of kop_spz_official.png
+            const rightLogosOverlay = `
+                <div class="spz-kop-custom-right-logos" style="position: absolute; right: 1.2%; top: 3.5%; width: 28.5%; height: 83%; background: #ffffff; display: flex; align-items: center; justify-content: flex-end; gap: 6px; z-index: 5; padding-right: 4px; box-sizing: border-box;">
+                    ${orgLogoSlot}
+                    ${kabinetLogoSlot}
+                </div>
+            `;
 
             return `
                 <div class="spz-kop-container preview-editable cursor-pointer hover:ring-2 hover:ring-blue-500/50 transition-all" onclick="bukaModalKustomisasiLogo()" data-edit-target="field_use_kop" data-edit-label="Kop Surat Resmi" data-edit-type="kop" title="Klik untuk ganti Logo Kabinet, Logo Organisasi, atau Watermark" style="position: relative; margin-bottom: ${marginBottom}; width: 100%;">
@@ -5478,11 +5557,23 @@
         function sinkronkanFormKustomisasiLogo() {
             // 1. Watermark
             const wmImg = document.getElementById('preview_thumb_watermark');
+            const wmNoneNotice = document.getElementById('notice_watermark_none');
             const curWm = getCustomWatermarkImage();
-            if (wmImg) wmImg.src = curWm;
+            const isActive = isWatermarkActive();
+
+            if (wmImg && wmNoneNotice) {
+                if (isActive && curWm) {
+                    wmImg.src = curWm;
+                    wmImg.classList.remove('hidden');
+                    wmNoneNotice.classList.add('hidden');
+                } else {
+                    wmImg.classList.add('hidden');
+                    wmNoneNotice.classList.remove('hidden');
+                }
+            }
 
             const toggleWm = document.getElementById('toggle_watermark_active');
-            if (toggleWm) toggleWm.checked = isWatermarkActive();
+            if (toggleWm) toggleWm.checked = isActive;
 
             const sliderOpacity = document.getElementById('slider_watermark_opacity');
             const labelOpacity = document.getElementById('label_watermark_opacity');
@@ -5492,13 +5583,33 @@
 
             // 2. Logo Kabinet
             const kabinetImg = document.getElementById('preview_thumb_kabinet');
-            const curKabinet = getCustomLogoKabinet() || 'assetkabinet/logokabinetjelas.png';
-            if (kabinetImg) kabinetImg.src = curKabinet;
+            const kabinetNoneNotice = document.getElementById('notice_kabinet_none');
+            const curKabinet = getCustomLogoKabinet();
+            if (kabinetImg && kabinetNoneNotice) {
+                if (curKabinet) {
+                    kabinetImg.src = curKabinet;
+                    kabinetImg.classList.remove('hidden');
+                    kabinetNoneNotice.classList.add('hidden');
+                } else {
+                    kabinetImg.classList.add('hidden');
+                    kabinetNoneNotice.classList.remove('hidden');
+                }
+            }
 
-            // 3. Logo IMIP
+            // 3. Logo Organisasi
             const imipImg = document.getElementById('preview_thumb_imip');
-            const curImip = getCustomLogoImip() || 'IMIP.png';
-            if (imipImg) imipImg.src = curImip;
+            const imipNoneNotice = document.getElementById('notice_imip_none');
+            const curImip = getCustomLogoImip();
+            if (imipImg && imipNoneNotice) {
+                if (curImip) {
+                    imipImg.src = curImip;
+                    imipImg.classList.remove('hidden');
+                    imipNoneNotice.classList.add('hidden');
+                } else {
+                    imipImg.classList.add('hidden');
+                    imipNoneNotice.classList.remove('hidden');
+                }
+            }
 
             // 4. Banner Kop
             const bannerImg = document.getElementById('preview_thumb_kop_banner');
@@ -5559,7 +5670,29 @@
             }
         }
 
+        function setWatermarkNone() {
+            localStorage.setItem('custom_watermark_active', 'false');
+            localStorage.setItem('custom_watermark_kabinet', '');
+            sinkronkanFormKustomisasiLogo();
+            updatePreview();
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Background Dimatikan',
+                    text: 'Lembar surat sekarang bersih tanpa logo background watermark.',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
+        }
+
         function setWatermarkPreset(presetPath, defaultOpacity = '0.95') {
+            if (!presetPath) {
+                setWatermarkNone();
+                return;
+            }
             localStorage.setItem('custom_watermark_kabinet', presetPath);
             localStorage.setItem('custom_watermark_active', 'true');
             localStorage.setItem('custom_watermark_opacity', defaultOpacity);
@@ -5568,7 +5701,7 @@
         }
 
         function resetWatermarkDefault() {
-            localStorage.removeItem('custom_watermark_kabinet');
+            localStorage.setItem('custom_watermark_kabinet', 'surat/assets/watermark_spz.png');
             localStorage.setItem('custom_watermark_active', 'true');
             localStorage.setItem('custom_watermark_opacity', '0.95');
             localStorage.setItem('custom_watermark_size', '345');
@@ -5585,6 +5718,7 @@
 
         function handleWatermarkActiveToggle(active) {
             localStorage.setItem('custom_watermark_active', active ? 'true' : 'false');
+            sinkronkanFormKustomisasiLogo();
             updatePreview();
         }
 
@@ -5616,6 +5750,17 @@
             localStorage.removeItem('custom_logo_kabinet');
             sinkronkanFormKustomisasiLogo();
             updatePreview();
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Logo Kabinet Dikosongkan',
+                    text: 'Template logo kabinet kembali ke kotak placeholder.',
+                    timer: 1800,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
         }
 
         async function handleUploadLogoImip(event) {
@@ -5646,6 +5791,17 @@
             localStorage.removeItem('custom_logo_imip');
             sinkronkanFormKustomisasiLogo();
             updatePreview();
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Logo Organisasi Dikosongkan',
+                    text: 'Template logo organisasi kembali ke kotak placeholder.',
+                    timer: 1800,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
         }
 
         async function handleUploadKopBanner(event) {
