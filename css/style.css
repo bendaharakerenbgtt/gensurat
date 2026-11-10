@@ -233,6 +233,50 @@ html.light-mode header p {
     color: #576175 !important;
 }
 
+/* Brand Logo Icon Badge (High-Contrast in Light & Dark Mode) */
+.brand-logo-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
+}
+
+.brand-logo-icon i {
+    color: #ffffff;
+    transition: color 0.25s ease;
+}
+
+:root[data-theme="light"] .brand-logo-icon,
+html.light-mode .brand-logo-icon,
+html.light-mode header .brand-logo-icon,
+html.light-mode header .w-9.h-9:not(button):not(a),
+html.light-mode header .w-8.h-8:not(button):not(a),
+html.light-mode header div[class*="bg-white/10"],
+html.light-mode .modal-card-box .w-9.h-9,
+html.light-mode .modal-card-box .w-10.h-10 {
+    background-color: #0f121d !important;
+    border: 1px solid #0f121d !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 12px rgba(15, 18, 29, 0.2) !important;
+}
+
+:root[data-theme="light"] .brand-logo-icon i,
+html.light-mode .brand-logo-icon i,
+html.light-mode header .brand-logo-icon i,
+html.light-mode header .w-9.h-9:not(button):not(a) i,
+html.light-mode header .w-8.h-8:not(button):not(a) i,
+html.light-mode header div[class*="bg-white/10"] i,
+html.light-mode .modal-card-box .w-9.h-9 i,
+html.light-mode .modal-card-box .w-10.h-10 i {
+    color: #ffffff !important;
+}
+
 html.light-mode header button:not(.theme-toggle-btn),
 html.light-mode header label {
     background-color: #ffffff !important;
