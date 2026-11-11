@@ -5670,7 +5670,7 @@ Organisasi</textarea>
 
             // Right logos overlay positioned strictly in the right logo zone (74.5%..98.8% horizontally) so "Jakarta Selatan 12640" (ends at 72.06%) is NEVER covered!
             const rightLogosOverlay = `
-                <div class="spz-kop-custom-right-logos" style="position: absolute; left: 74.5%; right: 1.2%; top: 3.5%; height: 83%; background: #ffffff; display: flex; align-items: center; justify-content: flex-end; gap: 4px; z-index: 5; padding-right: 2px; box-sizing: border-box;">
+                <div class="spz-kop-custom-right-logos" style="position: absolute; left: 74.5%; right: 1.2%; top: 1%; height: 92%; background: #ffffff; display: flex; align-items: center; justify-content: flex-end; gap: 4px; z-index: 5; padding-right: 2px; box-sizing: border-box;">
                     ${orgLogoSlot}
                     ${kabinetLogoSlot}
                 </div>
@@ -5685,7 +5685,7 @@ Organisasi</textarea>
 
             return `
                 <div class="spz-kop-container preview-editable cursor-pointer hover:ring-2 hover:ring-blue-500/50 transition-all" onclick="bukaModalKustomisasiLogo()" data-edit-target="field_use_kop" data-edit-label="Kop Surat Resmi" data-edit-type="kop" title="Klik untuk ganti Logo Kabinet, Logo Organisasi, Email Kop, atau Watermark" style="position: relative; margin-bottom: ${marginBottom}; width: 100%;">
-                    <img src="surat/assets/kop_spz_official.png" alt="Kop Surat Resmi Organisasi" style="width: 100%; height: auto; display: block; object-fit: contain;">
+                    <img src="surat/assets/kop_spz_official.png?v=2" alt="Kop Surat Resmi Organisasi" style="width: 100%; height: auto; display: block; object-fit: contain;">
                     ${rightLogosOverlay}
                     ${emailOverlay}
                 </div>
@@ -5869,8 +5869,8 @@ Organisasi</textarea>
 
                     modalKopContainer.innerHTML = `
                         <div style="position: relative; width: 100%;">
-                            <img src="surat/assets/kop_spz_official.png" alt="Kop Resmi" style="width: 100%; height: auto; display: block; object-fit: contain;">
-                            <div style="position: absolute; left: 74.5%; right: 1.2%; top: 3.5%; height: 83%; background: #ffffff; display: flex; align-items: center; justify-content: flex-end; gap: 4px; z-index: 5; padding-right: 2px; box-sizing: border-box;">
+                            <img src="surat/assets/kop_spz_official.png?v=2" alt="Kop Resmi" style="width: 100%; height: auto; display: block; object-fit: contain;">
+                            <div style="position: absolute; left: 74.5%; right: 1.2%; top: 1%; height: 92%; background: #ffffff; display: flex; align-items: center; justify-content: flex-end; gap: 4px; z-index: 5; padding-right: 2px; box-sizing: border-box;">
                                 ${orgSlot}
                                 ${kabinetSlot}
                             </div>
