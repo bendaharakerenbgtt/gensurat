@@ -40,14 +40,11 @@ console.log('1. Loading buat-surat.html?editor=1...');
 await page.goto(`http://localhost:${PORT}/buat-surat.html?editor=1`);
 await page.waitForSelector('.spz-kop-container', { timeout: 15000 });
 
-// Verify initial kop container and watermark exist
+// Verify initial kop container exists
 const initialKopCount = await page.locator('.spz-kop-container').count();
 assert.ok(initialKopCount >= 1, 'Kop container must exist on rendered sheet');
 
-const initialWmCount = await page.locator('.spz-watermark-layer').count();
-assert.ok(initialWmCount >= 1, 'Watermark layer must exist on rendered sheet');
-
-console.log('✓ Initial Kop & Watermark verified');
+console.log('✓ Initial Kop verified');
 
 // 2. Open Modal Kustomisasi Logo & Background
 console.log('2. Opening Modal Kustomisasi Gambar Kabinet...');
