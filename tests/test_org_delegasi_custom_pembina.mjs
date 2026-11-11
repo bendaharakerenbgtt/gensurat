@@ -174,7 +174,61 @@ try {
     assert.strictEqual(persistedDosenNama, 'Prof. Ahmad Fauzi, M.T.', 'Nama custom dosen harus tersimpan dan persisten');
     assert.strictEqual(persistedKopEmail, 'humas.bem@polimedia.ac.id', 'Email kop kustom harus tersimpan dan persisten setelah reload');
 
-    console.log('🎉 All 7 feature verification checks passed with 100% success!');
+    // Test 8: Verifikasi Tujuan SPZ, SPM, SBA, SUD memakai Politeknik Negeri Media Kreatif (bukan Sekretariat / Kampus)
+    console.log('9. Verifying SPZ Tujuan, Subbag Umum, and other surat templates match authentic Polimedia format...');
+    await page.evaluate(() => {
+        selectSuratType('SPZ');
+    });
+    await page.waitForTimeout(350);
+
+    const spzCheck = await page.evaluate(() => {
+        const tujuanVal = document.getElementById('field_tujuan')?.value;
+        const tujuanPreviewEl = document.querySelector('[data-edit-target="field_tujuan"]');
+        const tujuanPreviewHtml = tujuanPreviewEl ? tujuanPreviewEl.innerHTML : '';
+        const tujuanPreviewText = tujuanPreviewEl ? tujuanPreviewEl.innerText.replace(/\u00a0/g, ' ') : '';
+        const allPreviewText = Array.from(document.querySelectorAll('.spz-page-sheet')).map(el => el.innerText).join('\n');
+        return {
+            tujuanVal,
+            tujuanPreviewHtml,
+            tujuanPreviewText,
+            hasPolimediaSubbag: allPreviewText.includes('Kepala Subbagian Umum Politeknik Negeri Media Kreatif menyetujui'),
+            hasKampusPoliMedia: allPreviewText.includes('berlaku di Kampus PoliMedia'),
+            hasBemPoliMedia: allPreviewText.includes('Ketua BEM PoliMedia'),
+            hasMpmPoliMedia: allPreviewText.includes('PoliMedia Periode 2026'),
+            hasSekretariatKampus: allPreviewText.includes('Sekretariat / Kampus')
+        };
+    });
+    console.log('SPZ Check:', spzCheck);
+    assert.strictEqual(spzCheck.tujuanVal, 'Yth, Kepala Subbagian Umum\nPoliteknik Negeri Media Kreatif\nDi Tempat', 'Field tujuan SPZ harus persis sesuai contoh');
+    assert.ok(spzCheck.tujuanPreviewText.includes('Yth,') && spzCheck.tujuanPreviewText.includes('Kepala Subbagian Umum'), 'Preview tujuan SPZ harus memuat Yth, Kepala Subbagian Umum');
+    assert.ok(spzCheck.tujuanPreviewText.includes('Politeknik Negeri Media Kreatif'), 'Preview tujuan SPZ harus memuat Politeknik Negeri Media Kreatif');
+    assert.ok(!spzCheck.tujuanPreviewHtml.includes('<strong style="font-weight: bold;">Kepala Subbagian Umum</strong>'), 'Kepala Subbagian Umum di SPZ tidak boleh dipaksa bold');
+    assert.strictEqual(spzCheck.hasPolimediaSubbag, true, 'Halaman Subbag Umum SPZ harus menyebut Kepala Subbagian Umum Politeknik Negeri Media Kreatif');
+    assert.strictEqual(spzCheck.hasKampusPoliMedia, true, 'Peraturan no 11 SPZ harus menyebut Kampus PoliMedia');
+    assert.strictEqual(spzCheck.hasBemPoliMedia, true, 'Jabatan BEM harus Ketua BEM PoliMedia');
+    assert.strictEqual(spzCheck.hasMpmPoliMedia, true, 'Jabatan MPM harus Ketua Umum MPM PoliMedia');
+    assert.strictEqual(spzCheck.hasSekretariatKampus, false, 'Tidak boleh ada teks Sekretariat / Kampus di preview SPZ');
+
+    // Cek SPM, SBA, SUD
+    const otherTypesCheck = await page.evaluate(() => {
+        selectSuratType('SPM');
+        const spmTujuan = document.getElementById('field_tujuan')?.value;
+        const spmPembuka = document.getElementById('field_pembuka')?.value;
+        selectSuratType('SBA');
+        const sbaPembuka = document.getElementById('field_pembuka')?.value;
+        selectSuratType('SUD');
+        const sudPembuka = document.getElementById('field_pembuka')?.value;
+        const sudIsi = document.getElementById('field_isi_inti')?.value;
+        return { spmTujuan, spmPembuka, sbaPembuka, sudPembuka, sudIsi };
+    });
+    console.log('Other Types Check:', otherTypesCheck);
+    assert.ok(otherTypesCheck.spmTujuan.includes('Politeknik Negeri Media Kreatif Jakarta'), 'Tujuan SPM harus menyebut Politeknik Negeri Media Kreatif Jakarta');
+    assert.ok(otherTypesCheck.spmPembuka.includes('**Unit Kegiatan Mahasiswa Organisasi**'), 'Pembuka SPM harus menyebut Unit Kegiatan Mahasiswa Organisasi');
+    assert.ok(otherTypesCheck.sbaPembuka.includes('Politeknik Negeri Media Kreatif Jakarta'), 'Pembuka SBA harus menyebut Politeknik Negeri Media Kreatif Jakarta');
+    assert.ok(otherTypesCheck.sudPembuka.includes('Politeknik Negeri Media Kreatif Jakarta'), 'Pembuka SUD harus menyebut Politeknik Negeri Media Kreatif Jakarta');
+    assert.ok(!otherTypesCheck.sudIsi.includes('IMIP'), 'Isi SUD tidak boleh menyisakan mention IMIP');
+
+    console.log('🎉 All 8 feature verification checks passed with 100% success!');
 } finally {
     await browser.close();
     server.close();

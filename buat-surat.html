@@ -1615,7 +1615,7 @@
                             </div>
                             <div class="flex items-center gap-1.5 bg-neutral-900/90 p-2 rounded-lg border border-neutral-800 flex-wrap sm:flex-nowrap">
                                 <span class="text-xs text-neutral-300 font-medium whitespace-nowrap">Surat Perizinan Peminjaman Fasilitas</span>
-                                <input type="text" id="spz_input_fasilitas" oninput="handleSpzFasilitasChange(this.value)" class="text-xs font-semibold py-1 px-2.5 bg-neutral-900 border border-neutral-700 rounded-lg focus:outline-none focus:border-neutral-400 text-blue-400 flex-1 min-w-[130px]" placeholder="Aula Utama / Gedung Serbaguna" value="">
+                                <input type="text" id="spz_input_fasilitas" oninput="handleSpzFasilitasChange(this.value)" class="text-xs font-semibold py-1 px-2.5 bg-neutral-900 border border-neutral-700 rounded-lg focus:outline-none focus:border-neutral-400 text-blue-400 flex-1 min-w-[130px]" placeholder="Masjid Ar-Rahman" value="">
                             </div>
                         </div>
 
@@ -1641,8 +1641,8 @@
                     <!-- KHUSUS SPZ: TAMPILAN STATIS AUTO TANPA PLACEHOLDER / INPUT -->
                     <div id="spz_tujuan_static" class="hidden flex items-center justify-between p-3 rounded-lg bg-neutral-900/90 border border-neutral-800 text-xs">
                         <div class="flex flex-col gap-0.5">
-                            <span class="font-bold text-white">Yth. Kepala Subbagian Umum</span>
-                            <span class="text-neutral-400 text-[11px]">Sekretariat / Kampus</span>
+                            <span class="font-bold text-white">Yth, Kepala Subbagian Umum</span>
+                            <span class="text-neutral-400 text-[11px]">Politeknik Negeri Media Kreatif</span>
                             <span class="text-neutral-400 text-[11px]">Di Tempat</span>
                         </div>
                         <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded flex items-center gap-1">
@@ -1664,7 +1664,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <textarea id="field_tujuan" oninput="updatePreview()" rows="3" class="form-input text-xs" placeholder="Yth. Kepala Subbagian Umum&#10;Sekretariat / Kampus&#10;Di Tempat"></textarea>
+                            <textarea id="field_tujuan" oninput="updatePreview()" rows="3" class="form-input text-xs" placeholder="Yth, Kepala Subbagian Umum&#10;Politeknik Negeri Media Kreatif&#10;Di Tempat"></textarea>
                         </div>
                     </div>
                 </div>
@@ -1695,7 +1695,7 @@
                                 </div>
                             </div>
                             <div id="spz_pembuka_display_box" class="text-xs text-neutral-300 leading-relaxed bg-black/40 p-2.5 rounded border border-neutral-800">
-                                Melalui surat ini, kami <strong class="text-white">Organisasi</strong> bermaksud untuk mengajukan permohonan izin peminjaman fasilitas <span id="spz_pembuka_tag_fasilitas" class="text-blue-400 font-normal bg-white/10 px-1.5 py-0.5 rounded border border-blue-500/30">Aula Utama / Gedung Serbaguna</span> Jakarta untuk kegiatan <strong id="spz_pembuka_tag_acara" class="text-blue-400 bg-white/10 px-1.5 py-0.5 rounded border border-blue-500/30">Kegiatan Organisasi 2026</strong> yang akan dilaksanakan pada:
+                                Melalui surat ini, kami <strong class="text-white">Unit Kegiatan Mahasiswa Organisasi</strong> bermaksud untuk mengajukan permohonan izin peminjaman fasilitas <span id="spz_pembuka_tag_fasilitas" class="text-blue-400 font-normal bg-white/10 px-1.5 py-0.5 rounded border border-blue-500/30">Masjid Ar-Rahman</span> Jakarta untuk kegiatan <strong id="spz_pembuka_tag_acara" class="text-blue-400 bg-white/10 px-1.5 py-0.5 rounded border border-blue-500/30">QURMEDIA 2026</strong> yang akan dilaksanakan pada:
                             </div>
                         </div>
 
@@ -1715,7 +1715,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <textarea id="field_pembuka" oninput="handlePembukaInput(this.value);" rows="3" class="form-input text-xs" placeholder="Melalui surat ini, kami Organisasi bermaksud untuk mengajukan permohonan izin peminjaman fasilitas Aula Utama / Gedung Serbaguna Jakarta untuk kegiatan Kegiatan Organisasi 2026 yang akan dilaksanakan pada:"></textarea>
+                            <textarea id="field_pembuka" oninput="handlePembukaInput(this.value);" rows="3" class="form-input text-xs" placeholder="Melalui surat ini, kami Unit Kegiatan Mahasiswa Organisasi bermaksud untuk mengajukan permohonan izin peminjaman fasilitas Masjid Ar-Rahman Jakarta untuk kegiatan QURMEDIA 2026 yang akan dilaksanakan pada:"></textarea>
                         </div>
                     </div>
                 </div>
@@ -1735,7 +1735,7 @@
                     <div id="event_details_fields" class="flex flex-col gap-3">
                         <div>
                             <label class="text-[11px] font-bold text-neutral-300 block mb-1">Nama Kegiatan</label>
-                            <input type="text" id="field_nama_acara" oninput="handleNamaAcaraChange(this.value); updatePreview();" class="form-input" placeholder="Kegiatan Organisasi 2026">
+                            <input type="text" id="field_nama_acara" oninput="handleNamaAcaraChange(this.value); updatePreview();" class="form-input" placeholder="QURMEDIA 2026">
                         </div>
 
                         <!-- DATE CONTROLS WITH KALENDER & MULTI-DATE SUPPORT -->
@@ -1810,7 +1810,7 @@
                                     <i class="fa-solid fa-rotate-left"></i> Saran Otomatis Fasilitas
                                 </button>
                             </div>
-                            <textarea id="field_tempat" oninput="handleTempatManualInput(this.value)" rows="3" class="form-input text-xs" placeholder="Aula Utama / Gedung Serbaguna Sekretariat / Kampus,&#10;Jl. Srengseng Sawah, Kel. Srengseng Sawah, Kec. Jagakarsa,&#10;Jakarta Selatan 12630"></textarea>
+                            <textarea id="field_tempat" oninput="handleTempatManualInput(this.value)" rows="3" class="form-input text-xs" placeholder="Masjid Ar-Rahman Politeknik Negeri Media Kreatif Jakarta,&#10;Jl. Srengseng Sawah, Kel. Srengseng Sawah, Kec. Jagakarsa,&#10;Jakarta Selatan 12630"></textarea>
                         </div>
                     </div>
                 </div>
@@ -1850,7 +1850,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <textarea id="field_isi_inti" oninput="handleIsiIntiInput(this.value);" rows="5" class="form-input text-xs leading-relaxed" placeholder="Deskripsikan kegiatan (misal: Kegiatan ini merupakan rangkaian persiapan pelaksanaan Kegiatan Organisasi 2026...)">Deskripsikan Kegiatan.</textarea>
+                            <textarea id="field_isi_inti" oninput="handleIsiIntiInput(this.value);" rows="5" class="form-input text-xs leading-relaxed" placeholder="Deskripsikan kegiatan (misal: Kegiatan ini merupakan rangkaian persiapan pelaksanaan QURMEDIA 2026...)">Deskripsikan Kegiatan.</textarea>
                         </div>
                     </div>
                 </div>
@@ -2111,9 +2111,9 @@ Organisasi</textarea>
                         </div>
                     </div>
 
-                    <!-- Pihak Mengetahui Ormawa Kampus: Ketua Umum MPM & Ketua BEM Organisasi -->
+                    <!-- Pihak Mengetahui Ormawa Kampus: Ketua Umum MPM & Ketua BEM PoliMedia -->
                     <div id="card_ttd_ormawa_mpm_bem" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                        <!-- Ketua Umum MPM Organisasi -->
+                        <!-- Ketua Umum MPM PoliMedia -->
                         <div class="p-3 rounded-lg bg-neutral-900/60 border border-neutral-800 flex flex-col gap-2.5">
                             <div class="flex items-center justify-between border-b border-neutral-800/80 pb-1.5">
                                 <span class="text-[11px] font-black text-blue-400 uppercase font-mono flex items-center gap-1.5">
@@ -2128,12 +2128,12 @@ Organisasi</textarea>
                             <!-- Jabatan Otomatis -->
                             <div class="p-2.5 rounded-lg bg-neutral-950/70 border border-neutral-800/80 flex items-center justify-between">
                                 <div>
-                                    <div class="text-[11px] font-bold text-neutral-200">Ketua Umum MPM Organisasi</div>
+                                    <div class="text-[11px] font-bold text-neutral-200">Ketua Umum MPM PoliMedia</div>
                                     <div class="text-[10px] text-neutral-400 font-mono mt-0.5">Majelis Permusyawaratan Mahasiswa</div>
                                 </div>
                                 <span class="text-[9px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 font-mono border border-neutral-700/50">Otomatis</span>
                             </div>
-                            <input type="hidden" id="field_ttd_mpm_jabatan" value="Ketua Umum MPM&#10;Organisasi Periode 2026">
+                            <input type="hidden" id="field_ttd_mpm_jabatan" value="Ketua Umum MPM&#10;PoliMedia Periode 2026">
                             <div>
                                 <label class="text-[10px] text-neutral-300 block mb-1 font-semibold">Periode</label>
                                 <input type="text" id="field_ttd_mpm_periode" value="Periode 2026" placeholder="Periode 2026" oninput="syncMpmJabatan(); updatePreview();" class="form-input text-xs font-mono">
@@ -2158,11 +2158,11 @@ Organisasi</textarea>
                             </div>
                         </div>
 
-                        <!-- Ketua BEM Organisasi -->
+                        <!-- Ketua BEM PoliMedia -->
                         <div class="p-3 rounded-lg bg-neutral-900/60 border border-neutral-800 flex flex-col gap-2.5">
                             <div class="flex items-center justify-between border-b border-neutral-800/80 pb-1.5">
                                 <span class="text-[11px] font-black text-blue-400 uppercase font-mono flex items-center gap-1.5">
-                                    <i class="fa-solid fa-users-gear text-[10px]"></i> Ketua BEM Organisasi
+                                    <i class="fa-solid fa-users-gear text-[10px]"></i> Ketua BEM PoliMedia
                                 </span>
                                 <label class="flex items-center gap-1.5 text-[10px] text-neutral-400 cursor-pointer select-none" title="Centang untuk menyertakan tanda tangan Ketua BEM di surat">
                                     <input type="checkbox" id="field_ttd_bem_active" onchange="updateTtdState(); updatePreview();" class="rounded border-neutral-700 text-blue-500 focus:ring-neutral-400 w-3 h-3" checked>
@@ -2173,12 +2173,12 @@ Organisasi</textarea>
                             <!-- Jabatan Otomatis -->
                             <div class="p-2.5 rounded-lg bg-neutral-950/70 border border-neutral-800/80 flex items-center justify-between">
                                 <div>
-                                    <div class="text-[11px] font-bold text-neutral-200">Ketua BEM Organisasi</div>
+                                    <div class="text-[11px] font-bold text-neutral-200">Ketua BEM PoliMedia</div>
                                     <div class="text-[10px] text-neutral-400 font-mono mt-0.5">Badan Eksekutif Mahasiswa</div>
                                 </div>
                                 <span class="text-[9px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 font-mono border border-neutral-700/50">Otomatis</span>
                             </div>
-                            <input type="hidden" id="field_ttd_bem_jabatan" value="Ketua BEM Organisasi&#10;Periode 2026">
+                            <input type="hidden" id="field_ttd_bem_jabatan" value="Ketua BEM PoliMedia&#10;Periode 2026">
                             <div>
                                 <label class="text-[10px] text-neutral-300 block mb-1 font-semibold">Periode</label>
                                 <input type="text" id="field_ttd_bem_periode" value="Periode 2026" placeholder="Periode 2026" oninput="syncBemJabatan(); updatePreview();" class="form-input text-xs font-mono">
@@ -3597,8 +3597,8 @@ Organisasi</textarea>
                 rows: [
                     { no: '1', kegiatan: 'Sarah Muthiah Widad', waktu: 'Pemateri Utama' },
                     { no: '2', kegiatan: 'Muhammad Jaisyul Haq', waktu: 'Pemateri Sesi 2' },
-                    { no: '3', kegiatan: 'Perwakilan BEM Organisasi', waktu: 'Tamu Undangan' },
-                    { no: '4', kegiatan: 'Perwakilan MPM Organisasi', waktu: 'Tamu Undangan' }
+                    { no: '3', kegiatan: 'Perwakilan BEM PoliMedia', waktu: 'Tamu Undangan' },
+                    { no: '4', kegiatan: 'Perwakilan MPM PoliMedia', waktu: 'Tamu Undangan' }
                 ]
             }
         };
@@ -3983,18 +3983,18 @@ Organisasi</textarea>
                 nomorSurat: '042/SPM/ORG/IX/2026',
                 lampiran: '-',
                 tanggalSurat: 'Jakarta, 08 September 2026',
-                perihal: 'Surat Permohonan Penyesuaian Jadwal Kegiatan',
-                tujuan: 'Yth. **Majelis Permusyawaratan Mahasiswa**\nSekretariat / Kampus\nDi Tempat',
+                perihal: 'Surat Permohonan Pemunduran Open House',
+                tujuan: 'Yth. **Majelis Permusyawaratan Mahasiswa**\nPoliteknik Negeri Media Kreatif Jakarta\nDi Tempat',
                 incEvent: false,
-                namaAcara: 'Kegiatan Tahunan 2026',
+                namaAcara: 'Open House 2026',
                 hariTanggal: 'Jum’at, 18 September 2026',
                 waktu: '13.30 WIB s.d. Selesai',
                 tempat: 'Auditorium Hall Polimedia Jakarta',
-                pembuka: 'Melalui surat ini, kami **Organisasi** bermaksud untuk mengajukan surat pemunduran tanggal agenda **Open House** dari 10 September 2026 menjadi 18 September 2026. Dikarenakan terdapat beberapa penyesuaian dalam persiapan kegiatan yang belum dapat diselesaikan sesuai dengan waktu yang telah ditentukan. Beberapa di antaranya meliputi penyesuaian rangkaian dan teknis acara, koordinasi antar panitia, serta kesiapan perlengkapan dan kebutuhan kegiatan agar seluruh persiapan dapat diselesaikan dengan lebih matang dan kegiatan **Open House** dapat terlaksana dengan baik.',
+                pembuka: 'Melalui surat ini, kami **Unit Kegiatan Mahasiswa Organisasi** bermaksud untuk mengajukan surat pemunduran tanggal agenda **Open House** dari 10 September 2026 menjadi 18 September 2026. Dikarenakan terdapat beberapa penyesuaian dalam persiapan kegiatan yang belum dapat diselesaikan sesuai dengan waktu yang telah ditentukan. Beberapa di antaranya meliputi penyesuaian rangkaian dan teknis acara, koordinasi antar panitia, serta kesiapan perlengkapan dan kebutuhan kegiatan agar seluruh persiapan dapat diselesaikan dengan lebih matang dan kegiatan **Open House** dapat terlaksana dengan baik.',
                 isiInti: 'Besar harapan kami atas terwujudnya permohonan tersebut.',
                 penutup: 'Demikian surat perizinan ini kami buat. Atas perhatian dan kerja sama, kami sampaikan terima kasih.',
                 ttd1Active: false,
-                ttd1Jabatan: 'Ketua Pelaksana\nKegiatan Organisasi 2026',
+                ttd1Jabatan: 'Ketua Pelaksana\nOpen House 2026',
                 ttd1Nama: 'Fadly A. (Contoh)',
                 ttd1Nim: 'NIM. 2490xxxx34',
                 ttd2Active: true,
@@ -4006,11 +4006,11 @@ Organisasi</textarea>
                 ttd3Nama: 'Dr. H. Zainul Hakim, S.Ag., M.Pd.I.',
                 ttd3Nim: 'NIP. 198005072023211013',
                 bemActive: true,
-                bemJabatan: 'Ketua BEM Organisasi\nPeriode 2026',
+                bemJabatan: 'Ketua BEM PoliMedia\nPeriode 2026',
                 bemNama: 'Ujang Rahman',
                 bemNim: 'NIM. 2490343155',
                 mpmActive: true,
-                mpmJabatan: 'Ketua Umum MPM\nOrganisasi Periode 2026',
+                mpmJabatan: 'Ketua Umum MPM\nPoliMedia Periode 2026',
                 mpmNama: 'Sheyla Aulya',
                 mpmNim: 'NIM. 2491345088',
                 wadirActive: false
@@ -4030,7 +4030,7 @@ Organisasi</textarea>
                 hariTanggal: 'Minggu, 28 Juni 2026',
                 waktu: '08.00 s/d 13.10 WIB',
                 tempat: 'Masjid Ulul Albab Kampus B UNJ, JL. Pemuda, No. 10, Rawamangun, RT.8/RW.5, Rawamangun, Kec. Pulo Gadung, Kota Jakarta Timur, Daerah Khusus Ibukota Jakarta 13220',
-                pembuka: 'Melalui surat ini kami sampaikan bahwa **Organisasi** Sekretariat / Kampus telah melaksanakan kegiatan **Studi Banding 2026** pada:',
+                pembuka: 'Melalui surat ini kami sampaikan bahwa **Unit Kegiatan Mahasiswa Organisasi** Politeknik Negeri Media Kreatif Jakarta telah melaksanakan kegiatan **Studi Banding 2026** pada:',
                 isiInti: '**Studi Banding** antara pengurus dan delegasi kegiatan ini diselenggarakan sebagai wadah untuk saling berbagi insight, bertukar pikiran, serta mengevaluasi program kerja masing-masing organisasi. Melalui forum diskusi yang interaktif, kedua belah pihak dapat saling mengadopsi inovasi strategis dan praktik terbaik guna meningkatkan kualitas pengurusan serta mempererat tali silaturahmi antar lembaga.',
                 penutup: 'Demikian surat Berita Acara ini dibuat dan disahkan dengan penuh tanggung jawab agar dipergunakan semestinya. Atas perhatiannya, kami sampaikan terimakasih.',
                 ttd1Jabatan: 'Ketua Pelaksana\nStudi Banding 2026',
@@ -4052,13 +4052,13 @@ Organisasi</textarea>
                 lampiran: '1',
                 tanggalSurat: 'Jakarta, 30 September 2026',
                 perihal: '',
-                tujuan: 'Yth. **Kepala Subbagian Umum**\nSekretariat / Kampus\nDi Tempat',
+                tujuan: 'Yth, Kepala Subbagian Umum\nPoliteknik Negeri Media Kreatif\nDi Tempat',
                 incEvent: true,
                 namaAcara: '',
                 hariTanggal: '',
                 waktu: '',
                 tempat: '',
-                pembuka: 'Melalui surat ini, kami **Organisasi** bermaksud untuk mengajukan permohonan izin peminjaman fasilitas Aula Utama / Gedung Serbaguna Jakarta untuk kegiatan **Kegiatan Organisasi 2026** yang akan dilaksanakan pada:',
+                pembuka: 'Melalui surat ini, kami **Unit Kegiatan Mahasiswa Organisasi** bermaksud untuk mengajukan permohonan izin peminjaman fasilitas Masjid Ar-Rahman Jakarta untuk kegiatan **QURMEDIA 2026** yang akan dilaksanakan pada:',
                 isiInti: 'Deskripsikan Kegiatan.',
                 penutup: 'Demikian surat perizinan ini kami buat. Atas perhatian dan kerja sama, kami sampaikan terima kasih.',
                 ttd1Jabatan: 'Ketua Pelaksana',
@@ -4082,14 +4082,14 @@ Organisasi</textarea>
                 perihal: 'Surat Undangan Sarah Muthiah Widad',
                 tujuan: 'Yth. Sarah Muthiah Widad\nDi Tempat',
                 incEvent: true,
-                namaAcara: 'Seminar & Pelatihan 2026',
+                namaAcara: 'Dauroh Islami 2026',
                 hariTanggal: 'Sabtu, 02 Mei 2026',
                 waktu: '13.00 s/d 15.00 WIB',
                 tempat: 'WAMY Indonesia, Jl. Moch. Kahfi II No. 42 RT 08/RW 08, Kel. Srengseng Sawah, Kec. Jagakarsa, Jakarta Selatan 12630',
-                pembuka: 'Melalui surat ini, kami **Organisasi 2026 Sekretariat / Kampus**, bermaksud untuk mengundang Saudari Sarah Muthiah Widad untuk hadir sebagai **Pemateri** dalam kegiatan **Seminar & Pelatihan 2026** yang akan dilaksanakan pada :',
-                isiInti: '**Seminar & Pelatihan 2026** merupakan kegiatan dalam rangka meningkatkan kadar wawasan islami dan sosial dengan berbagai kegiatan berisi pemberian materi seputar Keorganisasian IMIP, Kepemimpinan, Adab dan Akhlak, Dakwah dan Kepalestinaan, serta sharing session dengan alumni Organisasi.',
+                pembuka: 'Melalui surat ini, kami **Unit Kegiatan Mahasiswa Organisasi 2026 Politeknik Negeri Media Kreatif Jakarta**, bermaksud untuk mengundang Saudari Sarah Muthiah Widad untuk hadir sebagai **Pemateri** dalam kegiatan **Dauroh Islami 2026** yang akan dilaksanakan pada :',
+                isiInti: '**Dauroh Islami 2026** merupakan kegiatan dalam rangka meningkatkan kadar wawasan islami dan sosial dengan berbagai kegiatan berisi pemberian materi seputar Keorganisasian, Kepemimpinan, Adab dan Akhlak, Dakwah dan Kepalestinaan, serta sharing session dengan alumni Organisasi.',
                 penutup: 'Demikian surat undangan ini kami sampaikan. Atas perhatian Saudari, kami ucapkan terima kasih.',
-                ttd1Jabatan: 'Ketua Pelaksana\nSeminar & Pelatihan 2026',
+                ttd1Jabatan: 'Ketua Pelaksana\nDauroh Islami 2026',
                 ttd1Nama: 'Fadly A. (Contoh)',
                 ttd1Nim: 'NIM. 2490xxxx34',
                 ttd2Jabatan: 'Ketua Organisasi\nPeriode 2026',
@@ -4186,7 +4186,7 @@ Organisasi</textarea>
                 if (spzTujuanStatic) spzTujuanStatic.classList.remove('hidden');
                 if (containerFieldTujuan) containerFieldTujuan.classList.add('hidden');
                 if (fieldTujuan) {
-                    fieldTujuan.value = 'Yth. **Kepala Subbagian Umum**\nSekretariat / Kampus\nDi Tempat';
+                    fieldTujuan.value = 'Yth, Kepala Subbagian Umum\nPoliteknik Negeri Media Kreatif\nDi Tempat';
                     fieldTujuan.setAttribute('readonly', 'true');
                 }
                 isSpzPembukaManual = false;
@@ -4451,7 +4451,7 @@ Organisasi</textarea>
             if (type === 'SPZ') {
                 syncEventDateFromPickers();
                 syncTimeFromPickers();
-                const fas = document.getElementById('spz_input_fasilitas') ? document.getElementById('spz_input_fasilitas').value : 'Aula Utama / Gedung Serbaguna';
+                const fas = document.getElementById('spz_input_fasilitas') ? document.getElementById('spz_input_fasilitas').value : 'Masjid Ar-Rahman';
                 updateSpzAutoTempat(fas);
                 updateSpzAutoPembuka();
             } else {
@@ -4758,11 +4758,11 @@ Organisasi</textarea>
             const f = (fas !== undefined ? fas : (document.getElementById('spz_input_fasilitas') ? document.getElementById('spz_input_fasilitas').value.trim() : '')).trim();
             const tempatEl = document.getElementById('field_tempat');
             if (tempatEl) {
-                const saran = `${f || 'Aula Utama / Gedung Serbaguna'} Sekretariat / Kampus,\nJl. Srengseng Sawah, Kel. Srengseng Sawah, Kec. Jagakarsa,\nJakarta Selatan 12630`;
+                const saran = `${f || 'Masjid Ar-Rahman'} Politeknik Negeri Media Kreatif Jakarta,\nJl. Srengseng Sawah, Kel. Srengseng Sawah, Kec. Jagakarsa,\nJakarta Selatan 12630`;
                 tempatEl.placeholder = saran;
                 if (!isSpzTempatManuallyEdited) {
                     if (f) {
-                        tempatEl.value = `${f} Sekretariat / Kampus,\nJl. Srengseng Sawah, Kel. Srengseng Sawah, Kec. Jagakarsa,\nJakarta Selatan 12630`;
+                        tempatEl.value = `${f} Politeknik Negeri Media Kreatif Jakarta,\nJl. Srengseng Sawah, Kel. Srengseng Sawah, Kec. Jagakarsa,\nJakarta Selatan 12630`;
                     } else {
                         tempatEl.value = '';
                     }
@@ -4772,10 +4772,10 @@ Organisasi</textarea>
 
         function resetSpzTempatDefault() {
             isSpzTempatManuallyEdited = false;
-            const f = (document.getElementById('spz_input_fasilitas') ? document.getElementById('spz_input_fasilitas').value.trim() : '') || 'Aula Utama / Gedung Serbaguna';
+            const f = (document.getElementById('spz_input_fasilitas') ? document.getElementById('spz_input_fasilitas').value.trim() : '') || 'Masjid Ar-Rahman';
             const tempatEl = document.getElementById('field_tempat');
             if (tempatEl) {
-                tempatEl.value = `${f} Sekretariat / Kampus,\nJl. Srengseng Sawah, Kel. Srengseng Sawah, Kec. Jagakarsa,\nJakarta Selatan 12630`;
+                tempatEl.value = `${f} Politeknik Negeri Media Kreatif Jakarta,\nJl. Srengseng Sawah, Kel. Srengseng Sawah, Kec. Jagakarsa,\nJakarta Selatan 12630`;
                 updatePreview();
             }
         }
@@ -4810,20 +4810,20 @@ Organisasi</textarea>
 
             const fasTag = document.getElementById('spz_pembuka_tag_fasilitas');
             if (fasTag) {
-                fasTag.innerText = fas || 'Aula Utama / Gedung Serbaguna';
+                fasTag.innerText = fas || 'Masjid Ar-Rahman';
                 if (!fas) fasTag.classList.add('opacity-50');
                 else fasTag.classList.remove('opacity-50');
             }
             const acaraTag = document.getElementById('spz_pembuka_tag_acara');
             if (acaraTag) {
-                acaraTag.innerText = acara || 'Kegiatan Organisasi 2026';
+                acaraTag.innerText = acara || 'QURMEDIA 2026';
                 if (!acara) acaraTag.classList.add('opacity-50');
                 else acaraTag.classList.remove('opacity-50');
             }
 
-            const fasForText = fas || 'Aula Utama / Gedung Serbaguna';
-            const acaraForText = acara || 'Kegiatan Organisasi 2026';
-            const autoText = `Melalui surat ini, kami **Organisasi** bermaksud untuk mengajukan permohonan izin peminjaman fasilitas ${fasForText} Jakarta untuk kegiatan **${acaraForText}** yang akan dilaksanakan pada:`;
+            const fasForText = fas || 'Masjid Ar-Rahman';
+            const acaraForText = acara || 'QURMEDIA 2026';
+            const autoText = `Melalui surat ini, kami **Unit Kegiatan Mahasiswa Organisasi** bermaksud untuk mengajukan permohonan izin peminjaman fasilitas ${fasForText} Jakarta untuk kegiatan **${acaraForText}** yang akan dilaksanakan pada:`;
             const pembukaEl = document.getElementById('field_pembuka');
             if (pembukaEl) {
                 pembukaEl.placeholder = autoText;
@@ -4849,19 +4849,19 @@ Organisasi</textarea>
 
             const fas = (document.getElementById('spz_input_fasilitas') ? document.getElementById('spz_input_fasilitas').value.trim() : '');
             const acara = (document.getElementById('field_nama_acara') ? document.getElementById('field_nama_acara').value.trim() : '');
-            const fasForText = fas || 'Aula Utama / Gedung Serbaguna';
-            const acaraForText = acara || 'Kegiatan Organisasi 2026';
-            const autoText = `Melalui surat ini, kami **Organisasi** bermaksud untuk mengajukan permohonan izin peminjaman fasilitas ${fasForText} Jakarta untuk kegiatan **${acaraForText}** yang akan dilaksanakan pada:`;
+            const fasForText = fas || 'Masjid Ar-Rahman';
+            const acaraForText = acara || 'QURMEDIA 2026';
+            const autoText = `Melalui surat ini, kami **Unit Kegiatan Mahasiswa Organisasi** bermaksud untuk mengajukan permohonan izin peminjaman fasilitas ${fasForText} Jakarta untuk kegiatan **${acaraForText}** yang akan dilaksanakan pada:`;
 
             const fasTag = document.getElementById('spz_pembuka_tag_fasilitas');
             if (fasTag) {
-                fasTag.innerText = fas || 'Aula Utama / Gedung Serbaguna';
+                fasTag.innerText = fas || 'Masjid Ar-Rahman';
                 if (!fas) fasTag.classList.add('opacity-50');
                 else fasTag.classList.remove('opacity-50');
             }
             const acaraTag = document.getElementById('spz_pembuka_tag_acara');
             if (acaraTag) {
-                acaraTag.innerText = acara || 'Kegiatan Organisasi 2026';
+                acaraTag.innerText = acara || 'QURMEDIA 2026';
                 if (!acara) acaraTag.classList.add('opacity-50');
                 else acaraTag.classList.remove('opacity-50');
             }
@@ -4911,7 +4911,7 @@ Organisasi</textarea>
                     currentPembuka.includes('telah melaksanakan kegiatan');
 
                 if (isDefaultPembuka) {
-                    pembukaEl.value = `Melalui surat ini kami sampaikan bahwa **Organisasi** Sekretariat / Kampus telah melaksanakan kegiatan **${namaAcara}** pada:`;
+                    pembukaEl.value = `Melalui surat ini kami sampaikan bahwa **Unit Kegiatan Mahasiswa Organisasi** Politeknik Negeri Media Kreatif Jakarta telah melaksanakan kegiatan **${namaAcara}** pada:`;
                 }
             }
 
@@ -4953,7 +4953,7 @@ Organisasi</textarea>
                 if (!/(?:^|[^\d])20\d{2}(?:[^\d]|$)/.test(namaAcara)) {
                     namaAcara = `${namaAcara} 2026`;
                 }
-                const defaultPembuka = `Melalui surat ini kami sampaikan bahwa **Organisasi** Sekretariat / Kampus telah melaksanakan kegiatan **${namaAcara}** pada:`;
+                const defaultPembuka = `Melalui surat ini kami sampaikan bahwa **Unit Kegiatan Mahasiswa Organisasi** Politeknik Negeri Media Kreatif Jakarta telah melaksanakan kegiatan **${namaAcara}** pada:`;
                 if (!val || val.trim() === '' || val.trim() === defaultPembuka) {
                     isSbaPembukaManuallyEdited = false;
                 } else {
@@ -5109,7 +5109,7 @@ Organisasi</textarea>
             const pVal = (pEl ? pEl.value.trim() : '') || 'Periode 2026';
             const jabEl = document.getElementById('field_ttd_mpm_jabatan');
             if (jabEl) {
-                jabEl.value = `Ketua Umum MPM\nOrganisasi ${pVal}`;
+                jabEl.value = `Ketua Umum MPM\nPoliMedia ${pVal}`;
             }
         }
 
@@ -5118,7 +5118,7 @@ Organisasi</textarea>
             const pVal = (pEl ? pEl.value.trim() : '') || 'Periode 2026';
             const jabEl = document.getElementById('field_ttd_bem_jabatan');
             if (jabEl) {
-                jabEl.value = `Ketua BEM Organisasi\n${pVal}`;
+                jabEl.value = `Ketua BEM PoliMedia\n${pVal}`;
             }
         }
 
@@ -6616,7 +6616,8 @@ Organisasi</textarea>
             const currentFas = (document.getElementById('spz_input_fasilitas')?.value || '').trim();
 
             const autoBoldList = [
-                'Organisasi',
+                'Unit Kegiatan Mahasiswa Organisasi',
+                'UKM Organisasi',
                 'Organisasi'
             ];
 
@@ -6639,12 +6640,12 @@ Organisasi</textarea>
             const fasTermsToUnbold = [];
             if (currentFas) {
                 fasTermsToUnbold.push(currentFas);
-                fasTermsToUnbold.push(`${currentFas} Organisasi`);
-                fasTermsToUnbold.push(`${currentFas} Instansi / Organisasi`);
+                fasTermsToUnbold.push(`${currentFas} PoliMedia`);
+                fasTermsToUnbold.push(`${currentFas} Politeknik Negeri Media Kreatif`);
             }
-            fasTermsToUnbold.push('Aula Utama / Gedung Serbaguna');
-            fasTermsToUnbold.push('Aula Utama / Gedung Serbaguna Organisasi');
-            fasTermsToUnbold.push('Aula Utama / Gedung Serbaguna Instansi / Organisasi');
+            fasTermsToUnbold.push('Masjid Ar-Rahman');
+            fasTermsToUnbold.push('Masjid Ar-Rahman PoliMedia');
+            fasTermsToUnbold.push('Masjid Ar-Rahman Politeknik Negeri Media Kreatif');
 
             fasTermsToUnbold.forEach(fasName => {
                 if (!fasName) return;
@@ -6663,17 +6664,10 @@ Organisasi</textarea>
 
             let firstLine = rawLines[0];
             let remainingFirst = firstLine.replace(/^(Kepada\s+Yth\.?,?|Kepada\s*|Yth\.?,?)\s*/i, '');
-            let prefix = 'Yth.&nbsp;';
+            let prefix = /^Yth\./i.test(firstLine) ? 'Yth.&nbsp;' : 'Yth,&nbsp;';
 
             if (!remainingFirst) remainingFirst = 'Kepala Subbagian Umum';
             let formattedFirst = formatSpzText(remainingFirst);
-            if (!formattedFirst.includes('<strong')) {
-                if (/kepala\s*subbagian\s*umum/i.test(formattedFirst)) {
-                    formattedFirst = formattedFirst.replace(/Kepala Subbagian Umum/i, '<strong style="font-weight: bold;">Kepala Subbagian Umum</strong>');
-                } else if (/sub\.?\s*tim\s*umum/i.test(formattedFirst)) {
-                    formattedFirst = `<strong style="font-weight: bold;">${formattedFirst}</strong>`;
-                }
-            }
 
             let flattenedLines = [];
             rawLines.slice(1).forEach(line => {
@@ -7075,9 +7069,9 @@ Organisasi</textarea>
                 // Cadangan proker resmi Organisasi 2026 agar dropdown dan modal tidak pernah kosong / macet loading
                 sbaDbProkers = [
                     { id: '13', nama_proker: 'Studi Banding 2026', jenis: 'Program Kerja', divisi: 'BPH', status: 'Selesai' },
-                    { id: '14', nama_proker: 'Seminar & Pelatihan 2026', jenis: 'Program Kerja', divisi: 'Kaderisasi', status: 'Running' },
-                    { id: '15', nama_proker: 'Pelatihan Organisasi 2026', jenis: 'Program Kerja', divisi: 'Kaderisasi', status: 'Running' },
-                    { id: '16', nama_proker: 'Kegiatan Tahunan 2026', jenis: 'Agenda Kerja', divisi: 'BPH', status: 'Running' },
+                    { id: '14', nama_proker: 'Dauroh Islami 2026', jenis: 'Program Kerja', divisi: 'Kaderisasi', status: 'Running' },
+                    { id: '15', nama_proker: 'Mabit Muharrik 2026', jenis: 'Program Kerja', divisi: 'Kaderisasi', status: 'Running' },
+                    { id: '16', nama_proker: 'Open House 2026', jenis: 'Agenda Kerja', divisi: 'BPH', status: 'Running' },
                     { id: '17', nama_proker: 'Kajian Rutin & Keputrian', jenis: 'Agenda Kerja', divisi: 'Syiar', status: 'Running' },
                     { id: '18', nama_proker: 'Rapat Kerja Pengurus 2026', jenis: 'Agenda Kerja', divisi: 'BPH', status: 'Selesai' }
                 ];
@@ -9797,14 +9791,14 @@ Organisasi</textarea>
             const perihal = rawPerihal || (rawFasilitas ? `Surat Perizinan Peminjaman Fasilitas ${rawFasilitas}` : 'Surat Perizinan Peminjaman Fasilitas');
             
             const tanggalSurat = document.getElementById('field_tanggal_surat').value.trim() || 'Jakarta, 30 September 2026';
-            const tujuan = document.getElementById('field_tujuan').value.trim() || 'Yth. **Kepala Subbagian Umum**\nSekretariat / Kampus\nDi Tempat';
+            const tujuan = document.getElementById('field_tujuan').value.trim() || 'Yth, Kepala Subbagian Umum\nPoliteknik Negeri Media Kreatif\nDi Tempat';
 
             const namaAcara = document.getElementById('field_nama_acara').value.trim();
             const hariTanggal = document.getElementById('field_hari_tanggal').value.trim();
             const waktu = document.getElementById('field_waktu').value.trim();
             const tempat = document.getElementById('field_tempat').value.trim();
 
-            const pembuka = document.getElementById('field_pembuka').value.trim() || 'Melalui surat ini, kami **Organisasi** bermaksud untuk mengajukan permohonan izin peminjaman fasilitas Aula Utama / Gedung Serbaguna Jakarta untuk kegiatan **Kegiatan Organisasi 2026** yang akan dilaksanakan pada:';
+            const pembuka = document.getElementById('field_pembuka').value.trim() || 'Melalui surat ini, kami **Unit Kegiatan Mahasiswa Organisasi** bermaksud untuk mengajukan permohonan izin peminjaman fasilitas Masjid Ar-Rahman Jakarta untuk kegiatan **QURMEDIA 2026** yang akan dilaksanakan pada:';
             const isiInti = document.getElementById('field_isi_inti').value.trim() || 'Deskripsikan Kegiatan.';
             const penutup = document.getElementById('field_penutup').value.trim() || 'Demikian surat perizinan ini kami buat. Atas perhatian dan kerja sama, kami sampaikan terima kasih.';
 
@@ -9828,11 +9822,11 @@ Organisasi</textarea>
             const ttd3Nama = (document.getElementById('field_ttd3_nama') && document.getElementById('field_ttd3_nama').value.trim()) || 'Dr. H. Zainul Hakim, S.Ag., M.Pd.I.';
             const ttd3Nim = (document.getElementById('field_ttd3_nim') && document.getElementById('field_ttd3_nim').value.trim()) || 'NIP. 198005072023211013';
 
-            const mpmJabatan = (document.getElementById('field_ttd_mpm_jabatan')?.value || '').trim() || 'Ketua Umum MPM\nOrganisasi Periode 2026';
+            const mpmJabatan = (document.getElementById('field_ttd_mpm_jabatan')?.value || '').trim() || 'Ketua Umum MPM\nPoliMedia Periode 2026';
             const mpmNama = (document.getElementById('field_ttd_mpm_nama')?.value || '').trim() || 'Sheyla Aulya';
             const mpmNim = (document.getElementById('field_ttd_mpm_nim')?.value || '').trim() || 'NIM. 2491345088';
 
-            const bemJabatan = (document.getElementById('field_ttd_bem_jabatan')?.value || '').trim() || 'Ketua BEM Organisasi\nPeriode 2026';
+            const bemJabatan = (document.getElementById('field_ttd_bem_jabatan')?.value || '').trim() || 'Ketua BEM PoliMedia\nPeriode 2026';
             const bemNama = (document.getElementById('field_ttd_bem_nama')?.value || '').trim() || 'Ujang Rahman';
             const bemNim = (document.getElementById('field_ttd_bem_nim')?.value || '').trim() || 'NIM. 2490343155';
 
@@ -10387,7 +10381,7 @@ Organisasi</textarea>
 
                             <div class="spz-body-container" style="padding-left: 9mm; padding-right: 4mm;">
                                 <p style="margin: 16pt 0 14pt 0; text-align: justify; text-indent: 1.25cm; font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5;">
-                                    Dengan dikeluarkannya surat ini, Kepala Subbagian Umum Instansi / Organisasi menyetujui untuk memfasilitasi pengajuan peminjaman pada:
+                                    Dengan dikeluarkannya surat ini, Kepala Subbagian Umum Politeknik Negeri Media Kreatif menyetujui untuk memfasilitasi pengajuan peminjaman pada:
                                 </p>
 
                                 <table style="margin: 0 0 12pt 1.25cm; border-collapse: collapse; font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.45;">
@@ -10466,7 +10460,7 @@ Organisasi</textarea>
                                     </tr>
                                     <tr>
                                         <td style="width: 28px; vertical-align: top; text-align: left; padding: 1.5pt 0; font-family: 'Times New Roman', Times, serif; font-size: 12pt;">11.</td>
-                                        <td style="vertical-align: top; text-align: justify; padding: 1.5pt 0; font-family: 'Times New Roman', Times, serif; font-size: 12pt;">Segala bentuk pelanggaran akan dikenakan sanksi sesuai peraturan tata<br>tertib yang berlaku di Kampus Organisasi.</td>
+                                        <td style="vertical-align: top; text-align: justify; padding: 1.5pt 0; font-family: 'Times New Roman', Times, serif; font-size: 12pt;">Segala bentuk pelanggaran akan dikenakan sanksi sesuai peraturan tata<br>tertib yang berlaku di Kampus PoliMedia.</td>
                                     </tr>
                                 </table>
 
@@ -10525,7 +10519,7 @@ Organisasi</textarea>
             let ttd1Jabatan = (document.getElementById('field_ttd1_jabatan')?.value || '').trim();
             if (!ttd1Jabatan || ttd1Jabatan === 'Ketua Pelaksana') {
                 const formatted = (typeof formatProkerTtd1 === 'function') ? formatProkerTtd1(namaAcara) : '';
-                ttd1Jabatan = formatted ? `Ketua Pelaksana\n${formatted}` : 'Ketua Pelaksana\nSeminar & Pelatihan 2026';
+                ttd1Jabatan = formatted ? `Ketua Pelaksana\n${formatted}` : 'Ketua Pelaksana\nDauroh Islami 2026';
             } else {
                 const linesSud = ttd1Jabatan.split('\n');
                 if (linesSud.length > 1) {
@@ -10825,9 +10819,9 @@ Organisasi</textarea>
         function renderSpmLetterHtml() {
             const noSurat = document.getElementById('field_nomor_surat').value.trim() || '042/SPM/ORG/IX/2026';
             const lampiran = document.getElementById('field_lampiran').value.trim() || '-';
-            const perihal = document.getElementById('field_perihal').value.trim() || 'Surat Permohonan Penyesuaian Jadwal Kegiatan';
+            const perihal = document.getElementById('field_perihal').value.trim() || 'Surat Permohonan Pemunduran Open House';
             const tanggalSurat = document.getElementById('field_tanggal_surat').value.trim() || 'Jakarta, 08 September 2026';
-            const tujuan = document.getElementById('field_tujuan').value.trim() || 'Yth. Majelis Permusyawaratan Mahasiswa\nSekretariat / Kampus\nDi Tempat';
+            const tujuan = document.getElementById('field_tujuan').value.trim() || 'Yth. Majelis Permusyawaratan Mahasiswa\nPoliteknik Negeri Media Kreatif Jakarta\nDi Tempat';
 
             const incEvent = document.getElementById('field_include_event_details').checked;
             const hariTanggal = document.getElementById('field_hari_tanggal').value.trim();
@@ -10850,11 +10844,11 @@ Organisasi</textarea>
             const ttd3Nama = document.getElementById('field_ttd3_nama').value.trim() || 'Dr. H. Zainul Hakim, S.Ag., M.Pd.I.';
             const ttd3Nim = document.getElementById('field_ttd3_nim').value.trim() || 'NIP. 198005072023211013';
 
-            const mpmJabatan = (document.getElementById('field_ttd_mpm_jabatan')?.value || '').trim() || 'Ketua Umum MPM\nOrganisasi Periode 2026';
+            const mpmJabatan = (document.getElementById('field_ttd_mpm_jabatan')?.value || '').trim() || 'Ketua Umum MPM\nPoliMedia Periode 2026';
             const mpmNama = (document.getElementById('field_ttd_mpm_nama')?.value || '').trim() || 'Sheyla Aulya';
             const mpmNim = (document.getElementById('field_ttd_mpm_nim')?.value || '').trim() || 'NIM. 2491345088';
 
-            const bemJabatan = (document.getElementById('field_ttd_bem_jabatan')?.value || '').trim() || 'Ketua BEM Organisasi\nPeriode 2026';
+            const bemJabatan = (document.getElementById('field_ttd_bem_jabatan')?.value || '').trim() || 'Ketua BEM PoliMedia\nPeriode 2026';
             const bemNama = (document.getElementById('field_ttd_bem_nama')?.value || '').trim() || 'Ujang Rahman';
             const bemNim = (document.getElementById('field_ttd_bem_nim')?.value || '').trim() || 'NIM. 2490343155';
 
@@ -11210,8 +11204,8 @@ Organisasi</textarea>
             const waktu = document.getElementById('field_waktu').value.trim() || '08.00 s/d 13.10 WIB';
             const tempat = document.getElementById('field_tempat').value.trim() || 'Masjid Ulul Albab Kampus B UNJ, JL. Pemuda, No. 10, Rawamangun, RT.8/RW.5, Rawamangun, Kec. Pulo Gadung, Kota Jakarta Timur, Daerah Khusus Ibukota Jakarta 13220';
 
-            let rawPembuka = (document.getElementById('field_pembuka')?.value || '').trim() || `Melalui surat ini kami sampaikan bahwa **Organisasi** Sekretariat / Kampus telah melaksanakan kegiatan **${namaAcara}** pada:`;
-            rawPembuka = autoBoldPhrase(rawPembuka, 'Organisasi');
+            let rawPembuka = (document.getElementById('field_pembuka')?.value || '').trim() || `Melalui surat ini kami sampaikan bahwa **Unit Kegiatan Mahasiswa Organisasi** Politeknik Negeri Media Kreatif Jakarta telah melaksanakan kegiatan **${namaAcara}** pada:`;
+            rawPembuka = autoBoldPhrase(rawPembuka, 'Unit Kegiatan Mahasiswa Organisasi');
             if (namaAcara) rawPembuka = autoBoldPhrase(rawPembuka, namaAcara);
             if (rawNamaAcara) rawPembuka = autoBoldPhrase(rawPembuka, rawNamaAcara);
             const pembuka = rawPembuka;
@@ -11249,11 +11243,11 @@ Organisasi</textarea>
             }
             const ttd3Nim = document.getElementById('field_ttd3_nim').value.trim() || 'NIP. 198005072023211013';
 
-            const mpmJabatan = (document.getElementById('field_ttd_mpm_jabatan')?.value || '').trim() || 'Ketua Umum MPM\nOrganisasi Periode 2026';
+            const mpmJabatan = (document.getElementById('field_ttd_mpm_jabatan')?.value || '').trim() || 'Ketua Umum MPM\nPoliMedia Periode 2026';
             const mpmNama = (document.getElementById('field_ttd_mpm_nama')?.value || '').trim() || 'Sheyla Aulya';
             const mpmNim = (document.getElementById('field_ttd_mpm_nim')?.value || '').trim() || 'NIM. 2491345088';
 
-            const bemJabatan = (document.getElementById('field_ttd_bem_jabatan')?.value || '').trim() || 'Ketua BEM Organisasi\nPeriode 2026';
+            const bemJabatan = (document.getElementById('field_ttd_bem_jabatan')?.value || '').trim() || 'Ketua BEM PoliMedia\nPeriode 2026';
             const bemNama = (document.getElementById('field_ttd_bem_nama')?.value || '').trim() || 'Ujang Rahman';
             const bemNim = (document.getElementById('field_ttd_bem_nim')?.value || '').trim() || 'NIM. 2490343155';
 
@@ -13689,6 +13683,42 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
             if (ttd3JabatanSavedEl && ttd3JabatanSavedEl.value.trim() === 'Pembina / Penasihat\nOrganisasi') {
                 ttd3JabatanSavedEl.value = 'Dosen Pembina\nOrganisasi';
             }
+            const ttdBemJabatanSavedEl = document.getElementById('field_ttd_bem_jabatan');
+            if (ttdBemJabatanSavedEl && ttdBemJabatanSavedEl.value.includes('Ketua BEM Organisasi')) {
+                ttdBemJabatanSavedEl.value = ttdBemJabatanSavedEl.value.replace(/Ketua BEM Organisasi/g, 'Ketua BEM PoliMedia');
+            }
+            const ttdMpmJabatanSavedEl = document.getElementById('field_ttd_mpm_jabatan');
+            if (ttdMpmJabatanSavedEl && ttdMpmJabatanSavedEl.value.includes('Ketua Umum MPM\nOrganisasi')) {
+                ttdMpmJabatanSavedEl.value = ttdMpmJabatanSavedEl.value.replace(/Ketua Umum MPM\nOrganisasi/g, 'Ketua Umum MPM\nPoliMedia');
+            }
+            const tujuanSavedEl = document.getElementById('field_tujuan');
+            if (tujuanSavedEl) {
+                if (doc.type === 'SPZ') {
+                    tujuanSavedEl.value = 'Yth, Kepala Subbagian Umum\nPoliteknik Negeri Media Kreatif\nDi Tempat';
+                } else if (tujuanSavedEl.value.includes('Sekretariat / Kampus')) {
+                    tujuanSavedEl.value = tujuanSavedEl.value.replace(/Sekretariat\s*\/\s*Kampus/g, 'Politeknik Negeri Media Kreatif Jakarta');
+                }
+            }
+            const pembukaSavedEl = document.getElementById('field_pembuka');
+            if (pembukaSavedEl) {
+                if (pembukaSavedEl.value.includes('Sekretariat / Kampus')) {
+                    pembukaSavedEl.value = pembukaSavedEl.value.replace(/Sekretariat\s*\/\s*Kampus/g, 'Politeknik Negeri Media Kreatif Jakarta');
+                }
+                if (pembukaSavedEl.value.includes('kami **Organisasi**') || pembukaSavedEl.value.includes('bahwa **Organisasi**')) {
+                    pembukaSavedEl.value = pembukaSavedEl.value.replace(/\*\*Organisasi\*\*/g, '**Unit Kegiatan Mahasiswa Organisasi**');
+                }
+                if (pembukaSavedEl.value.includes('**Organisasi 2026 Politeknik')) {
+                    pembukaSavedEl.value = pembukaSavedEl.value.replace(/\*\*Organisasi 2026 Politeknik/g, '**Unit Kegiatan Mahasiswa Organisasi 2026 Politeknik');
+                }
+            }
+            const tempatSavedEl = document.getElementById('field_tempat');
+            if (tempatSavedEl && tempatSavedEl.value.includes('Sekretariat / Kampus')) {
+                tempatSavedEl.value = tempatSavedEl.value.replace(/Sekretariat\s*\/\s*Kampus/g, 'Politeknik Negeri Media Kreatif Jakarta');
+            }
+            const isiIntiSavedEl = document.getElementById('field_isi_inti');
+            if (isiIntiSavedEl && isiIntiSavedEl.value.includes('Keorganisasian IMIP')) {
+                isiIntiSavedEl.value = isiIntiSavedEl.value.replace(/Keorganisasian IMIP/g, 'Keorganisasian');
+            }
 
             // 4. Restore SPZ dynamic lists
             if (doc.type === 'SPZ') {
@@ -14601,7 +14631,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                         field_hari_tanggal: 'Minggu, 28 Juni 2026',
                         field_waktu: '08.00 s/d 13.10 WIB',
                         field_tempat: 'Masjid Ulul Albab Kampus B UNJ, JL. Pemuda, No. 10, Rawamangun, RT.8/RW.5, Rawamangun, Kec. Pulo Gadung, Kota Jakarta Timur, Daerah Khusus Ibukota Jakarta 13220',
-                        field_pembuka: `Melalui surat ini kami sampaikan bahwa **Organisasi** Sekretariat / Kampus telah melaksanakan kegiatan **Studi Banding 2026** pada:`,
+                        field_pembuka: `Melalui surat ini kami sampaikan bahwa **Unit Kegiatan Mahasiswa Organisasi** Politeknik Negeri Media Kreatif Jakarta telah melaksanakan kegiatan **Studi Banding 2026** pada:`,
                         field_isi_inti: `**Studi Banding** antara pengurus dan delegasi kegiatan ini diselenggarakan sebagai wadah untuk saling berbagi insight, bertukar pikiran, serta mengevaluasi program kerja masing-masing organisasi. Melalui forum diskusi yang interaktif, kedua belah pihak dapat saling mengadopsi inovasi strategis dan praktik terbaik guna meningkatkan kualitas pengurusan serta mempererat tali silaturahmi antar lembaga.`,
                         field_penutup: 'Demikian surat Berita Acara ini dibuat dan disahkan dengan penuh tanggung jawab agar dipergunakan semestinya. Atas perhatiannya, kami sampaikan terimakasih.',
                         field_ttd1_active: true,
@@ -14641,7 +14671,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                         field_lampiran_angka: '3',
                         field_tanggal_surat: `Jakarta, ${formatIndoDate(now)}`,
                         spz_input_fasilitas: 'Gedung Serbaguna & Sound System',
-                        field_nama_acara: 'Pelatihan Organisasi 2026',
+                        field_nama_acara: 'Mabit Muharrik 2026',
                         field_hari_tanggal: 'Sabtu - Ahad, 24 - 25 Oktober 2026',
                         field_waktu: '16.00 WIB s/d 06.00 WIB',
                         field_tempat: 'Gedung Serbaguna & Ruang Teater Kampus Polimedia',
@@ -14672,7 +14702,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                 // 3. Seed SPM Resmi 2026
                 const spmDoc = {
                     id: 'doc_seed_spm_2026',
-                    title: '042_SPM Pemunduran Kegiatan Organisasi 2026',
+                    title: '042_SPM Pemunduran Open House 2026',
                     type: 'SPM',
                     createdAt: nowIso,
                     updatedAt: nowIso,
@@ -14681,9 +14711,9 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                         field_nomor_urut: '042',
                         field_lampiran: '-',
                         field_tanggal_surat: 'Jakarta, 08 September 2026',
-                        field_perihal: 'Surat Permohonan Penyesuaian Jadwal Kegiatan',
-                        field_tujuan: 'Yth. Majelis Permusyawaratan Mahasiswa\nSekretariat / Kampus\nDi Tempat',
-                        field_nama_acara: 'Kegiatan Tahunan 2026',
+                        field_perihal: 'Surat Permohonan Pemunduran Open House',
+                        field_tujuan: 'Yth. Majelis Permusyawaratan Mahasiswa\nPoliteknik Negeri Media Kreatif Jakarta\nDi Tempat',
+                        field_nama_acara: 'Open House 2026',
                         field_hari_tanggal: 'Jum’at, 18 September 2026',
                         field_waktu: '13.30 WIB s.d. Selesai',
                         field_tempat: 'Auditorium Hall Polimedia Jakarta',
@@ -14691,7 +14721,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                         field_isi_inti: SURAT_TEMPLATES.SPM.isiInti,
                         field_penutup: SURAT_TEMPLATES.SPM.penutup,
                         field_ttd1_active: false,
-                        field_ttd1_jabatan: 'Ketua Pelaksana\nKegiatan Organisasi 2026',
+                        field_ttd1_jabatan: 'Ketua Pelaksana\nOpen House 2026',
                         field_ttd1_nama: 'Fadly A. (Contoh)',
                         field_ttd1_nim: 'NIM. 2490xxxx34',
                         field_ttd2_active: true,
@@ -14721,7 +14751,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                         field_tanggal_surat: 'Jakarta, 21 April 2026',
                         field_perihal: 'Surat Undangan Sarah Muthiah Widad',
                         field_tujuan: 'Yth. Sarah Muthiah Widad\nDi Tempat',
-                        field_nama_acara: 'Seminar & Pelatihan 2026',
+                        field_nama_acara: 'Dauroh Islami 2026',
                         field_hari_tanggal: 'Sabtu, 02 Mei 2026',
                         field_waktu: '13.00 s/d 15.00 WIB',
                         field_tempat: 'WAMY Indonesia, Jl. Moch. Kahfi II No. 42 RT 08/RW 08, Kel. Srengseng Sawah, Kec. Jagakarsa, Jakarta Selatan 12630',
@@ -14729,7 +14759,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                         field_isi_inti: SURAT_TEMPLATES.SUD.isiInti,
                         field_penutup: SURAT_TEMPLATES.SUD.penutup,
                         field_ttd1_active: true,
-                        field_ttd1_jabatan: 'Ketua Pelaksana\nSeminar & Pelatihan 2026',
+                        field_ttd1_jabatan: 'Ketua Pelaksana\nDauroh Islami 2026',
                         field_ttd1_nama: 'Fadly A. (Contoh)',
                         field_ttd1_nim: 'NIM. 2490xxxx34',
                         field_ttd2_active: true,
@@ -15443,7 +15473,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
             if (targetId === 'spz_input_fasilitas') {
                 const formInput = document.getElementById('spz_input_fasilitas');
                 const val = formInput ? formInput.value : '';
-                const ph = formInput ? (formInput.placeholder || 'Aula Utama / Gedung Serbaguna') : 'Aula Utama / Gedung Serbaguna';
+                const ph = formInput ? (formInput.placeholder || 'Masjid Ar-Rahman') : 'Masjid Ar-Rahman';
                 return `
                     <div class="space-y-2">
                         <div class="flex items-center justify-between mb-0.5">
@@ -15467,7 +15497,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
             if (targetId === 'field_nama_acara') {
                 const formInput = document.getElementById('field_nama_acara');
                 const val = formInput ? formInput.value : '';
-                const ph = formInput ? (formInput.placeholder || 'Kegiatan Organisasi 2026') : 'Kegiatan Organisasi 2026';
+                const ph = formInput ? (formInput.placeholder || 'QURMEDIA 2026') : 'QURMEDIA 2026';
                 return `
                     <div class="space-y-2">
                         <label class="text-[11px] font-bold text-neutral-300 flex items-center gap-1.5 mb-0.5">
@@ -15485,7 +15515,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
             if (targetId === 'field_tujuan') {
                 const formInput = document.getElementById('field_tujuan');
                 const val = formInput ? formInput.value : '';
-                const ph = formInput ? (formInput.placeholder || 'Yth. Kepala Subbagian Umum\nSekretariat / Kampus\nDi Tempat') : 'Yth. Kepala Subbagian Umum\nSekretariat / Kampus\nDi Tempat';
+                const ph = formInput ? (formInput.placeholder || 'Yth, Kepala Subbagian Umum\nPoliteknik Negeri Media Kreatif\nDi Tempat') : 'Yth, Kepala Subbagian Umum\nPoliteknik Negeri Media Kreatif\nDi Tempat';
                 return `
                     <div class="space-y-2">
                         <div class="flex items-center justify-between mb-0.5">
@@ -15509,7 +15539,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
             if (targetId === 'field_pembuka') {
                 const formInput = document.getElementById('field_pembuka');
                 const val = formInput ? formInput.value : '';
-                let defaultPh = 'Melalui surat ini, kami Organisasi bermaksud untuk mengajukan permohonan izin peminjaman fasilitas Aula Utama / Gedung Serbaguna Jakarta untuk kegiatan Kegiatan Organisasi 2026 yang akan dilaksanakan pada:';
+                let defaultPh = 'Melalui surat ini, kami Unit Kegiatan Mahasiswa Organisasi bermaksud untuk mengajukan permohonan izin peminjaman fasilitas Masjid Ar-Rahman Jakarta untuk kegiatan QURMEDIA 2026 yang akan dilaksanakan pada:';
                 if (currentSuratType === 'SBA') {
                     defaultPh = 'Unit Kegiatan Mahasiswa Lembaga Dakwah Kampus Ikatan Mahasiswa Muslim Organisasi (Organisasi) telah menyelenggarakan program kerja...';
                 } else if (currentSuratType === 'SUD') {
@@ -15611,7 +15641,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                                 </button>
                             </div>
                             <textarea id="quick_detail_tempat" rows="2" 
-                                placeholder="Contoh: Aula Utama / Gedung Serbaguna Sekretariat / Kampus,&#10;Jl. Srengseng Sawah, Kel. Srengseng Sawah, Kec. Jagakarsa,&#10;Jakarta Selatan 12630" 
+                                placeholder="Contoh: Masjid Ar-Rahman Politeknik Negeri Media Kreatif Jakarta,&#10;Jl. Srengseng Sawah, Kel. Srengseng Sawah, Kec. Jagakarsa,&#10;Jakarta Selatan 12630" 
                                 oninput="syncQuickEditToForm('field_tempat', this.value)" 
                                 class="form-input text-xs py-1.5 px-2.5 w-full bg-neutral-950 border-neutral-700 rounded-lg text-white focus:border-neutral-400 font-sans leading-relaxed">${escapeHtml(valTempat)}</textarea>
                         </div>
@@ -15623,7 +15653,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
             if (targetId === 'field_isi_inti') {
                 const formInput = document.getElementById('field_isi_inti');
                 const val = formInput ? formInput.value : '';
-                const ph = formInput ? (formInput.placeholder || 'Deskripsikan kegiatan (misal: Kegiatan ini merupakan rangkaian persiapan pelaksanaan Kegiatan Organisasi 2026...)') : 'Deskripsikan kegiatan (misal: Kegiatan ini merupakan rangkaian persiapan pelaksanaan Kegiatan Organisasi 2026...)';
+                const ph = formInput ? (formInput.placeholder || 'Deskripsikan kegiatan (misal: Kegiatan ini merupakan rangkaian persiapan pelaksanaan QURMEDIA 2026...)') : 'Deskripsikan kegiatan (misal: Kegiatan ini merupakan rangkaian persiapan pelaksanaan QURMEDIA 2026...)';
                 const isSpz = currentSuratType === 'SPZ';
 
                 return `
@@ -16015,7 +16045,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                         </div>
                         <div class="p-2.5 rounded-xl bg-neutral-950 border border-neutral-800">
                             <div class="flex items-center justify-between mb-1.5">
-                                <label class="text-[10.5px] text-blue-400 font-bold">Ketua BEM Organisasi</label>
+                                <label class="text-[10.5px] text-blue-400 font-bold">Ketua BEM PoliMedia</label>
                                 <label class="flex items-center gap-1.5 text-[9.5px] text-neutral-400 cursor-pointer">
                                     <input type="checkbox" ${bemActive ? 'checked' : ''} onchange="syncQuickCheckboxToForm('field_ttd_bem_active', this.checked); updateTtdState();" class="rounded border-neutral-700 text-blue-500 focus:ring-neutral-400 w-3 h-3">
                                     <span>Aktif</span>
