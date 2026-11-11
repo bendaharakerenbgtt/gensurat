@@ -1555,6 +1555,13 @@
                     <div class="flex flex-col gap-3">
                         <div>
                             <div class="flex items-center justify-between mb-1">
+                                <label class="text-[11px] font-bold text-neutral-300">Email Resmi di Kop Surat</label>
+                                <span class="text-[9px] text-emerald-400 font-mono">Bisa Diganti</span>
+                            </div>
+                            <input type="text" id="field_kop_email" value="ldkimip@gmail.com" placeholder="ldkimip@gmail.com" oninput="handleKopEmailInput(this.value);" class="form-input text-xs font-mono" title="Email organisasi pada bagian bawah Kop Surat">
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
                                 <label class="text-[11px] font-bold text-neutral-300">Nomor Surat</label>
                                 <button type="button" onclick="autoGenerateNoSurat()" class="text-[10px] text-blue-400 hover:text-white font-mono flex items-center gap-1">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i> Buat Nomor Otomatis
@@ -3140,6 +3147,24 @@
             </div>
 
             <div class="space-y-4">
+                <!-- 0. EMAIL ORGANISASI DI KOP SURAT -->
+                <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-envelope text-blue-400 text-sm"></i>
+                            <span class="text-xs font-bold text-white uppercase tracking-wider">Email Resmi di Kop Surat</span>
+                        </div>
+                        <span class="text-[10px] text-emerald-400 font-mono">Dapat Diubah Bebas</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="modal_input_kop_email" value="ldkimip@gmail.com" placeholder="ldkimip@gmail.com" oninput="handleKopEmailInput(this.value)" class="form-input text-xs py-2 px-3 flex-1 font-mono bg-neutral-900 border-neutral-700 text-white rounded-lg focus:border-blue-400" title="Ketik alamat email organisasi untuk ditampilkan di bawah alamat kop surat">
+                        <button type="button" onclick="resetKopEmailDefault()" class="px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium transition-colors cursor-pointer shrink-0">
+                            Reset Default
+                        </button>
+                    </div>
+                    <p class="text-[10.5px] text-neutral-400">Anda juga dapat mengeklik langsung tulisan email biru pada kop di lembar surat untuk mengeditnya secara cepat.</p>
+                </div>
+
                 <!-- 1. LOGO KABINET DI ATAS KANAN KOP -->
                 <div class="p-4 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-3">
                     <div class="flex items-center justify-between">
@@ -5494,6 +5519,54 @@
         // ==========================================
         // KUSTOMISASI GAMBAR KABINET & KOP SURAT
         // ==========================================
+        function getCustomKopEmail() {
+            const inputEl = document.getElementById('field_kop_email');
+            if (inputEl && inputEl.value.trim()) {
+                return inputEl.value.trim();
+            }
+            const saved = localStorage.getItem('custom_kop_email');
+            if (saved !== null && saved.trim() !== '') {
+                return saved.trim();
+            }
+            return 'ldkimip@gmail.com';
+        }
+
+        function handleKopEmailInput(val) {
+            const rawVal = (val !== undefined && val !== null) ? String(val) : '';
+            localStorage.setItem('custom_kop_email', rawVal.trim());
+            const fieldEl = document.getElementById('field_kop_email');
+            if (fieldEl && fieldEl.value !== rawVal) fieldEl.value = rawVal;
+            const modalEl = document.getElementById('modal_input_kop_email');
+            if (modalEl && modalEl.value !== rawVal) modalEl.value = rawVal;
+            const quickEl = document.getElementById('quick_input_main');
+            if (quickEl && window.currentQuickEditTarget && window.currentQuickEditTarget.targetId === 'field_kop_email' && quickEl.value !== rawVal) {
+                quickEl.value = rawVal;
+            }
+            const modal = document.getElementById('modal_kustomisasi_logo');
+            if (modal && !modal.classList.contains('hidden')) {
+                sinkronkanFormKustomisasiLogo();
+            }
+            updatePreview();
+            if (typeof triggerAutoSave === 'function') triggerAutoSave();
+        }
+        window.handleKopEmailInput = handleKopEmailInput;
+
+        function resetKopEmailDefault() {
+            handleKopEmailInput('ldkimip@gmail.com');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Email Kop Direset',
+                    text: 'Email kop surat dikembalikan ke default (ldkimip@gmail.com).',
+                    timer: 1800,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
+        }
+        window.resetKopEmailDefault = resetKopEmailDefault;
+
         function getCustomLogoKabinet() {
             return localStorage.getItem('custom_logo_kabinet') || '';
         }
@@ -5541,7 +5614,7 @@
             `;
         }
 
-        // OFFICIAL REUSABLE KOP SURAT (HIGH-RES BANNER + DYNAMIC RIGHT LOGOS OVERLAY)
+        // OFFICIAL REUSABLE KOP SURAT (HIGH-RES BANNER + DYNAMIC RIGHT LOGOS & EMAIL OVERLAY)
         function generateOfficialKopHtml(marginBottom = '18pt') {
             const useKop = document.getElementById('field_use_kop') ? document.getElementById('field_use_kop').checked : true;
             if (!useKop) return '';
@@ -5557,6 +5630,7 @@
 
             const customKabinet = getCustomLogoKabinet();
             const customImip = getCustomLogoImip();
+            const kopEmail = getCustomKopEmail();
 
             // Slot 1: Logo Organisasi (sebelah kiri dari logo kabinet di sisi kanan banner)
             let orgLogoSlot = '';
@@ -5570,8 +5644,8 @@
                 orgLogoSlot = `
                     <div onclick="event.stopPropagation(); bukaModalKustomisasiLogo();" class="kop-logo-placeholder group flex flex-col items-center justify-center border border-dashed border-neutral-400 hover:border-blue-500 rounded p-0.5 sm:p-1 transition-all cursor-pointer bg-neutral-50/90 hover:bg-blue-50/80 print:hidden" style="height: 82%; width: 48%; text-align: center; box-sizing: border-box;" title="Ketuk untuk ganti Logo Organisasi">
                         <i class="fa-solid fa-plus text-[8px] text-neutral-500 group-hover:text-blue-600 mb-0.5"></i>
-                        <span style="font-size: 5.8pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; color: #334155; line-height: 1.1;" class="group-hover:text-blue-600">Logo Org</span>
-                        <span style="font-size: 4.6pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; color: #64748b; line-height: 1;">Ketuk ganti</span>
+                        <span style="font-size: 5.5pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; color: #334155; line-height: 1.1;" class="group-hover:text-blue-600">Logo Org</span>
+                        <span style="font-size: 4.4pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; color: #64748b; line-height: 1;">Ketuk ganti</span>
                     </div>
                 `;
             }
@@ -5588,24 +5662,32 @@
                 kabinetLogoSlot = `
                     <div onclick="event.stopPropagation(); bukaModalKustomisasiLogo();" class="kop-logo-placeholder group flex flex-col items-center justify-center border border-dashed border-neutral-400 hover:border-blue-500 rounded p-0.5 sm:p-1 transition-all cursor-pointer bg-neutral-50/90 hover:bg-blue-50/80 print:hidden" style="height: 82%; width: 48%; text-align: center; box-sizing: border-box;" title="Ketuk untuk ganti Logo Kabinet">
                         <i class="fa-solid fa-plus text-[8px] text-neutral-500 group-hover:text-blue-600 mb-0.5"></i>
-                        <span style="font-size: 5.8pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; color: #334155; line-height: 1.1;" class="group-hover:text-blue-600">Logo Kabinet</span>
-                        <span style="font-size: 4.6pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; color: #64748b; line-height: 1;">Ketuk ganti</span>
+                        <span style="font-size: 5.5pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; color: #334155; line-height: 1.1;" class="group-hover:text-blue-600">Logo Kabinet</span>
+                        <span style="font-size: 4.4pt; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; color: #64748b; line-height: 1;">Ketuk ganti</span>
                     </div>
                 `;
             }
 
-            // Always render white overlay to completely mask the hardcoded logos on the right of kop_spz_official.png
+            // Right logos overlay positioned strictly in the right logo zone (74.5%..98.8% horizontally) so "Jakarta Selatan 12640" (ends at 72.06%) is NEVER covered!
             const rightLogosOverlay = `
-                <div class="spz-kop-custom-right-logos" style="position: absolute; right: 1.2%; top: 3.5%; width: 28.5%; height: 83%; background: #ffffff; display: flex; align-items: center; justify-content: flex-end; gap: 6px; z-index: 5; padding-right: 4px; box-sizing: border-box;">
+                <div class="spz-kop-custom-right-logos" style="position: absolute; left: 74.5%; right: 1.2%; top: 3.5%; height: 83%; background: #ffffff; display: flex; align-items: center; justify-content: flex-end; gap: 4px; z-index: 5; padding-right: 2px; box-sizing: border-box;">
                     ${orgLogoSlot}
                     ${kabinetLogoSlot}
                 </div>
             `;
 
+            // Editable email overlay masking original email (y: 360..420 / 474 -> top: 74.2%, height: 16.5%) while staying clear of "Jakarta Selatan 12640" (ends at y=343) and bottom border (starts at y=452)
+            const emailOverlay = `
+                <div class="spz-kop-custom-email preview-editable cursor-pointer hover:ring-1 hover:ring-blue-400 rounded-xs transition-all" onclick="event.stopPropagation(); openPreviewQuickEdit(this);" data-edit-target="field_kop_email" data-edit-label="Email Kop Surat" data-edit-type="text" title="Klik untuk mengganti Email di Kop Surat" style="position: absolute; left: 20.5%; width: 52%; top: 74.2%; height: 16.5%; background: #ffffff; display: flex; align-items: center; justify-content: center; z-index: 6; box-sizing: border-box;">
+                    <span class="spz-kop-email-text" style="font-family: 'Times New Roman', Times, serif; font-size: 11pt; color: #1155cc; text-decoration: underline; line-height: 1; white-space: nowrap;">${escapeHtml(kopEmail)}</span>
+                </div>
+            `;
+
             return `
-                <div class="spz-kop-container preview-editable cursor-pointer hover:ring-2 hover:ring-blue-500/50 transition-all" onclick="bukaModalKustomisasiLogo()" data-edit-target="field_use_kop" data-edit-label="Kop Surat Resmi" data-edit-type="kop" title="Klik untuk ganti Logo Kabinet, Logo Organisasi, atau Watermark" style="position: relative; margin-bottom: ${marginBottom}; width: 100%;">
+                <div class="spz-kop-container preview-editable cursor-pointer hover:ring-2 hover:ring-blue-500/50 transition-all" onclick="bukaModalKustomisasiLogo()" data-edit-target="field_use_kop" data-edit-label="Kop Surat Resmi" data-edit-type="kop" title="Klik untuk ganti Logo Kabinet, Logo Organisasi, Email Kop, atau Watermark" style="position: relative; margin-bottom: ${marginBottom}; width: 100%;">
                     <img src="surat/assets/kop_spz_official.png" alt="Kop Surat Resmi Organisasi" style="width: 100%; height: auto; display: block; object-fit: contain;">
                     ${rightLogosOverlay}
+                    ${emailOverlay}
                 </div>
             `;
         }
@@ -5642,6 +5724,17 @@
         }
 
         function sinkronkanFormKustomisasiLogo() {
+            // 0. Email Kop
+            const curEmail = getCustomKopEmail();
+            const modalEmailInput = document.getElementById('modal_input_kop_email');
+            if (modalEmailInput && document.activeElement !== modalEmailInput) {
+                modalEmailInput.value = curEmail;
+            }
+            const fieldEmailInput = document.getElementById('field_kop_email');
+            if (fieldEmailInput && document.activeElement !== fieldEmailInput) {
+                fieldEmailInput.value = curEmail;
+            }
+
             // 1. Watermark
             const wmImg = document.getElementById('preview_thumb_watermark');
             const wmNoneNotice = document.getElementById('notice_watermark_none');
@@ -5777,9 +5870,12 @@
                     modalKopContainer.innerHTML = `
                         <div style="position: relative; width: 100%;">
                             <img src="surat/assets/kop_spz_official.png" alt="Kop Resmi" style="width: 100%; height: auto; display: block; object-fit: contain;">
-                            <div style="position: absolute; right: 1.2%; top: 3.5%; width: 28.5%; height: 83%; background: #ffffff; display: flex; align-items: center; justify-content: flex-end; gap: 6px; z-index: 5; padding-right: 4px; box-sizing: border-box;">
+                            <div style="position: absolute; left: 74.5%; right: 1.2%; top: 3.5%; height: 83%; background: #ffffff; display: flex; align-items: center; justify-content: flex-end; gap: 4px; z-index: 5; padding-right: 2px; box-sizing: border-box;">
                                 ${orgSlot}
                                 ${kabinetSlot}
+                            </div>
+                            <div style="position: absolute; left: 20.5%; width: 52%; top: 74.2%; height: 16.5%; background: #ffffff; display: flex; align-items: center; justify-content: center; z-index: 6; box-sizing: border-box;">
+                                <span style="font-family: 'Times New Roman', Times, serif; font-size: 8.5pt; color: #1155cc; text-decoration: underline; line-height: 1; white-space: nowrap;">${escapeHtml(curEmail)}</span>
                             </div>
                         </div>
                     `;
@@ -13349,7 +13445,7 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
         // Kumpulkan seluruh data form aktif ke objek JSON
         function collectCurrentFormData() {
             const fieldIds = [
-                'field_nomor_surat', 'field_nomor_urut', 'field_nomor_org', 'field_lampiran', 'field_lampiran_angka',
+                'field_kop_email', 'field_nomor_surat', 'field_nomor_urut', 'field_nomor_org', 'field_lampiran', 'field_lampiran_angka',
                 'field_tanggal_surat', 'field_tanggal_picker', 'field_perihal', 'spz_input_fasilitas',
                 'field_tujuan', 'field_nama_acara', 'field_hari_tanggal', 'field_waktu', 'field_tempat',
                 'field_pembuka', 'field_isi_inti', 'field_penutup',
@@ -13584,6 +13680,10 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                         el.value = d[key] !== undefined && d[key] !== null ? d[key] : '';
                     }
                 }
+            }
+            const kopEmailEl = document.getElementById('field_kop_email');
+            if (kopEmailEl && (!d['field_kop_email'] || !String(d['field_kop_email']).trim())) {
+                kopEmailEl.value = localStorage.getItem('custom_kop_email') || 'ldkimip@gmail.com';
             }
 
             // 4. Restore SPZ dynamic lists
@@ -16612,6 +16712,30 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                         <textarea id="quick_input_main" rows="3" placeholder="${escapeHtml(ph)}" 
                             oninput="syncQuickEditToForm('${targetId}', this.value)" 
                             class="form-input text-xs py-2 px-3 w-full leading-relaxed text-white bg-neutral-950 border-neutral-700 rounded-lg focus:border-neutral-400">${escapeHtml(val)}</textarea>
+                    </div>
+                `;
+            }
+
+            if (targetId === 'field_kop_email') {
+                const curEmailVal = getCustomKopEmail();
+                return `
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between mb-0.5">
+                            <label class="text-[11px] font-bold text-neutral-300 flex items-center gap-1.5">
+                                <i class="fa-solid fa-envelope text-blue-400"></i> Email Resmi Kop Surat
+                            </label>
+                            <button type="button" onclick="resetKopEmailDefault(); const q=document.getElementById('quick_input_main'); if(q) q.value='ldkimip@gmail.com';" class="text-[10px] text-blue-400 hover:text-white font-mono flex items-center gap-1">
+                                <i class="fa-solid fa-rotate-left"></i> Reset Default
+                            </button>
+                        </div>
+                        <input type="text" id="quick_input_main" value="${escapeHtml(curEmailVal)}" placeholder="ldkimip@gmail.com" 
+                            oninput="handleKopEmailInput(this.value)" 
+                            onkeydown="if(event.key==='Enter'){event.preventDefault(); closePreviewQuickEdit();}"
+                            class="form-input text-xs py-2 px-3 w-full font-mono text-white bg-neutral-950 border-neutral-700 rounded-lg focus:border-blue-400">
+                        <div class="flex items-center justify-between text-[10px] text-neutral-400 pt-0.5">
+                            <span>Tampil di bagian tengah bawah Kop Surat</span>
+                            <button type="button" onclick="bukaModalKustomisasiLogo()" class="text-blue-400 hover:underline font-semibold">Buka Pengaturan Kop &amp; Logo</button>
+                        </div>
                     </div>
                 `;
             }

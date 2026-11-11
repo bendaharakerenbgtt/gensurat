@@ -112,19 +112,57 @@ try {
     assert.strictEqual(customDosenNama, 'Prof. Ahmad Fauzi, M.T.', 'Nama Dosen Pembina harus bisa diganti bebas');
     assert.strictEqual(customDosenNim, 'NIP. 198501012015041002', 'NIP Dosen Pembina harus terupdate dinamis');
 
-    // Test 6: Reload page and confirm persistence
-    console.log('7. Testing persistence after reload...');
+    // Test 6: Verifikasi Overlay Logo Kanan Kop TIDAK Menutupi "Jakarta Selatan 12640" & Kustomisasi Email Kop
+    console.log('7. Verifying Kop Right Logos Overlay position & Custom Email Kop...');
+    const kopCheck = await page.evaluate(() => {
+        const rightOverlay = document.querySelector('.spz-kop-custom-right-logos');
+        const emailOverlay = document.querySelector('.spz-kop-custom-email');
+        const emailSpan = document.querySelector('.spz-kop-email-text');
+        return {
+            rightStyleLeft: rightOverlay ? rightOverlay.style.left : null,
+            hasEmailOverlay: !!emailOverlay,
+            defaultEmailText: emailSpan ? emailSpan.textContent.trim() : null
+        };
+    });
+    console.log('Kop Check Initial:', kopCheck);
+    assert.strictEqual(kopCheck.rightStyleLeft, '74.5%', 'Overlay logo kanan harus mulai dari left: 74.5% agar tidak menutupi teks Jakarta Selatan 12640 (yang berakhir di 72.06%)');
+    assert.strictEqual(kopCheck.hasEmailOverlay, true, 'Overlay email kop harus tersedia di atas kop surat');
+    assert.strictEqual(kopCheck.defaultEmailText, 'ldkimip@gmail.com', 'Default email kop harus ldkimip@gmail.com');
+
+    // Ganti email kop dan cek sinkronisasi di preview, form, dan modal
+    await page.evaluate(() => {
+        handleKopEmailInput('humas.bem@polimedia.ac.id');
+    });
+    await page.waitForTimeout(450);
+
+    const updatedEmailCheck = await page.evaluate(() => {
+        return {
+            previewText: document.querySelector('.spz-kop-email-text')?.textContent.trim(),
+            formVal: document.getElementById('field_kop_email')?.value,
+            modalVal: document.getElementById('modal_input_kop_email')?.value
+        };
+    });
+    console.log('Updated Email Check:', updatedEmailCheck);
+    assert.strictEqual(updatedEmailCheck.previewText, 'humas.bem@polimedia.ac.id', 'Teks email di preview kop harus berubah');
+    assert.strictEqual(updatedEmailCheck.formVal, 'humas.bem@polimedia.ac.id', 'Input form email kop harus tersinkronisasi');
+    assert.strictEqual(updatedEmailCheck.modalVal, 'humas.bem@polimedia.ac.id', 'Input modal email kop harus tersinkronisasi');
+
+    // Test 7: Reload page and confirm persistence
+    console.log('8. Testing persistence after reload...');
     await page.reload();
     await page.waitForSelector('.spz-kop-container', { timeout: 15000 });
 
     const persistedOrg = await page.evaluate(() => document.getElementById('field_nomor_org')?.value);
     const persistedDosenNama = await page.evaluate(() => document.getElementById('field_ttd3_nama')?.value);
+    const persistedKopEmail = await page.evaluate(() => document.querySelector('.spz-kop-email-text')?.textContent.trim());
     console.log('Persisted Org:', persistedOrg);
     console.log('Persisted Dosen:', persistedDosenNama);
+    console.log('Persisted Kop Email:', persistedKopEmail);
     assert.strictEqual(persistedOrg, 'HMJ-TI', 'Kode delegasi HMJ-TI harus tersimpan dan persisten');
     assert.strictEqual(persistedDosenNama, 'Prof. Ahmad Fauzi, M.T.', 'Nama custom dosen harus tersimpan dan persisten');
+    assert.strictEqual(persistedKopEmail, 'humas.bem@polimedia.ac.id', 'Email kop kustom harus tersimpan dan persisten setelah reload');
 
-    console.log('🎉 All 6 feature verification checks passed with 100% success!');
+    console.log('🎉 All 7 feature verification checks passed with 100% success!');
 } finally {
     await browser.close();
     server.close();
