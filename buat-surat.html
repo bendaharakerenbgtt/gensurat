@@ -5122,7 +5122,12 @@ Organisasi</textarea>
 
         function syncMpmJabatan() {
             const pEl = document.getElementById('field_ttd_mpm_periode');
-            const pVal = (pEl ? pEl.value.trim() : '') || 'Periode 2026';
+            let pVal = (pEl ? pEl.value.trim() : '');
+            if (!pVal) {
+                pVal = 'Periode 2026';
+            } else if (!/^periode\s+/i.test(pVal)) {
+                pVal = `Periode ${pVal}`;
+            }
             const jabEl = document.getElementById('field_ttd_mpm_jabatan');
             if (jabEl) {
                 jabEl.value = `Ketua Umum MPM\nPoliMedia ${pVal}`;
@@ -5131,7 +5136,12 @@ Organisasi</textarea>
 
         function syncBemJabatan() {
             const pEl = document.getElementById('field_ttd_bem_periode');
-            const pVal = (pEl ? pEl.value.trim() : '') || 'Periode 2026';
+            let pVal = (pEl ? pEl.value.trim() : '');
+            if (!pVal) {
+                pVal = 'Periode 2026';
+            } else if (!/^periode\s+/i.test(pVal)) {
+                pVal = `Periode ${pVal}`;
+            }
             const jabEl = document.getElementById('field_ttd_bem_jabatan');
             if (jabEl) {
                 jabEl.value = `Ketua BEM PoliMedia\n${pVal}`;
@@ -15996,9 +16006,11 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                 const ttd3Nama = document.getElementById('field_ttd3_nama')?.value || '';
                 const ttd3Nim = document.getElementById('field_ttd3_nim_angka')?.value || (document.getElementById('field_ttd3_nim')?.value || '').replace(/[^0-9]/g, '');
                 const mpmActive = document.getElementById('field_ttd_mpm_active')?.checked ?? true;
+                const mpmPeriode = document.getElementById('field_ttd_mpm_periode')?.value || 'Periode 2026';
                 const mpmNama = document.getElementById('field_ttd_mpm_nama')?.value || '';
                 const mpmNim = document.getElementById('field_ttd_mpm_nim_angka')?.value || (document.getElementById('field_ttd_mpm_nim')?.value || '').replace(/[^0-9]/g, '');
                 const bemActive = document.getElementById('field_ttd_bem_active')?.checked ?? true;
+                const bemPeriode = document.getElementById('field_ttd_bem_periode')?.value || 'Periode 2026';
                 const bemNama = document.getElementById('field_ttd_bem_nama')?.value || '';
                 const bemNim = document.getElementById('field_ttd_bem_nim_angka')?.value || (document.getElementById('field_ttd_bem_nim')?.value || '').replace(/[^0-9]/g, '');
                 return `
@@ -16046,6 +16058,12 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                                     <span>Aktif</span>
                                 </label>
                             </div>
+                            <div>
+                                <label class="text-[9.5px] text-neutral-400 block mb-0.5">Periode Jabatan MPM</label>
+                                <input type="text" value="${escapeHtml(mpmPeriode)}" placeholder="Periode 2026" 
+                                    oninput="handleQuickFormText('field_ttd_mpm_periode', this.value); syncMpmJabatan(); updatePreview();" 
+                                    class="form-input text-xs py-1.5 px-2 bg-neutral-900 border-neutral-700 font-mono text-white rounded-lg focus:border-neutral-400 w-full" title="Bisa diubah, misal: Periode 2026 atau 2026/2027">
+                            </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="text-[9.5px] text-neutral-400 block mb-0.5">Nama Lengkap Ketua MPM</label>
@@ -16071,6 +16089,12 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh.`;
                                     <input type="checkbox" ${bemActive ? 'checked' : ''} onchange="syncQuickCheckboxToForm('field_ttd_bem_active', this.checked); updateTtdState();" class="rounded border-neutral-700 text-blue-500 focus:ring-neutral-400 w-3 h-3">
                                     <span>Aktif</span>
                                 </label>
+                            </div>
+                            <div>
+                                <label class="text-[9.5px] text-neutral-400 block mb-0.5">Periode Jabatan BEM</label>
+                                <input type="text" value="${escapeHtml(bemPeriode)}" placeholder="Periode 2026" 
+                                    oninput="handleQuickFormText('field_ttd_bem_periode', this.value); syncBemJabatan(); updatePreview();" 
+                                    class="form-input text-xs py-1.5 px-2 bg-neutral-900 border-neutral-700 font-mono text-white rounded-lg focus:border-neutral-400 w-full" title="Bisa diubah, misal: Periode 2026 atau 2026/2027">
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
