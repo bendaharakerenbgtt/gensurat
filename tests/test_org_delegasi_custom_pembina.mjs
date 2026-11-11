@@ -93,22 +93,31 @@ try {
     assert.strictEqual(mpmNim, '2491345088', 'NIM Ketua MPM harus tetap 2491345088');
     assert.strictEqual(wadirNama, 'Dr. Dayu Sri Herti, S.Pd., M.Sn.', 'Nama Wadir harus tetap Dr. Dayu Sri Herti, S.Pd., M.Sn.');
 
-    // Test 5: Kustomisasi Pembina / Dosen Penasihat
-    console.log('6. Customizing Dosen Pembina name & NIP...');
+    // Test 5: Kustomisasi Jabatan, Nama & NIP Dosen Pembina
+    console.log('6. Verifying default Jabatan Dosen Pembina & customizing Jabatan, Name, and NIP...');
+    const defaultDosenJabatan = await page.evaluate(() => document.getElementById('field_ttd3_jabatan')?.value);
+    console.log('Default Dosen Jabatan:', JSON.stringify(defaultDosenJabatan));
+    assert.strictEqual(defaultDosenJabatan, 'Dosen Pembina\nOrganisasi', 'Default jabatan harus Dosen Pembina\\nOrganisasi');
+
     await page.evaluate(() => {
+        const j = document.getElementById('field_ttd3_jabatan');
         const n = document.getElementById('field_ttd3_nama');
         const a = document.getElementById('field_ttd3_nim_angka');
+        if (j) j.value = 'Dosen Pembina\nUKM Riset & Teknologi';
         if (n) n.value = 'Prof. Ahmad Fauzi, M.T.';
         if (a) {
             a.value = '198501012015041002';
             handleNipInput('field_ttd3_nim_angka', 'field_ttd3_nim');
         }
+        updatePreview();
         triggerAutoSave();
     });
     await page.waitForTimeout(300);
 
+    const customDosenJabatan = await page.evaluate(() => document.getElementById('field_ttd3_jabatan')?.value);
     const customDosenNama = await page.evaluate(() => document.getElementById('field_ttd3_nama')?.value);
     const customDosenNim = await page.evaluate(() => document.getElementById('field_ttd3_nim')?.value);
+    assert.strictEqual(customDosenJabatan, 'Dosen Pembina\nUKM Riset & Teknologi', 'Jabatan Dosen Pembina harus bisa diedit bebas');
     assert.strictEqual(customDosenNama, 'Prof. Ahmad Fauzi, M.T.', 'Nama Dosen Pembina harus bisa diganti bebas');
     assert.strictEqual(customDosenNim, 'NIP. 198501012015041002', 'NIP Dosen Pembina harus terupdate dinamis');
 
@@ -153,12 +162,15 @@ try {
     await page.waitForSelector('.spz-kop-container', { timeout: 15000 });
 
     const persistedOrg = await page.evaluate(() => document.getElementById('field_nomor_org')?.value);
+    const persistedDosenJabatan = await page.evaluate(() => document.getElementById('field_ttd3_jabatan')?.value);
     const persistedDosenNama = await page.evaluate(() => document.getElementById('field_ttd3_nama')?.value);
     const persistedKopEmail = await page.evaluate(() => document.querySelector('.spz-kop-email-text')?.textContent.trim());
     console.log('Persisted Org:', persistedOrg);
+    console.log('Persisted Dosen Jabatan:', JSON.stringify(persistedDosenJabatan));
     console.log('Persisted Dosen:', persistedDosenNama);
     console.log('Persisted Kop Email:', persistedKopEmail);
     assert.strictEqual(persistedOrg, 'HMJ-TI', 'Kode delegasi HMJ-TI harus tersimpan dan persisten');
+    assert.strictEqual(persistedDosenJabatan, 'Dosen Pembina\nUKM Riset & Teknologi', 'Jabatan custom dosen pembina harus tersimpan dan persisten');
     assert.strictEqual(persistedDosenNama, 'Prof. Ahmad Fauzi, M.T.', 'Nama custom dosen harus tersimpan dan persisten');
     assert.strictEqual(persistedKopEmail, 'humas.bem@polimedia.ac.id', 'Email kop kustom harus tersimpan dan persisten setelah reload');
 
